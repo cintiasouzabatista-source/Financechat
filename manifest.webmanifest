@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#0b1220",
   "theme_color": "#2563eb",
-  "description": "Finance em formato de chat (offline).",
+  "description": "Finance via chat (Opção B) — V14.",
   "icons": [
     {
       "src": "./icons/icon-192.png",

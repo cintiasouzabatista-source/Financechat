@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta charset="utf-8" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
   <title>Finance • Chat</title>
+  <link rel="icon" href="./favicon.ico">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#2563eb">
   <style>
@@ -1846,7 +1848,7 @@
     filterType.addEventListener("change", () => { state.ui.filterType = filterType.value; save(); renderTx(); });
     filterMethod.addEventListener("change", () => { state.ui.filterMethod = filterMethod.value; save(); renderTx(); });
 
-    document.getElementById("btnExport").addEventListener("click", () => {
+    document.getElementById("btnExport")?.addEventListener("click", () => {
       const payload = JSON.stringify(state, null, 2);
       const blob = new Blob([payload], {type:"application/json"});
       const url = URL.createObjectURL(blob);
@@ -1860,7 +1862,7 @@
     // =========================
     // Add account/card
     // =========================
-    document.getElementById("btnAddAccount").addEventListener("click", () => {
+    document.getElementById("btnAddAccount")?.addEventListener("click", () => {
       const name = prompt("Nome da conta (ex: Mercado Pago, VR, VA):");
       if(!name) return;
       state.accounts.push({ id: uid(), name: name.trim(), balance: 0 });
@@ -1870,7 +1872,7 @@
       renderAccountsCards();
     });
 
-    document.getElementById("btnAddCard").addEventListener("click", () => {
+    document.getElementById("btnAddCard")?.addEventListener("click", () => {
       const name = prompt("Nome do cartão (ex: Nubank):");
       if(!name) return;
       state.cards.push({ id: uid(), name: name.trim() });
@@ -1882,7 +1884,7 @@
     // =========================
     // Seed examples + Reset
     // =========================
-    document.getElementById("btnSeed").addEventListener("click", () => {
+    document.getElementById("btnSeed")?.addEventListener("click", () => {
       const samples = [
         "Salário 4400 hoje no Mercado Pago",
         "Uber 23,90 hoje no Nubank",
@@ -1897,7 +1899,7 @@
       input.focus();
     });
 
-    document.getElementById("btnReset").addEventListener("click", () => {
+    document.getElementById("btnReset")?.addEventListener("click", () => {
       const ok = confirm("Tem certeza que deseja apagar TUDO (chat + transações)?");
       if(!ok) return;
       state = defaultData();
@@ -2084,9 +2086,9 @@
       syncMonthUI();
     }
 
-    document.getElementById("btnCloseEdit").addEventListener("click", closeEditModal);
-    document.getElementById("btnEditCancel").addEventListener("click", closeEditModal);
-    document.getElementById("btnEditSave").addEventListener("click", saveEdit);
+    document.getElementById("btnCloseEdit")?.addEventListener("click", closeEditModal);
+    document.getElementById("btnEditCancel")?.addEventListener("click", closeEditModal);
+    document.getElementById("btnEditSave")?.addEventListener("click", saveEdit);
     editOverlay.addEventListener("click", (e) => { if(e.target === editOverlay) closeEditModal(); });
 
     // =========================

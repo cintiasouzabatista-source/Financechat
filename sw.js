@@ -1,11 +1,12 @@
-/* Finance Chat PWA - offline cache (v12) */
-const CACHE_VERSION = "v12-20260305-1";
+/* Finance Chat PWA - offline cache (v14) */
+const CACHE_VERSION = "v14-20260305-1";
 const CACHE_NAME = `finance-chat-${CACHE_VERSION}`;
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./sw.js",
+  "./favicon.ico",
   "./icons/icon-192.png",
   "./icons/icon-192-maskable.png",
   "./icons/icon-512.png",
@@ -26,6 +27,7 @@ self.addEventListener("activate", (event) => {
   })());
 });
 
+// Network-first para HTML
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
@@ -37,7 +39,7 @@ self.addEventListener("fetch", (event) => {
         const cache = await caches.open(CACHE_NAME);
         cache.put("./index.html", res.clone());
         return res;
-      } catch (e) {
+      } catch {
         return (await caches.match("./index.html")) || Response.error();
       }
     })());
