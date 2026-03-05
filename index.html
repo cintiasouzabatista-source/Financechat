@@ -2,194 +2,418 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Finanças • Chat</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#2563eb">
   <style>
     :root{
-      --bg:#f6f7fb; --panel:#fff; --text:#101828; --muted:#667085; --border:#e4e7ec;
-      --accent:#2563eb; --accent-2:#16a34a; --danger:#dc2626;
-      --shadow:0 10px 30px rgba(16,24,40,.08);
-      --bubble-ai:#eef2ff; --bubble-me:#e7f7ee; --chip:#f2f4f7; --input:#fff;
-      --ring:0 0 0 4px rgba(37,99,235,.15);
-      --radius2:22px;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #101828;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --accent: #2563eb;
+      --accent-2:#16a34a;
+      --danger:#dc2626;
+      --shadow: 0 10px 30px rgba(16,24,40,.08);
+      --bubble-ai:#eef2ff;
+      --bubble-me:#e7f7ee;
+      --chip:#f2f4f7;
+      --input:#ffffff;
+      --ring: 0 0 0 4px rgba(37,99,235,.15);
+      --radius: 18px;
+      --radius2: 22px;
       --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
     html[data-theme="dark"]{
-      --bg:#0b1220; --panel:#0f172a; --text:#e5e7eb; --muted:#94a3b8; --border:#1f2a44;
-      --accent:#60a5fa; --accent-2:#34d399; --danger:#fb7185;
-      --shadow:0 12px 30px rgba(0,0,0,.45);
-      --bubble-ai:#111c36; --bubble-me:#0f2a1f; --chip:#111c36; --input:#0b1328;
-      --ring:0 0 0 4px rgba(96,165,250,.18);
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #1f2a44;
+      --accent: #60a5fa;
+      --accent-2:#34d399;
+      --danger:#fb7185;
+      --shadow: 0 12px 30px rgba(0,0,0,.45);
+      --bubble-ai:#111c36;
+      --bubble-me:#0f2a1f;
+      --chip:#111c36;
+      --input:#0b1328;
+      --ring: 0 0 0 4px rgba(96,165,250,.18);
     }
+
     *{box-sizing:border-box}
-    body{margin:0; font-family:var(--font); background:var(--bg); color:var(--text);}
-    .app{min-height:100vh; display:grid; grid-template-columns:280px 1fr;}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+
+    .app{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: 280px 1fr;
+    }
 
     /* Sidebar */
-    .sidebar{padding:18px; border-right:1px solid var(--border); background:var(--panel);}
-    .brand{display:flex; align-items:center; gap:10px; padding:10px 10px 16px;}
-    .logo{width:38px; height:38px; border-radius:14px;
-      background:radial-gradient(circle at 30% 30%, rgba(37,99,235,.9), rgba(37,99,235,.25)),
-                 radial-gradient(circle at 70% 70%, rgba(22,163,74,.85), rgba(22,163,74,.22));
-      box-shadow:var(--shadow);
+    .sidebar{
+      padding:18px;
+      border-right:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.0), rgba(255,255,255,.0)), var(--panel);
     }
-    .brand h1{font-size:15px; margin:0;}
-    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted);}
-    .nav{margin-top:10px; display:flex; flex-direction:column; gap:8px;}
-    .nav button{
-      width:100%; border:1px solid var(--border); background:transparent; color:var(--text);
-      padding:12px; border-radius:14px; text-align:left;
-      display:flex; align-items:center; justify-content:space-between;
-      cursor:pointer; transition:transform .06s ease, background .2s ease, border-color .2s ease;
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 10px 16px;
     }
-    .nav button:hover{background:rgba(37,99,235,.06);}
-    html[data-theme="dark"] .nav button:hover{background:rgba(96,165,250,.08);}
-    .nav button:active{transform:scale(.99);}
-    .nav button[aria-current="page"]{background:rgba(37,99,235,.10); border-color:rgba(37,99,235,.25);}
-    html[data-theme="dark"] .nav button[aria-current="page"]{background:rgba(96,165,250,.12); border-color:rgba(96,165,250,.25);}
-    .badge{font-size:12px; padding:4px 10px; border-radius:999px; background:var(--chip); color:var(--muted); border:1px solid var(--border);}
+    .logo{
+      width:38px; height:38px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(37,99,235,.9), rgba(37,99,235,.25)),
+                  radial-gradient(circle at 70% 70%, rgba(22,163,74,.85), rgba(22,163,74,.22));
+      box-shadow: var(--shadow);
+    }
+    .brand h1{
+      font-size:15px; margin:0;
+      letter-spacing:.2px;
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size:12px;
+      color:var(--muted);
+    }
 
-    .sidebar-footer{margin-top:auto; padding-top:14px;}
-    .toggle{border:1px solid var(--border); background:var(--panel); border-radius:16px; padding:12px; display:flex; align-items:center; justify-content:space-between;}
-    .toggle small{color:var(--muted); display:block; margin-top:2px; font-size:12px;}
-    .switch{width:48px; height:28px; border-radius:999px; background:rgba(102,112,133,.25); border:1px solid var(--border); position:relative; cursor:pointer;}
-    .knob{position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:999px; background:var(--panel); box-shadow:0 6px 16px rgba(0,0,0,.18); transition:left .18s ease;}
-    html[data-theme="dark"] .switch{background:rgba(96,165,250,.25);}
-    html[data-theme="dark"] .knob{left:23px;}
+    .nav{
+      margin-top:10px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .nav button{
+      width:100%;
+      border:1px solid var(--border);
+      background:transparent;
+      color:var(--text);
+      padding:12px 12px;
+      border-radius:14px;
+      text-align:left;
+      display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+    .nav button:hover{ background: rgba(37,99,235,.06); }
+    html[data-theme="dark"] .nav button:hover{ background: rgba(96,165,250,.08); }
+    .nav button:active{ transform: scale(.99); }
+    .nav button[aria-current="page"]{
+      background: rgba(37,99,235,.10);
+      border-color: rgba(37,99,235,.25);
+    }
+    html[data-theme="dark"] .nav button[aria-current="page"]{
+      background: rgba(96,165,250,.12);
+      border-color: rgba(96,165,250,.25);
+    }
+    .badge{
+      font-size:12px;
+      padding:4px 10px;
+      border-radius:999px;
+      background: var(--chip);
+      color: var(--muted);
+      border:1px solid var(--border);
+    }
+
+    .sidebar-footer{
+      margin-top:auto;
+      padding-top:14px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .toggle{
+      border:1px solid var(--border);
+      background: var(--panel);
+      border-radius:16px;
+      padding:12px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow: none;
+    }
+    .toggle small{ color:var(--muted); display:block; margin-top:2px; font-size:12px; }
+    .switch{
+      width:48px; height:28px; border-radius:999px;
+      background: rgba(102,112,133,.25);
+      border:1px solid var(--border);
+      position:relative;
+      cursor:pointer;
+      flex: 0 0 auto;
+    }
+    .knob{
+      position:absolute; top:3px; left:3px;
+      width:22px; height:22px; border-radius:999px;
+      background: var(--panel);
+      box-shadow: 0 6px 16px rgba(0,0,0,.18);
+      transition: left .18s ease, transform .18s ease;
+    }
+    html[data-theme="dark"] .switch{ background: rgba(96,165,250,.25); }
+    html[data-theme="dark"] .knob{ left:23px; }
 
     /* Main */
-    .main{padding:18px; display:flex; flex-direction:column; gap:14px; min-height:100vh;}
+    .main{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
     .topbar{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:14px 16px; border:1px solid var(--border); border-radius:var(--radius2);
-      background:var(--panel); box-shadow:var(--shadow);
+      padding:14px 16px;
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: var(--panel);
+      box-shadow: var(--shadow);
     }
-    .topbar h2{margin:0; font-size:16px;}
-    .topbar p{margin:0; font-size:13px; color:var(--muted);}
-    .topbar .title{display:flex; flex-direction:column; gap:2px;}
-    .topbar .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-
+    .topbar .title{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .topbar h2{ margin:0; font-size:16px; }
+    .topbar p{ margin:0; font-size:13px; color:var(--muted); }
+    .topbar .actions{
+      display:flex; gap:10px; align-items:center;
+    }
     .btn{
-      border:1px solid var(--border); background:transparent; color:var(--text);
-      padding:10px 12px; border-radius:14px; cursor:pointer;
-      transition:background .2s ease, transform .06s ease, border-color .2s ease;
-      font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: background .2s ease, transform .06s ease, border-color .2s ease;
+      font-weight:600;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
-    .btn:hover{background:rgba(37,99,235,.06);}
-    html[data-theme="dark"] .btn:hover{background:rgba(96,165,250,.08);}
-    .btn:active{transform:scale(.99);}
-    .btn.primary{background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25);}
-    html[data-theme="dark"] .btn.primary{background:rgba(96,165,250,.14); border-color:rgba(96,165,250,.25);}
-    .btn.danger{background:rgba(220,38,38,.10); border-color:rgba(220,38,38,.25);}
-    html[data-theme="dark"] .btn.danger{background:rgba(251,113,133,.12); border-color:rgba(251,113,133,.25);}
-    .btn.small{padding:8px 10px; border-radius:12px; font-size:12px;}
-    .btn.icon{width:36px; height:36px; padding:0; justify-content:center; border-radius:12px;}
+    .btn:hover{ background: rgba(37,99,235,.06); }
+    html[data-theme="dark"] .btn:hover{ background: rgba(96,165,250,.08); }
+    .btn:active{ transform: scale(.99); }
+    .btn.primary{
+      background: rgba(37,99,235,.12);
+      border-color: rgba(37,99,235,.25);
+      color: var(--text);
+    }
+    html[data-theme="dark"] .btn.primary{
+      background: rgba(96,165,250,.14);
+      border-color: rgba(96,165,250,.25);
+    }
+    .btn.danger{
+      background: rgba(220,38,38,.10);
+      border-color: rgba(220,38,38,.25);
+    }
+    html[data-theme="dark"] .btn.danger{
+      background: rgba(251,113,133,.12);
+      border-color: rgba(251,113,133,.25);
+    }
 
     /* Views */
-    .view{flex:1; display:none; min-height:0;}
-    .view.active{display:flex; flex-direction:column; min-height:0;}
+    .view{
+      flex:1;
+      display:none;
+      min-height:0;
+    }
+    .view.active{ display:flex; flex-direction:column; min-height:0; }
 
     /* Chat */
     .chat-card{
-      flex:1; display:flex; flex-direction:column;
-      border:1px solid var(--border); border-radius:var(--radius2);
-      background:var(--panel); box-shadow:var(--shadow);
-      overflow:hidden; min-height:0;
+      flex:1;
+      display:flex; flex-direction:column;
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-height:0;
     }
     .chat-header{
-      padding:14px 16px; border-bottom:1px solid var(--border);
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background:linear-gradient(180deg, rgba(37,99,235,.06), rgba(37,99,235,0));
+      background: linear-gradient(180deg, rgba(37,99,235,.06), rgba(37,99,235,0));
     }
-    html[data-theme="dark"] .chat-header{background:linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,0));}
-    .chat-header h3{margin:0; font-size:15px;}
-    .chat-header span{font-size:12px; color:var(--muted);}
-    .chat-body{padding:16px; overflow:auto; display:flex; flex-direction:column; gap:10px; min-height:0;}
-    .msg-row{display:flex; gap:10px; align-items:flex-end;}
-    .msg-row.me{justify-content:flex-end;}
+    html[data-theme="dark"] .chat-header{
+      background: linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,0));
+    }
+    .chat-header .left{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .chat-header h3{ margin:0; font-size:15px; }
+    .chat-header span{ font-size:12px; color:var(--muted); }
+    .chat-body{
+      padding:16px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:0;
+    }
+    .msg-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+    }
+    .msg-row.me{ justify-content:flex-end; }
     .bubble{
       max-width:min(560px, 88%);
-      padding:10px 12px; border-radius:16px; border:1px solid var(--border);
-      background:var(--bubble-ai); box-shadow:0 10px 20px rgba(0,0,0,.05);
-      line-height:1.25rem; font-size:14px; white-space:pre-wrap; word-break:break-word;
+      padding:10px 12px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: var(--bubble-ai);
+      box-shadow: 0 10px 20px rgba(0,0,0,.05);
+      line-height:1.25rem;
+      font-size:14px;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
-    .msg-row.me .bubble{background:var(--bubble-me);}
-    .meta{font-size:11px; color:var(--muted); margin-top:4px; display:flex; justify-content:flex-end;}
-    .pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--chip); color:var(--muted);}
-    .chat-input{border-top:1px solid var(--border); padding:12px; display:flex; gap:10px; align-items:flex-end; background:var(--panel);}
-    .textarea{
-      flex:1; border:1px solid var(--border); background:var(--input); color:var(--text);
-      border-radius:16px; padding:10px 12px; min-height:44px; max-height:120px; resize:none; outline:none;
-      font-size:14px; line-height:1.25rem;
+    .msg-row.me .bubble{ background: var(--bubble-me); }
+    .meta{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:4px;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
     }
-    .textarea:focus{box-shadow:var(--ring); border-color:rgba(37,99,235,.35);}
-    html[data-theme="dark"] .textarea:focus{border-color:rgba(96,165,250,.45);}
-    .icon-btn{
-      width:44px; height:44px; border-radius:16px; border:1px solid var(--border);
-      background:transparent; display:grid; place-items:center; cursor:pointer;
-      transition:background .2s ease, transform .06s ease;
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: var(--chip);
+      color: var(--muted);
     }
-    .icon-btn:hover{background:rgba(37,99,235,.06);}
-    html[data-theme="dark"] .icon-btn:hover{background:rgba(96,165,250,.08);}
-    .icon-btn:active{transform:scale(.99);}
-    .icon{width:20px; height:20px; display:block; fill:currentColor; color:var(--text);}
 
-    /* Cards / Tables */
-    .card{border:1px solid var(--border); border-radius:var(--radius2); background:var(--panel); box-shadow:var(--shadow); overflow:hidden; min-height:0;}
-    .card-head{padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
-    .card-head h3{margin:0; font-size:15px;}
-    .filters{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-    select, input[type="month"], input[type="date"], input[type="text"], input[type="number"]{
-      border:1px solid var(--border); background:var(--input); color:var(--text);
-      padding:8px 10px; border-radius:12px; outline:none; font-size:13px;
+    .chat-input{
+      border-top:1px solid var(--border);
+      padding:12px;
+      display:flex; gap:10px; align-items:flex-end;
+      background: var(--panel);
     }
-    select:focus, input:focus{box-shadow:var(--ring);}
-    table{width:100%; border-collapse:collapse; font-size:13px;}
-    th, td{padding:12px 14px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top;}
-    th{color:var(--muted); font-weight:700; font-size:12px;}
-    .amount{font-weight:800;}
-    .pos{color:var(--accent-2);}
-    .neg{color:var(--danger);}
-    .muted{color:var(--muted);}
-    .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; min-height:0;}
-    .grid .card{min-height:260px;}
+    .textarea{
+      flex:1;
+      border:1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      border-radius: 16px;
+      padding:10px 12px;
+      min-height:44px;
+      max-height:120px;
+      resize:none;
+      outline:none;
+      font-size:14px;
+      line-height:1.25rem;
+    }
+    .textarea:focus{ box-shadow: var(--ring); border-color: rgba(37,99,235,.35); }
+    html[data-theme="dark"] .textarea:focus{ border-color: rgba(96,165,250,.45); }
+
+    .icon-btn{
+      width:44px; height:44px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: transparent;
+      display:grid; place-items:center;
+      cursor:pointer;
+      transition: background .2s ease, transform .06s ease;
+    }
+    .icon-btn:hover{ background: rgba(37,99,235,.06); }
+    html[data-theme="dark"] .icon-btn:hover{ background: rgba(96,165,250,.08); }
+    .icon-btn:active{ transform: scale(.99); }
+    .icon{
+      width:20px; height:20px; display:block;
+      fill: currentColor;
+      color: var(--text);
+    }
+
+    /* Tables (Transações / Contas / Cartões) */
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-height:0;
+    }
+    .card-head{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .card-head h3{ margin:0; font-size:15px; }
+    .filters{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    select, input[type="month"]{
+      border:1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      padding:8px 10px;
+      border-radius: 12px;
+      outline:none;
+    }
+    select:focus, input[type="month"]:focus{ box-shadow: var(--ring); }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    th, td{
+      padding:12px 14px;
+      border-bottom:1px solid var(--border);
+      text-align:left;
+      vertical-align:top;
+    }
+    th{ color:var(--muted); font-weight:700; font-size:12px; }
+    .amount{ font-weight:800; }
+    .pos{ color: var(--accent-2); }
+    .neg{ color: var(--danger); }
+    .muted{ color: var(--muted); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      min-height:0;
+    }
+    .grid .card{ min-height:260px; }
 
     /* Charts */
-    .chart-wrap{padding:14px 16px 16px;}
-    .chart-legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
-    .legend-item{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--chip); font-size:12px; color:var(--muted);}
-    .dot{width:10px; height:10px; border-radius:999px; background:var(--accent); border:1px solid rgba(0,0,0,.12);}
-
-    /* Modal */
-    .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:16px; z-index:9999;}
-    .modal-overlay.open{display:flex;}
-    .modal{width:min(560px, 100%); background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:var(--radius2); box-shadow:0 20px 60px rgba(0,0,0,.35); overflow:hidden;}
-    .modal-head{padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px;
-      background:linear-gradient(180deg, rgba(37,99,235,.06), rgba(37,99,235,0));
+    .chart-wrap{ padding:14px 16px 16px; }
+    .chart-legend{
+      display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;
     }
-    html[data-theme="dark"] .modal-head{background:linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,0));}
-    .modal-head h3{margin:0; font-size:15px;}
-    .modal-body{padding:14px 16px; display:grid; gap:10px;}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-    .row.single{grid-template-columns:1fr;}
-    label{font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:6px;}
-    .modal-actions{padding:14px 16px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;}
+    .legend-item{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--border); background: var(--chip);
+      font-size:12px; color: var(--muted);
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px; background: var(--accent);
+      border:1px solid rgba(0,0,0,.12);
+    }
 
+    /* Mobile */
     @media (max-width: 920px){
-      .app{grid-template-columns:1fr;}
-      .sidebar{border-right:none; border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:center;}
-      .nav{flex-direction:row; gap:8px; overflow:auto; padding-bottom:6px;}
-      .nav button{white-space:nowrap;}
-      .sidebar-footer{margin-top:0; padding-top:0;}
-      .grid{grid-template-columns:1fr;}
-      .row{grid-template-columns:1fr;}
+      .app{ grid-template-columns: 1fr; }
+      .sidebar{
+        border-right:none;
+        border-bottom:1px solid var(--border);
+        display:flex; gap:10px; align-items:center;
+      }
+      .nav{ flex-direction:row; gap:8px; overflow:auto; padding-bottom:6px; }
+      .nav button{ white-space:nowrap; }
+      .sidebar-footer{ margin-top:0; padding-top:0; }
+      .grid{ grid-template-columns:1fr; }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
     <aside class="sidebar">
@@ -198,16 +422,27 @@
           <div class="logo" aria-hidden="true"></div>
           <div style="min-width:0;">
             <h1>Finanças • Chat</h1>
-            <p>Parcelas por mês • editar/excluir: só esta ou todas</p>
+            <p>Estilo WhatsApp, com menus</p>
           </div>
         </div>
 
         <nav class="nav" aria-label="Navegação">
-          <button data-view="chat" aria-current="page"><span>💬 Chat IA</span><span class="badge">Ativo</span></button>
-          <button data-view="tx"><span>🧾 Transações</span><span class="badge" id="badgeTx">0</span></button>
-          <button data-view="saldo"><span>💰 Saldo</span><span class="badge">Mês</span></button>
-          <button data-view="accounts"><span>🏦 Contas e Cartões</span><span class="badge">Resumo</span></button>
-          <button data-view="charts"><span>📊 Gráficos</span><span class="badge">%</span></button>
+          <button data-view="chat" aria-current="page">
+            <span>💬 Chat IA</span>
+            <span class="badge" id="badgeChat">Ativo</span>
+          </button>
+          <button data-view="tx">
+            <span>🧾 Transações</span>
+            <span class="badge" id="badgeTx">0</span>
+          </button>
+          <button data-view="accounts">
+            <span>🏦 Contas e Cartões</span>
+            <span class="badge">Resumo</span>
+          </button>
+          <button data-view="charts">
+            <span>📊 Gráficos</span>
+            <span class="badge">%</span>
+          </button>
         </nav>
       </div>
 
@@ -217,7 +452,9 @@
             <strong style="font-size:13px;">Tema</strong>
             <small id="themeLabel">Claro</small>
           </div>
-          <div class="switch" id="themeSwitch" role="switch" aria-checked="false" tabindex="0"><div class="knob" aria-hidden="true"></div></div>
+          <div class="switch" id="themeSwitch" role="switch" aria-checked="false" tabindex="0">
+            <div class="knob" aria-hidden="true"></div>
+          </div>
         </div>
       </div>
     </aside>
@@ -234,7 +471,7 @@
         </div>
       </header>
 
-      <!-- CHAT -->
+      <!-- VIEW: CHAT -->
       <section class="view active" id="view-chat">
         <div class="chat-card">
           <div class="chat-header">
@@ -242,7 +479,9 @@
               <h3>Chat IA</h3>
               <span>Digite ou fale — eu registro em Transações</span>
             </div>
-            <span class="pill" id="statusPill">🟢 Pronto</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span class="pill" id="statusPill">🟢 Pronto</span>
+            </div>
           </div>
 
           <div class="chat-body" id="chatBody"></div>
@@ -253,7 +492,9 @@
                 <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/>
               </svg>
             </button>
-            <textarea class="textarea" id="msgInput" placeholder="Ex: Uber 23,90 hoje no Nubank • Mercado 180 no crédito Mercado Pago em 3x • Netflix 39,90 todo mês" rows="1"></textarea>
+
+            <textarea class="textarea" id="msgInput" placeholder="Ex: Uber 23,90 hoje no Nubank • ou • Salário 4400 entrou no Mercado Pago" rows="1"></textarea>
+
             <button class="icon-btn" id="btnSend" title="Enviar">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M2 21 23 12 2 3v7l15 2-15 2v7Z"/>
@@ -263,7 +504,7 @@
         </div>
       </section>
 
-      <!-- TRANSAÇÕES -->
+      <!-- VIEW: TRANSAÇÕES -->
       <section class="view" id="view-tx">
         <div class="card" style="min-height:0;">
           <div class="card-head">
@@ -276,7 +517,9 @@
                 <option value="expense">Despesas</option>
                 <option value="transfer">Transferências</option>
               </select>
-              <select id="filterMethod"><option value="all">Todas (contas/cartões)</option></select>
+              <select id="filterMethod">
+                <option value="all">Todas (contas/cartões)</option>
+              </select>
               <button class="btn" id="btnExport">Exportar JSON</button>
             </div>
           </div>
@@ -285,7 +528,11 @@
             <table>
               <thead>
                 <tr>
-                  <th>Data</th><th>Descrição</th><th>Categoria</th><th>Método</th><th>Valor</th><th style="width:120px;">Ações</th>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Método</th>
+                  <th>Valor</th>
                 </tr>
               </thead>
               <tbody id="txTableBody"></tbody>
@@ -294,94 +541,7 @@
         </div>
       </section>
 
-
-      <!-- SALDO -->
-      <section class="view" id="view-saldo">
-        <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="card">
-            <div class="card-head">
-              <h3>Receitas</h3>
-              <span class="muted" id="saldoMonth1"></span>
-            </div>
-            <div style="padding:14px 16px;">
-              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" class="pos" id="cardIncome">R$ 0,00</div>
-              <div class="muted" style="margin-top:6px;">Total de receitas do mês</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-head">
-              <h3>Despesas</h3>
-              <span class="muted" id="saldoMonth2"></span>
-            </div>
-            <div style="padding:14px 16px;">
-              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" class="neg" id="cardExpense">R$ 0,00</div>
-              <div class="muted" style="margin-top:6px;">Total de despesas do mês (conta + cartão)</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-head">
-              <h3>Resultado</h3>
-              <span class="muted" id="saldoMonth3"></span>
-            </div>
-            <div style="padding:14px 16px;">
-              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" id="cardResult">R$ 0,00</div>
-              <div class="muted" style="margin-top:6px;">Receitas − Despesas (mês)</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid" style="margin-top:14px; grid-template-columns: 1.2fr .8fr;">
-          <div class="card">
-            <div class="card-head">
-              <h3>Cartões / Faturas do mês</h3>
-              <span class="muted" id="saldoMonth4"></span>
-            </div>
-            <div style="padding:0 0 6px;">
-              <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                <div class="muted">Total (todos os cartões)</div>
-                <div class="amount neg" style="font-size:18px;" id="cardCardsTotal">R$ 0,00</div>
-              </div>
-              <div style="overflow:auto; max-height:260px;">
-                <table>
-                  <thead>
-                    <tr><th>Cartão</th><th>Fatura (mês)</th></tr>
-                  </thead>
-                  <tbody id="saldoCardsBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-head">
-              <h3>Líquido do mês</h3>
-              <span class="muted" id="saldoMonth5"></span>
-            </div>
-            <div style="padding:14px 16px;">
-              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" id="cardNet">R$ 0,00</div>
-              <div class="muted" style="margin-top:6px;">Receitas em conta − Despesas em conta (cartão fica separado)</div>
-              <div style="height:12px;"></div>
-              <div class="pill">✅ Método: conta (inclui VR/VA/Auxílio/Dinheiro)</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <div class="card-head">
-            <h3>Como ler esses números</h3>
-            <span class="muted">MVP</span>
-          </div>
-          <div style="padding:14px 16px; color:var(--muted); line-height:1.4;">
-            <div><strong>Resultado</strong> considera tudo (conta + cartão) no mês.</div>
-            <div style="margin-top:6px;"><strong>Líquido do mês</strong> mostra o que sobrou nas contas (sem descontar cartão). As compras no cartão aparecem em <strong>Cartões / Faturas</strong>.</div>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- CONTAS -->
+      <!-- VIEW: CONTAS/CARTÕES -->
       <section class="view" id="view-accounts">
         <div class="grid">
           <div class="card">
@@ -390,115 +550,100 @@
               <button class="btn primary" id="btnAddAccount">+ Conta</button>
             </div>
             <div style="overflow:auto;">
-              <table><thead><tr><th>Conta</th><th>Saldo</th></tr></thead><tbody id="accountsBody"></tbody></table>
+              <table>
+                <thead>
+                  <tr><th>Conta</th><th>Saldo</th></tr>
+                </thead>
+                <tbody id="accountsBody"></tbody>
+              </table>
             </div>
           </div>
+
           <div class="card">
             <div class="card-head">
-              <h3>Cartões (fatura do mês)</h3>
+              <h3>Cartões (fatura)</h3>
               <button class="btn primary" id="btnAddCard">+ Cartão</button>
             </div>
             <div style="overflow:auto;">
-              <table><thead><tr><th>Cartão</th><th>Fatura</th></tr></thead><tbody id="cardsBody"></tbody></table>
+              <table>
+                <thead>
+                  <tr><th>Cartão</th><th>Fatura (mês)</th></tr>
+                </thead>
+                <tbody id="cardsBody"></tbody>
+              </table>
             </div>
           </div>
         </div>
+
         <div class="card" style="margin-top:14px;">
           <div class="card-head">
-            <h3>Regras</h3>
-            <span class="muted">Parcelas no cartão são distribuídas por mês. Editar/excluir parcela pergunta: só esta ou todas.</span>
+            <h3>Distribuição</h3>
+            <span class="muted">Neste MVP, a distribuição é automática pelo “método” reconhecido no chat.</span>
           </div>
           <div style="padding:14px 16px;">
-            <div class="pill">✅ “todo mês/mensal/assinatura” → pergunta se quer registrar próximos 12 meses</div>
+            <div class="pill">✅ Despesa em cartão → soma na fatura</div>
+            <div style="height:10px"></div>
+            <div class="pill">✅ Despesa em conta/benefício → reduz saldo</div>
+            <div style="height:10px"></div>
+            <div class="pill">✅ Receita em conta → aumenta saldo</div>
           </div>
         </div>
       </section>
 
-      <!-- GRÁFICOS -->
+      <!-- VIEW: CHARTS -->
       <section class="view" id="view-charts">
         <div class="grid">
           <div class="card">
-            <div class="card-head"><h3>Despesas por categoria (%)</h3><span class="muted" id="chartMonthLabel1"></span></div>
+            <div class="card-head">
+              <h3>Despesas por categoria (%)</h3>
+              <span class="muted" id="chartMonthLabel1"></span>
+            </div>
             <div class="chart-wrap">
               <canvas id="pieCategories" width="800" height="460" style="width:100%; height:auto;"></canvas>
               <div class="chart-legend" id="legendCategories"></div>
             </div>
           </div>
+
           <div class="card">
-            <div class="card-head"><h3>Receitas x Despesas (%)</h3><span class="muted" id="chartMonthLabel2"></span></div>
+            <div class="card-head">
+              <h3>Receitas x Despesas (%)</h3>
+              <span class="muted" id="chartMonthLabel2"></span>
+            </div>
             <div class="chart-wrap">
               <canvas id="donutInOut" width="800" height="460" style="width:100%; height:auto;"></canvas>
               <div class="chart-legend" id="legendInOut"></div>
             </div>
           </div>
         </div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-head">
+            <h3>Observações</h3>
+            <span class="muted">Gráficos usam somente transações do mês selecionado em Transações.</span>
+          </div>
+          <div style="padding:14px 16px; color:var(--muted);">
+            Dica: registre no chat “mercado 180 no crédito mercado pago em 3x” e depois veja em <strong>Contas e Cartões</strong> e <strong>Gráficos</strong>.
+          </div>
+        </div>
       </section>
     </main>
-  </div>
-
-  <!-- MODAL EDIT -->
-  <div class="modal-overlay" id="editOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
-      <div class="modal-head">
-        <h3 id="editTitle">Editar transação</h3>
-        <button class="btn icon" id="btnCloseEdit" title="Fechar">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <label>Tipo
-            <select id="editType">
-              <option value="income">Receita</option>
-              <option value="expense">Despesa</option>
-              <option value="transfer">Transferência</option>
-            </select>
-          </label>
-          <label>Data
-            <input id="editDate" type="date" />
-          </label>
-        </div>
-
-        <div class="row single">
-          <label>Descrição
-            <input id="editDesc" type="text" placeholder="Ex: Uber, Mercado, Salário" />
-          </label>
-        </div>
-
-        <div class="row">
-          <label>Categoria
-            <input id="editCategory" type="text" placeholder="Ex: Transporte" />
-          </label>
-          <label>Valor (R$)
-            <input id="editAmount" type="number" step="0.01" inputmode="decimal" />
-          </label>
-        </div>
-
-        <div class="row">
-          <label>Método (conta/cartão)
-            <select id="editMethod"></select>
-          </label>
-          <label>Parcelas (somente leitura)
-            <input id="editInstallments" type="text" disabled />
-          </label>
-        </div>
-
-        <div class="pill" style="justify-self:start;">Para parcelas: ao salvar/excluir, você escolhe “só esta” ou “todas”.</div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn" id="btnEditCancel">Cancelar</button>
-        <button class="btn primary" id="btnEditSave">Salvar</button>
-      </div>
-    </div>
   </div>
 
   <script>
     // =========================
     // Storage + State
     // =========================
-    const STORAGE_KEY = "fin_chat_mvp_v3";
+    const STORAGE_KEY = "fin_chat_mvp_v1";
     const THEME_KEY = "fin_chat_theme";
 
     const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+
+    const todayISO = () => {
+      const d = new Date();
+      const off = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - off*60000);
+      return local.toISOString().slice(0,10);
+    };
 
     const currentMonth = () => {
       const d = new Date();
@@ -520,7 +665,7 @@
       ],
       tx: [],
       chat: [
-        { role: "ai", text: "O que vamos registrar? Ex: “Mercado 180 no crédito Mercado Pago em 3x” ou “Netflix 39,90 todo mês no Nubank”.", ts: Date.now() }
+        { role: "ai", text: "O que vamos registrar hoje? Ex: “Uber 23,90 hoje no Nubank” ou “Salário 4400 entrou no Mercado Pago”.", ts: Date.now() }
       ],
       ui: { filterMonth: currentMonth(), filterType: "all", filterMethod: "all" }
     });
@@ -530,22 +675,27 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if(!raw) return defaultData();
         const parsed = JSON.parse(raw);
+        // fallback safeguards
         parsed.ui ??= { filterMonth: currentMonth(), filterType: "all", filterMethod: "all" };
         parsed.chat ??= [];
         parsed.tx ??= [];
         parsed.accounts ??= [];
         parsed.cards ??= [];
         return parsed;
-      }catch{
+      }catch(e){
+        console.warn("load error", e);
         return defaultData();
       }
     }
 
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
     let state = load();
-    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
     // =========================
-    // Theme
+    // Theme (Light/Dark)
     // =========================
     function getPreferredTheme(){
       const saved = localStorage.getItem(THEME_KEY);
@@ -555,9 +705,11 @@
     function setTheme(theme){
       document.documentElement.dataset.theme = theme;
       localStorage.setItem(THEME_KEY, theme);
-      document.getElementById("themeLabel").textContent = theme === "dark" ? "Escuro" : "Claro";
-      document.getElementById("themeSwitch").setAttribute("aria-checked", theme === "dark" ? "true" : "false");
-      drawCharts();
+      const label = document.getElementById("themeLabel");
+      const sw = document.getElementById("themeSwitch");
+      label.textContent = theme === "dark" ? "Escuro" : "Claro";
+      sw.setAttribute("aria-checked", theme === "dark" ? "true" : "false");
+      drawCharts(); // charts adapt via colors
     }
 
     // =========================
@@ -566,14 +718,17 @@
     const views = {
       chat: document.getElementById("view-chat"),
       tx: document.getElementById("view-tx"),
-      saldo: document.getElementById("view-saldo"),
       accounts: document.getElementById("view-accounts"),
       charts: document.getElementById("view-charts"),
     };
 
     function setActiveView(key){
-      Object.entries(views).forEach(([k, el]) => el.classList.toggle("active", k === key));
-      document.querySelectorAll(".nav button").forEach(btn => btn.setAttribute("aria-current", btn.dataset.view === key ? "page" : "false"));
+      Object.entries(views).forEach(([k, el]) => {
+        el.classList.toggle("active", k === key);
+      });
+      document.querySelectorAll(".nav button").forEach(btn => {
+        btn.setAttribute("aria-current", btn.dataset.view === key ? "page" : "false");
+      });
 
       const pageTitle = document.getElementById("pageTitle");
       const pageSubtitle = document.getElementById("pageSubtitle");
@@ -583,16 +738,11 @@
         pageSubtitle.textContent = "O que vamos registrar?";
       }else if(key === "tx"){
         pageTitle.textContent = "Transações";
-        pageSubtitle.textContent = "Editar / excluir por linha";
+        pageSubtitle.textContent = "Tudo que você registrou vira tabela";
         renderTx();
-      }else if(key === "saldo"){
-        pageTitle.textContent = "Saldo";
-        pageSubtitle.textContent = "Resumo do mês (líquido pós-cartão)";
-        renderSaldo();
       }else if(key === "accounts"){
-
         pageTitle.textContent = "Contas e Cartões";
-        pageSubtitle.textContent = "Saldo e fatura por mês";
+        pageSubtitle.textContent = "Saldo e fatura a partir das transações";
         recomputeBalances();
         renderAccountsCards();
       }else if(key === "charts"){
@@ -604,7 +754,7 @@
     }
 
     // =========================
-    // Chat
+    // Chat rendering
     // =========================
     const chatBody = document.getElementById("chatBody");
     function formatTime(ts){
@@ -621,9 +771,11 @@
       state.chat.forEach(msg => {
         const row = document.createElement("div");
         row.className = "msg-row " + (msg.role === "me" ? "me" : "ai");
+
         const bubble = document.createElement("div");
         bubble.className = "bubble";
         bubble.textContent = msg.text;
+
         row.appendChild(bubble);
         chatBody.appendChild(row);
 
@@ -632,17 +784,32 @@
         meta.textContent = formatTime(msg.ts);
         chatBody.appendChild(meta);
       });
-      if(scrollToBottom) chatBody.scrollTop = chatBody.scrollHeight;
+
+      if(scrollToBottom){
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
     }
 
     // =========================
-    // Parsing
+    // Simple parser (MVP)
     // =========================
+    const categories = [
+      "Alimentação","Transporte","Mercado","Saúde","Educação","Lazer","Casa",
+      "Assinaturas","Beleza","Filhos (Rafa)","Impostos/Taxas","Outros"
+    ];
+
     function normalizeNumber(str){
+      // "23,90" -> 23.90 ; "1.234,56" -> 1234.56 ; "1234.56" -> 1234.56
       if(!str) return null;
-      let s = str.trim().replace(/\s/g,"");
-      if(s.includes(".") && s.includes(",")) s = s.replace(/\./g,"").replace(",",".");
-      else if(s.includes(",")) s = s.replace(",",".");
+      let s = str.trim();
+      s = s.replace(/\s/g,"");
+      // if has both "." and "," assume "." thousands and "," decimal
+      if(s.includes(".") && s.includes(",")){
+        s = s.replace(/\./g,"").replace(",",".");
+      }else{
+        // if only comma -> decimal
+        if(s.includes(",")) s = s.replace(",",".");
+      }
       const n = Number(s);
       return Number.isFinite(n) ? n : null;
     }
@@ -654,17 +821,27 @@
       const local = new Date(now.getTime() - off*60000);
 
       if(/\bhoje\b/.test(t)) return local.toISOString().slice(0,10);
+
       if(/\bontem\b/.test(t)){
-        const d = new Date(local); d.setDate(d.getDate()-1);
+        const d = new Date(local);
+        d.setDate(d.getDate()-1);
         return d.toISOString().slice(0,10);
       }
+
+      // dd/mm or dd/mm/yyyy
       const m = t.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
       if(m){
         const dd = String(m[1]).padStart(2,"0");
         const mm = String(m[2]).padStart(2,"0");
-        let yyyy = m[3] ? (m[3].length===2 ? String(2000+Number(m[3])) : String(m[3])) : String(local.getFullYear());
+        let yyyy = m[3];
+        if(!yyyy){
+          yyyy = String(local.getFullYear());
+        }else{
+          yyyy = yyyy.length === 2 ? String(2000 + Number(yyyy)) : String(yyyy);
+        }
         return `${yyyy}-${mm}-${dd}`;
       }
+
       return local.toISOString().slice(0,10);
     }
 
@@ -680,15 +857,22 @@
 
     function detectMethod(text){
       const t = text.toLowerCase();
+
+      // cards keywords
       const card = state.cards.find(c => t.includes(c.name.toLowerCase()));
       const account = state.accounts.find(a => t.includes(a.name.toLowerCase()));
 
+      // explicit hints
       if(/\bcr[eé]dito\b/.test(t)) return { kind:"card", id: card?.id ?? null, name: card?.name ?? null };
       if(/\bd[eé]bito\b/.test(t)) return { kind:"account", id: account?.id ?? null, name: account?.name ?? null };
 
+      // if mentions card name => card
       if(card) return { kind:"card", id: card.id, name: card.name };
+
+      // if mentions account name => account
       if(account) return { kind:"account", id: account.id, name: account.name };
 
+      // default: account Mercado Pago
       const mp = state.accounts.find(a => a.name.toLowerCase().includes("mercado pago"));
       return { kind:"account", id: mp?.id ?? state.accounts[0]?.id ?? null, name: mp?.name ?? state.accounts[0]?.name ?? "Conta" };
     }
@@ -698,28 +882,33 @@
       if(/\btransfer/i.test(t) || /\btransf/i.test(t) || /\bde\s+.*\s+para\s+.*/i.test(text)) return "transfer";
       if(/\b(sal[aá]rio|recebi|entrou|pix recebido|reembolso|venda)\b/.test(t)) return "income";
       if(/\b(paguei|gastei|compra|uber|mercado|ifood|aluguel|conta|boleto)\b/.test(t)) return "expense";
+      // fallback by sign/words
       return "expense";
     }
 
     function detectCategory(text){
       const t = text.toLowerCase();
+
       const rules = [
         ["Transporte", /\b(uber|99|metr[oô]|onibus|ônibus|gasolina|combust[ií]vel|estacionamento|ped[aá]gio)\b/],
-        ["Alimentação", /\b(ifood|restaurante|lanche|padaria|caf[eé]|pizza)\b/],
+        ["Alimentação", /\b(ifood|ifood|restaurante|lanche|padaria|caf[eé]|pizza)\b/],
         ["Mercado", /\b(mercado|supermercado|hortifruti|a[cç]ougue)\b/],
         ["Casa", /\b(aluguel|condom[ií]nio|luz|energia|agua|água|internet|telefone|g[aá]s)\b/],
         ["Saúde", /\b(farm[aá]cia|m[eé]dico|consulta|exame|rem[eé]dio)\b/],
         ["Educação", /\b(escola|curso|faculdade|livro)\b/],
         ["Assinaturas", /\b(netflix|spotify|prime|amazon|youtube|assinatura)\b/],
-        ["Filhos (Rafa)", /\b(rafa|mesada|material)\b/],
+        ["Filhos (Rafa)", /\b(rafa|mesada|escola|material)\b/],
         ["Lazer", /\b(cinema|show|viagem|bar|lazer)\b/],
         ["Impostos/Taxas", /\b(iptu|ipva|taxa|multa|imposto)\b/],
       ];
-      for(const [cat, re] of rules) if(re.test(t)) return cat;
+      for(const [cat, re] of rules){
+        if(re.test(t)) return cat;
+      }
       return "Outros";
     }
 
     function extractAmount(text){
+      // picks first currency-like number
       const m = text.match(/(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})|\d+(?:,\d{2})|\d+(?:\.\d{2})?)/);
       return m ? normalizeNumber(m[1]) : null;
     }
@@ -731,11 +920,6 @@
         .trim();
     }
 
-    function isRecurringText(text){
-      const t = (text || "").toLowerCase();
-      return /\b(todo\s*m[eê]s|mensal|todo\s*mes|fixo|recorrente|assinatura)\b/.test(t);
-    }
-
     function parseMessageToTx(text){
       const amount = extractAmount(text);
       const type = detectType(text);
@@ -744,11 +928,18 @@
       const method = detectMethod(text);
       const category = detectCategory(text);
 
+      // description: remove amount + known tokens
       let desc = text;
       desc = desc.replace(/r\$\s*/i,"");
       desc = desc.replace(/(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})|\d+(?:,\d{2})|\d+(?:\.\d{2})?)/, " ");
       desc = stripNoise(desc);
-      if(desc.length === 0) desc = type === "income" ? "Receita" : (type === "transfer" ? "Transferência" : "Despesa");
+      if(desc.length === 0){
+        desc = type === "income" ? "Receita" : (type === "transfer" ? "Transferência" : "Despesa");
+      }
+
+      const missing = [];
+      if(amount === null) missing.push("valor");
+      if(!method?.id) missing.push("método (conta/cartão)");
 
       return {
         id: uid(),
@@ -757,66 +948,44 @@
         description: desc,
         amount: amount ?? 0,
         category: type === "expense" ? category : (type === "income" ? "Receita" : "Transferência"),
-        method,
+        method, // {kind, id, name}
         installments: installments ? { total: installments } : null,
         createdAt: Date.now()
       };
     }
 
     // =========================
-    // Parcelamento / Recorrência
-    // =========================
-    function addMonthsISO(isoDate, monthsToAdd){
-      const [y, m, d] = isoDate.split("-").map(Number);
-      const dt = new Date(y, (m - 1) + monthsToAdd, d);
-      const targetMonth = ((m - 1 + monthsToAdd) % 12 + 12) % 12;
-      if(dt.getMonth() !== targetMonth) dt.setDate(0);
-      const yyyy = dt.getFullYear();
-      const mm = String(dt.getMonth() + 1).padStart(2,"0");
-      const dd = String(dt.getDate()).padStart(2,"0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function splitIntoInstallments(total, n){
-      const cents = Math.round((Number(total) || 0) * 100);
-      const base = Math.floor(cents / n);
-      const arr = new Array(n).fill(base);
-      const remainder = cents - base * n;
-      for(let i=0;i<remainder;i++) arr[i] += 1;
-      return arr.map(c => c / 100);
-    }
-
-    function registerRecurringNext12(txBase){
-      for(let i=1;i<=12;i++){
-        state.tx.push({
-          ...txBase,
-          id: uid(),
-          date: addMonthsISO(txBase.date, i),
-          installments: null,
-          createdAt: Date.now()
-        });
-      }
-    }
-
-    // =========================
-    // Balances
+    // Apply Tx to balances/faturas
     // =========================
     function recomputeBalances(){
+      // reset
       state.accounts.forEach(a => a.balance = 0);
+
+      // card month totals computed on renderCards
+      // apply:
       state.tx.forEach(t => {
-        if(t.type === "income" && t.method.kind === "account"){
-          const a = state.accounts.find(x => x.id === t.method.id);
-          if(a) a.balance += t.amount;
-        } else if(t.type === "expense" && t.method.kind === "account"){
-          const a = state.accounts.find(x => x.id === t.method.id);
-          if(a) a.balance -= t.amount;
+        if(t.type === "income"){
+          if(t.method.kind === "account"){
+            const a = state.accounts.find(x => x.id === t.method.id);
+            if(a) a.balance += t.amount;
+          }
+        } else if(t.type === "expense"){
+          if(t.method.kind === "account"){
+            const a = state.accounts.find(x => x.id === t.method.id);
+            if(a) a.balance -= t.amount;
+          }
+          // if card: does not change account balance here (MVP)
+        } else if(t.type === "transfer"){
+          // MVP: try parse "de X para Y" if possible
+          // If not, ignore for balances
         }
       });
+
       save();
     }
 
     // =========================
-    // Transações Table
+    // Transações table
     // =========================
     const txBody = document.getElementById("txTableBody");
     const filterMonth = document.getElementById("filterMonth");
@@ -836,7 +1005,7 @@
         opt.textContent = label;
         filterMethod.appendChild(opt);
       };
-      state.accounts.forEach(a => addOpt("account:"+a.id, "Conta • " + a.name));
+      state.accounts.forEach(a => addOpt("acc:"+a.id, "Conta • " + a.name));
       state.cards.forEach(c => addOpt("card:"+c.id, "Cartão • " + c.name));
     }
 
@@ -857,17 +1026,18 @@
     }
 
     function renderTx(){
+      // sync UI
       filterMonth.value = state.ui.filterMonth ?? currentMonth();
       filterType.value = state.ui.filterType ?? "all";
       renderMethodOptions();
       filterMethod.value = state.ui.filterMethod ?? "all";
 
       const rows = getFilteredTx();
-      txBody.innerHTML = "";
 
+      txBody.innerHTML = "";
       if(rows.length === 0){
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="6" class="muted">Nenhuma transação neste mês. Volte no Chat e registre algo.</td>`;
+        tr.innerHTML = `<td colspan="5" class="muted">Nenhuma transação neste mês. Volte no Chat e registre algo.</td>`;
         txBody.appendChild(tr);
         return;
       }
@@ -877,8 +1047,9 @@
         const methodLabel = t.method.kind === "card" ? ("Cartão • " + (t.method.name ?? "—")) : ("Conta • " + (t.method.name ?? "—"));
         const sign = t.type === "income" ? "+" : (t.type === "expense" ? "-" : "↔");
         const cls = t.type === "income" ? "pos" : (t.type === "expense" ? "neg" : "");
-        const inst = t.installments?.total ? ` <span class="muted">(parc ${t.installments.current || 1}/${t.installments.total})</span>` : "";
+        const amount = (t.type === "transfer" ? t.amount : t.amount);
 
+        const inst = t.installments?.total ? ` <span class="muted">(${t.installments.total}x)</span>` : "";
         tr.innerHTML = `
           <td class="muted">${t.date}</td>
           <td>
@@ -887,31 +1058,16 @@
           </td>
           <td>${escapeHtml(t.category)}</td>
           <td class="muted">${escapeHtml(methodLabel)}</td>
-          <td class="amount ${cls}">${sign} R$ ${formatBRL(t.amount)}</td>
-          <td>
-            <div style="display:flex; gap:8px;">
-              <button class="btn small" data-action="edit" data-id="${t.id}">Editar</button>
-              <button class="btn small danger" data-action="del" data-id="${t.id}">Excluir</button>
-            </div>
-          </td>
+          <td class="amount ${cls}">${sign} R$ ${formatBRL(amount)}</td>
         `;
         txBody.appendChild(tr);
-      });
-
-      txBody.querySelectorAll("button[data-action]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-id");
-          const action = btn.getAttribute("data-action");
-          if(action === "edit") openEditModal(id);
-          if(action === "del") deleteTxFlow(id);
-        });
       });
 
       updateBadges();
     }
 
     // =========================
-    // Accounts / Cards
+    // Accounts/Cards rendering
     // =========================
     const accountsBody = document.getElementById("accountsBody");
     const cardsBody = document.getElementById("cardsBody");
@@ -932,7 +1088,10 @@
       state.accounts.forEach(a => {
         const tr = document.createElement("tr");
         const cls = a.balance >= 0 ? "pos" : "neg";
-        tr.innerHTML = `<td style="font-weight:800;">${escapeHtml(a.name)}</td><td class="amount ${cls}">R$ ${formatBRL(a.balance)}</td>`;
+        tr.innerHTML = `
+          <td style="font-weight:800;">${escapeHtml(a.name)}</td>
+          <td class="amount ${cls}">R$ ${formatBRL(a.balance)}</td>
+        `;
         accountsBody.appendChild(tr);
       });
 
@@ -940,93 +1099,34 @@
       state.cards.forEach(c => {
         const total = cardMonthTotal(c.id);
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td style="font-weight:800;">${escapeHtml(c.name)}</td><td class="amount neg">R$ ${formatBRL(total)}</td>`;
+        tr.innerHTML = `
+          <td style="font-weight:800;">${escapeHtml(c.name)}</td>
+          <td class="amount neg">R$ ${formatBRL(total)}</td>
+        `;
         cardsBody.appendChild(tr);
       });
-
       updateBadges();
     }
 
-
     // =========================
-    // Saldo (cards)
+    // Charts (Canvas)
     // =========================
-    const saldoCardsBody = document.getElementById("saldoCardsBody");
-
-    function monthTx(m){
-      return state.tx.filter(t => getMonthFromISO(t.date) === m);
-    }
-
-    function sumBy(filterFn, m){
-      return monthTx(m).filter(filterFn).reduce((s,t)=>s+(t.amount||0),0);
-    }
-
-    function renderSaldo(){
-      const m = state.ui.filterMonth ?? currentMonth();
-      ["saldoMonth1","saldoMonth2","saldoMonth3","saldoMonth4","saldoMonth5"].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.textContent = "Mês: " + m;
-      });
-
-      const incomeTotal = sumBy(t => t.type === "income", m);
-      const expenseTotal = sumBy(t => t.type === "expense", m);
-      const result = incomeTotal - expenseTotal;
-
-      // Líquido pós-cartão: só conta
-      const incomeAcc = sumBy(t => t.type === "income" && t.method?.kind === "account", m);
-      const expenseAcc = sumBy(t => t.type === "expense" && t.method?.kind === "account", m);
-      const net = incomeAcc - expenseAcc;
-
-      document.getElementById("cardIncome").textContent = "R$ " + formatBRL(incomeTotal);
-      document.getElementById("cardExpense").textContent = "R$ " + formatBRL(expenseTotal);
-
-      const resultEl = document.getElementById("cardResult");
-      const netEl = document.getElementById("cardNet");
-
-      resultEl.textContent = "R$ " + formatBRL(result);
-      netEl.textContent = "R$ " + formatBRL(net);
-
-      resultEl.className = "";
-      netEl.className = "";
-      resultEl.classList.add("amount", result >= 0 ? "pos" : "neg");
-      netEl.classList.add("amount", net >= 0 ? "pos" : "neg");
-
-      // Cartões / faturas do mês
-      if(saldoCardsBody){
-        saldoCardsBody.innerHTML = "";
-        let cardsTotal = 0;
-        state.cards.forEach(c => {
-          const total = cardMonthTotal(c.id);
-          cardsTotal += total;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td style="font-weight:800;">${escapeHtml(c.name)}</td><td class="amount neg">R$ ${formatBRL(total)}</td>`;
-          saldoCardsBody.appendChild(tr);
-        });
-        const totalEl = document.getElementById("cardCardsTotal");
-        if(totalEl) totalEl.textContent = "R$ " + formatBRL(cardsTotal);
-      }
-    }
-
-    // =========================
-    // Charts
-    // =========================
-    function getCssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-
-    function buildPalette(){
-      const t = document.documentElement.dataset.theme || "light";
-      return (t === "dark")
-        ? ["#60a5fa","#34d399","#fbbf24","#fb7185","#a78bfa","#22c55e","#38bdf8","#f472b6","#cbd5e1","#f97316"]
-        : ["#2563eb","#16a34a","#f59e0b","#dc2626","#7c3aed","#059669","#0284c7","#db2777","#475569","#ea580c"];
+    function getCssVar(name){
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     }
 
     function drawPie(canvas, data){
+      // data: [{label, value, color}]
       const ctx = canvas.getContext("2d");
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0,0,w,h);
+
       const total = data.reduce((s,d)=>s+d.value,0);
       const cx = w/2, cy = h/2, r = Math.min(w,h)*0.33;
 
-      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      // background ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
       ctx.lineWidth = Math.max(24, r*0.18);
       ctx.strokeStyle = withAlpha(getCssVar("--border"), 0.7);
       ctx.stroke();
@@ -1038,10 +1138,12 @@
         ctx.arc(cx, cy, r, start, start + angle);
         ctx.lineWidth = Math.max(24, r*0.18);
         ctx.strokeStyle = d.color;
+        ctx.lineCap = "butt";
         ctx.stroke();
         start += angle;
       });
 
+      // center text
       ctx.fillStyle = getCssVar("--text");
       ctx.font = "700 28px " + getCssVar("--font").replaceAll('"','');
       ctx.textAlign = "center";
@@ -1053,13 +1155,17 @@
     }
 
     function drawDonut(canvas, parts){
+      // parts: [{label, value, color}]
       const ctx = canvas.getContext("2d");
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0,0,w,h);
+
       const total = parts.reduce((s,d)=>s+d.value,0);
       const cx = w/2, cy = h/2, r = Math.min(w,h)*0.33;
 
-      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      // ring base
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
       ctx.lineWidth = Math.max(24, r*0.18);
       ctx.strokeStyle = withAlpha(getCssVar("--border"), 0.7);
       ctx.stroke();
@@ -1071,6 +1177,7 @@
         ctx.arc(cx, cy, r, start, start + angle);
         ctx.lineWidth = Math.max(24, r*0.18);
         ctx.strokeStyle = d.color;
+        ctx.lineCap = "butt";
         ctx.stroke();
         start += angle;
       });
@@ -1097,6 +1204,7 @@
         dot.className = "dot";
         dot.style.background = d.color;
         item.appendChild(dot);
+
         const pct = d.total ? Math.round((d.value/d.total)*100) : 0;
         item.appendChild(document.createTextNode(`${d.label}: ${pct}% (R$ ${formatBRL(d.value)})`));
         el.appendChild(item);
@@ -1104,21 +1212,33 @@
     }
 
     function drawCharts(){
+      // Use month from state.ui.filterMonth
       const m = state.ui.filterMonth ?? currentMonth();
-      document.getElementById("chartMonthLabel1").textContent = "Mês: " + m;
-      document.getElementById("chartMonthLabel2").textContent = "Mês: " + m;
+      const label1 = document.getElementById("chartMonthLabel1");
+      const label2 = document.getElementById("chartMonthLabel2");
+      label1.textContent = "Mês: " + m;
+      label2.textContent = "Mês: " + m;
 
       const txMonth = state.tx.filter(t => getMonthFromISO(t.date) === m);
+
+      // Categories expenses
       const exp = txMonth.filter(t => t.type === "expense");
       const byCat = new Map();
-      exp.forEach(t => byCat.set(t.category || "Outros", (byCat.get(t.category || "Outros") || 0) + (t.amount || 0)));
+      exp.forEach(t => {
+        const cat = t.category || "Outros";
+        byCat.set(cat, (byCat.get(cat) || 0) + (t.amount || 0));
+      });
 
+      // pick colors (theme-aware) but deterministic
       const palette = buildPalette();
-      const catData = Array.from(byCat.entries()).sort((a,b)=>b[1]-a[1]).slice(0,10)
+      const catData = Array.from(byCat.entries())
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,10)
         .map(([label, value], i) => ({ label, value, color: palette[i % palette.length] }));
       const totalExp = catData.reduce((s,d)=>s+d.value,0);
       catData.forEach(d => d.total = totalExp);
 
+      // In vs Out
       const incomeTotal = txMonth.filter(t => t.type === "income").reduce((s,t)=>s+(t.amount||0),0);
       const expenseTotal = exp.reduce((s,t)=>s+(t.amount||0),0);
 
@@ -1129,9 +1249,11 @@
       const totalInOut = inOut.reduce((s,d)=>s+d.value,0);
       inOut.forEach(d => d.total = totalInOut);
 
+      // Draw
       const pie = document.getElementById("pieCategories");
       const donut = document.getElementById("donutInOut");
 
+      // handle empty gracefully
       if(catData.length === 0){
         const ctx = pie.getContext("2d");
         ctx.clearRect(0,0,pie.width,pie.height);
@@ -1159,26 +1281,52 @@
       }
     }
 
+    function buildPalette(){
+      const t = document.documentElement.dataset.theme || "light";
+      // palette with enough contrast in both themes
+      return (t === "dark")
+        ? ["#60a5fa","#34d399","#fbbf24","#fb7185","#a78bfa","#22c55e","#38bdf8","#f472b6","#cbd5e1","#f97316"]
+        : ["#2563eb","#16a34a","#f59e0b","#dc2626","#7c3aed","#059669","#0284c7","#db2777","#475569","#ea580c"];
+    }
+
     // =========================
     // Utilities
     // =========================
     function formatBRL(n){
-      return (Number(n)||0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      try{
+        return (Number(n)||0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }catch{
+        return String(n);
+      }
     }
     function escapeHtml(str){
-      return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
     function withAlpha(color, a){
-      if(color.startsWith("rgb(")) return color.replace("rgb(","rgba(").replace(")",`, ${a})`);
+      // color in rgb/hex not guaranteed; fallback
+      if(color.startsWith("rgb(")){
+        return color.replace("rgb(","rgba(").replace(")",`, ${a})`);
+      }
+      // try hex
       if(color.startsWith("#")){
         const c = color.slice(1);
         const hex = c.length===3 ? c.split("").map(x=>x+x).join("") : c;
-        const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+        const r = parseInt(hex.slice(0,2),16);
+        const g = parseInt(hex.slice(2,4),16);
+        const b = parseInt(hex.slice(4,6),16);
         return `rgba(${r},${g},${b},${a})`;
       }
       return color;
     }
-    function updateBadges(){ document.getElementById("badgeTx").textContent = String(state.tx.length); }
+
+    function updateBadges(){
+      document.getElementById("badgeTx").textContent = String(state.tx.length);
+    }
 
     // =========================
     // Chat actions
@@ -1198,70 +1346,40 @@
 
       addChat("me", trimmed);
 
-      const txBase = parseMessageToTx(trimmed);
+      // parse and register tx
+      const tx = parseMessageToTx(trimmed);
 
-      if(txBase.amount === 0 && extractAmount(trimmed) === null){
+      // If missing value, ask
+      if(tx.amount === 0 && extractAmount(trimmed) === null){
         addChat("ai", "Não encontrei o valor 😅\nMe diga assim: “Descrição 23,90” (ex: “Uber 23,90 no Nubank”).");
         setStatus("🟡 Preciso do valor", false);
         return;
       }
-      if(!txBase.method.id){
+
+      // If missing method id, ask (rare in this MVP)
+      if(!tx.method.id){
         addChat("ai", "Em qual conta ou cartão foi isso? Ex: “no Nubank” ou “no Mercado Pago”.");
         setStatus("🟡 Preciso do método", false);
         return;
       }
 
-      const shouldSplit =
-        txBase.type === "expense" &&
-        txBase.method.kind === "card" &&
-        txBase.installments?.total &&
-        txBase.installments.total >= 2;
+      // Save tx
+      state.tx.push(tx);
+      save();
+      setStatus("🟢 Registrado", true);
 
-      if(shouldSplit){
-        const n = txBase.installments.total;
-        const parts = splitIntoInstallments(txBase.amount, n);
-        const groupId = uid();
+      // AI confirmation message
+      const prettyType = tx.type === "income" ? "Receita" : tx.type === "expense" ? "Despesa" : "Transferência";
+      const prettyMethod = tx.method.kind === "card" ? `Cartão ${tx.method.name}` : `Conta ${tx.method.name}`;
+      const inst = tx.installments?.total ? ` • ${tx.installments.total}x` : "";
+      addChat("ai",
+        `✅ Registrei:\n• ${prettyType}\n• ${tx.description}\n• R$ ${formatBRL(tx.amount)}\n• ${tx.date}\n• ${tx.category}\n• ${prettyMethod}${inst}\n\nQuer registrar mais uma?`
+      );
 
-        for(let i=0;i<n;i++){
-          state.tx.push({
-            ...txBase,
-            id: uid(),
-            date: addMonthsISO(txBase.date, i),
-            amount: parts[i],
-            installments: { total: n, current: i+1, groupId },
-            createdAt: Date.now()
-          });
-        }
-
-        save();
-        setStatus("🟢 Parcelado registrado", true);
-        addChat("ai", `✅ Registrei parcelado:\n• ${txBase.description}\n• Total R$ ${formatBRL(txBase.amount)} em ${n}x\n• Cartão ${txBase.method.name}\n• 1ª parcela em ${txBase.date}\n\nQuer registrar mais uma?`);
-      }else{
-        state.tx.push(txBase);
-        save();
-        setStatus("🟢 Registrado", true);
-
-        const prettyType = txBase.type === "income" ? "Receita" : txBase.type === "expense" ? "Despesa" : "Transferência";
-        const prettyMethod = txBase.method.kind === "card" ? `Cartão ${txBase.method.name}` : `Conta ${txBase.method.name}`;
-
-        addChat("ai", `✅ Registrei:\n• ${prettyType}\n• ${txBase.description}\n• R$ ${formatBRL(txBase.amount)}\n• ${txBase.date}\n• ${txBase.category}\n• ${prettyMethod}\n\nQuer registrar mais uma?`);
-
-        if(isRecurringText(trimmed)){
-          const ok = confirm("Parece um lançamento fixo/mensal. Quer registrar também para os próximos 12 meses?");
-          if(ok){
-            registerRecurringNext12(txBase);
-            save();
-            addChat("ai", "✅ Feito! Registrei também para os próximos 12 meses.");
-          }else{
-            addChat("ai", "Ok! Mantive só este lançamento.");
-          }
-        }
-      }
-
+      // Update derived screens
       recomputeBalances();
       renderTx();
       renderAccountsCards();
-      renderSaldo();
       drawCharts();
       updateBadges();
     }
@@ -1274,6 +1392,7 @@
     });
 
     input.addEventListener("keydown", (e) => {
+      // Enter sends, Shift+Enter breaks line
       if(e.key === "Enter" && !e.shiftKey){
         e.preventDefault();
         btnSend.click();
@@ -1304,14 +1423,24 @@
       rec.interimResults = false;
       rec.maxAlternatives = 1;
 
-      rec.onstart = () => { listening = true; setStatus("🔴 Ouvindo...", true); };
-      rec.onend = () => { listening = false; setStatus("🟢 Pronto", true); };
-      rec.onerror = () => { listening = false; setStatus("🟠 Voz indisponível", false); };
+      rec.onstart = () => {
+        listening = true;
+        setStatus("🔴 Ouvindo...", true);
+      };
+      rec.onend = () => {
+        listening = false;
+        setStatus("🟢 Pronto", true);
+      };
+      rec.onerror = () => {
+        listening = false;
+        setStatus("🟠 Voz indisponível", false);
+      };
       rec.onresult = (event) => {
         const transcript = event.results?.[0]?.[0]?.transcript || "";
         if(transcript){
           input.value = transcript;
           input.dispatchEvent(new Event("input"));
+          // auto-send for WhatsApp feel
           sendMessage(transcript);
           input.value = "";
           input.style.height = "auto";
@@ -1320,7 +1449,8 @@
 
       btnMic.addEventListener("click", () => {
         if(!rec) return;
-        if(listening) rec.stop(); else rec.start();
+        if(listening) rec.stop();
+        else rec.start();
       });
     }
 
@@ -1332,11 +1462,18 @@
       save();
       renderTx();
       renderAccountsCards();
-      renderSaldo();
       drawCharts();
     });
-    filterType.addEventListener("change", () => { state.ui.filterType = filterType.value; save(); renderTx(); });
-    filterMethod.addEventListener("change", () => { state.ui.filterMethod = filterMethod.value; save(); renderTx(); });
+    filterType.addEventListener("change", () => {
+      state.ui.filterType = filterType.value;
+      save();
+      renderTx();
+    });
+    filterMethod.addEventListener("change", () => {
+      state.ui.filterMethod = filterMethod.value;
+      save();
+      renderTx();
+    });
 
     document.getElementById("btnExport").addEventListener("click", () => {
       const payload = JSON.stringify(state, null, 2);
@@ -1379,9 +1516,9 @@
         "Salário 4400 hoje no Mercado Pago",
         "Uber 23,90 hoje no Nubank",
         "Mercado 180 no crédito Mercado Pago em 3x",
-        "Netflix 39,90 todo mês no Nubank",
+        "VA 145 hoje",
         "Combustível 120 hoje no Auxílio Combustível",
-        "VA 145 hoje"
+        "Pix 50 pra Rafa hoje no Mercado Pago"
       ];
       const pick = samples[Math.floor(Math.random()*samples.length)];
       input.value = pick;
@@ -1399,7 +1536,7 @@
     });
 
     // =========================
-    // Theme switch
+    // Theme switch events
     // =========================
     const themeSwitch = document.getElementById("themeSwitch");
     function toggleTheme(){
@@ -1414,174 +1551,12 @@
     // =========================
     // Navigation events
     // =========================
-    document.querySelectorAll(".nav button").forEach(btn => btn.addEventListener("click", () => setActiveView(btn.dataset.view)));
+    document.querySelectorAll(".nav button").forEach(btn => {
+      btn.addEventListener("click", () => setActiveView(btn.dataset.view));
+    });
 
     // =========================
-    // Edit / Delete flows (parcelas: só esta ou todas)
-    // =========================
-    const editOverlay = document.getElementById("editOverlay");
-    const editType = document.getElementById("editType");
-    const editDate = document.getElementById("editDate");
-    const editDesc = document.getElementById("editDesc");
-    const editCategory = document.getElementById("editCategory");
-    const editAmount = document.getElementById("editAmount");
-    const editMethod = document.getElementById("editMethod");
-    const editInstallments = document.getElementById("editInstallments");
-
-    let editingId = null;
-
-    function rebuildEditMethodOptions(){
-      editMethod.innerHTML = "";
-      state.accounts.forEach(a => {
-        const opt = document.createElement("option");
-        opt.value = "account:"+a.id;
-        opt.textContent = "Conta • " + a.name;
-        editMethod.appendChild(opt);
-      });
-      state.cards.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = "card:"+c.id;
-        opt.textContent = "Cartão • " + c.name;
-        editMethod.appendChild(opt);
-      });
-    }
-
-    function openEditModal(id){
-      const t = state.tx.find(x => x.id === id);
-      if(!t) return;
-      editingId = id;
-
-      rebuildEditMethodOptions();
-
-      editType.value = t.type;
-      editDate.value = t.date;
-      editDesc.value = t.description;
-      editCategory.value = t.category;
-      editAmount.value = Number(t.amount || 0).toFixed(2);
-      editMethod.value = `${t.method.kind}:${t.method.id}`;
-
-      if(t.installments?.total){
-        editInstallments.value = `Parcela ${t.installments.current}/${t.installments.total} (grupo)`;
-      }else{
-        editInstallments.value = "—";
-      }
-
-      editOverlay.classList.add("open");
-      editOverlay.setAttribute("aria-hidden","false");
-    }
-
-    function closeEditModal(){
-      editingId = null;
-      editOverlay.classList.remove("open");
-      editOverlay.setAttribute("aria-hidden","true");
-    }
-
-    function saveEdit(){
-      const t = state.tx.find(x => x.id === editingId);
-      if(!t) return closeEditModal();
-
-      const [kind, mid] = editMethod.value.split(":");
-      const name = kind === "card"
-        ? (state.cards.find(c => c.id === mid)?.name ?? "Cartão")
-        : (state.accounts.find(a => a.id === mid)?.name ?? "Conta");
-
-      const updated = {
-        type: editType.value,
-        date: editDate.value,
-        description: editDesc.value.trim() || t.description,
-        category: editCategory.value.trim() || t.category,
-        amount: Number(editAmount.value || 0),
-        method: { kind, id: mid, name }
-      };
-
-      const isGroup = !!t.installments?.groupId;
-
-      if(isGroup){
-        const applyAll = confirm("Esta é uma parcela. OK = editar TODAS as parcelas. Cancelar = editar só esta.");
-        if(applyAll){
-          const groupId = t.installments.groupId;
-          const group = state.tx
-            .filter(x => x.installments?.groupId === groupId)
-            .sort((a,b) => (a.installments.current||0) - (b.installments.current||0));
-
-          const n = group.length;
-          const parts = splitIntoInstallments(updated.amount, n);
-          const baseDate = group[0].date;
-
-          group.forEach((g, i) => {
-            g.type = updated.type;
-            g.description = updated.description;
-            g.category = updated.category;
-            g.method = updated.method;
-            g.date = addMonthsISO(baseDate, i);
-            g.amount = parts[i];
-            g.installments.total = n;
-            g.installments.current = i+1;
-          });
-        }else{
-          Object.assign(t, updated);
-        }
-      }else{
-        Object.assign(t, updated);
-      }
-
-      save();
-      closeEditModal();
-      recomputeBalances();
-      renderTx();
-      renderAccountsCards();
-      renderSaldo();
-      drawCharts();
-    }
-
-    function deleteTxFlow(id){
-      const t = state.tx.find(x => x.id === id);
-      if(!t) return;
-
-      const isGroup = !!t.installments?.groupId;
-
-      if(isGroup){
-        const delAll = confirm("Esta é uma parcela. OK = excluir TODAS as parcelas. Cancelar = excluir só esta.");
-        if(delAll){
-          const gid = t.installments.groupId;
-          state.tx = state.tx.filter(x => x.installments?.groupId !== gid);
-        }else{
-          const gid = t.installments.groupId;
-          state.tx = state.tx.filter(x => x.id !== id);
-
-          const group = state.tx
-            .filter(x => x.installments?.groupId === gid)
-            .sort((a,b) => a.date.localeCompare(b.date));
-
-          if(group.length > 0){
-            group.forEach((g, i) => {
-              g.installments.total = group.length;
-              g.installments.current = i+1;
-            });
-          }
-        }
-      }else{
-        const ok = confirm("Excluir esta transação?");
-        if(!ok) return;
-        state.tx = state.tx.filter(x => x.id !== id);
-      }
-
-      save();
-      recomputeBalances();
-      renderTx();
-      renderAccountsCards();
-      renderSaldo();
-      drawCharts();
-      updateBadges();
-    }
-
-    document.getElementById("btnCloseEdit").addEventListener("click", closeEditModal);
-    document.getElementById("btnEditCancel").addEventListener("click", closeEditModal);
-    document.getElementById("btnEditSave").addEventListener("click", saveEdit);
-    editOverlay.addEventListener("click", (e) => { if(e.target === editOverlay) closeEditModal(); });
-
-    // =========================
-    // Boot
+    // Render bootstrap
     // =========================
     function renderAll(){
       renderChat(true);
@@ -1589,31 +1564,16 @@
       renderTx();
       recomputeBalances();
       renderAccountsCards();
-      renderSaldo();
       drawCharts();
       updateBadges();
     }
 
-    // Autosize init
-    input.addEventListener("input", () => {
-      input.style.height = "auto";
-      input.style.height = Math.min(input.scrollHeight, 120) + "px";
-    });
-
+    // Boot
     setTheme(getPreferredTheme());
     filterMonth.value = state.ui.filterMonth ?? currentMonth();
     renderAll();
     setupSpeech();
     setActiveView("chat");
-  </script>
-
-  <script>
-    // PWA: Service Worker (offline + installable)
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
-      });
-    }
   </script>
 </body>
 </html>
