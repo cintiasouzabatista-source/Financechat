@@ -201,6 +201,7 @@
         <nav class="nav" aria-label="Navegação">
           <button data-view="chat" aria-current="page"><span>💬 Chat IA</span><span class="badge">Ativo</span></button>
           <button data-view="tx"><span>🧾 Transações</span><span class="badge" id="badgeTx">0</span></button>
+          <button data-view="saldo"><span>💰 Saldo</span><span class="badge">Mês</span></button>
           <button data-view="accounts"><span>🏦 Contas e Cartões</span><span class="badge">Resumo</span></button>
           <button data-view="charts"><span>📊 Gráficos</span><span class="badge">%</span></button>
         </nav>
@@ -288,6 +289,142 @@
           </div>
         </div>
       </section>
+
+
+      <!-- SALDO -->
+      <section class="view" id="view-saldo">
+        <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="card">
+            <div class="card-head">
+              <h3>Receitas</h3>
+              <span class="muted" id="saldoMonth1"></span>
+            </div>
+            <div style="padding:14px 16px;">
+              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" class="pos" id="cardIncome">R$ 0,00</div>
+              <div class="muted" style="margin-top:6px;">Total de receitas do mês</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Despesas</h3>
+              <span class="muted" id="saldoMonth2"></span>
+            </div>
+            <div style="padding:14px 16px;">
+              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" class="neg" id="cardExpense">R$ 0,00</div>
+              <div class="muted" style="margin-top:6px;">Total de despesas do mês (conta + cartão)</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Resultado</h3>
+              <span class="muted" id="saldoMonth3"></span>
+            </div>
+            <div style="padding:14px 16px;">
+              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" id="cardResult">R$ 0,00</div>
+              <div class="muted" style="margin-top:6px;">Receitas − Despesas (mês)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:14px; grid-template-columns: 1.2fr .8fr;">
+          <div class="card">
+            <div class="card-head">
+              <h3>Cartões / Faturas do mês</h3>
+              <span class="muted" id="saldoMonth4"></span>
+            </div>
+            <div style="padding:0 0 6px;">
+              <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div class="muted">Total (todos os cartões)</div>
+                <div class="amount neg" style="font-size:18px;" id="cardCardsTotal">R$ 0,00</div>
+              </div>
+              <div style="overflow:auto; max-height:260px;">
+                <table>
+                  <thead>
+                    <tr><th>Cartão</th><th>Fatura (mês)</th></tr>
+                  </thead>
+                  <tbody id="saldoCardsBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Líquido do mês</h3>
+              <span class="muted" id="saldoMonth5"></span>
+            </div>
+            <div style="padding:14px 16px;">
+              <div style="font-size:34px; font-weight:900; letter-spacing:-.5px;" id="cardNet">R$ 0,00</div>
+              <div class="muted" style="margin-top:6px;">Receitas em conta − Despesas em conta (cartão fica separado)</div>
+              <div style="height:12px;"></div>
+              <div class="pill">✅ Método: conta (inclui VR/VA/Auxílio/Dinheiro)</div>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="card" style="margin-top:14px;">
+          <div class="card-head">
+            <h3>Projeção do mês</h3>
+            <span class="muted" id="saldoMonthProj"></span>
+          </div>
+          <div style="padding:14px 16px;">
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap:12px;">
+              <div style="border:1px solid var(--border); border-radius:16px; padding:12px; background:rgba(127,127,127,.04);">
+                <div class="muted" style="font-size:12px;">Saldo atual (contas)</div>
+                <div class="amount" style="font-size:20px; margin-top:6px;" id="projSaldoAtual">R$ 0,00</div>
+                <div class="muted" style="font-size:12px; margin-top:6px;">Soma dos saldos das contas</div>
+              </div>
+
+              <div style="border:1px solid var(--border); border-radius:16px; padding:12px; background:rgba(127,127,127,.04);">
+                <div class="muted" style="font-size:12px;">Restante no mês (contas)</div>
+                <div class="amount" style="font-size:20px; margin-top:6px;" id="projRestanteContas">R$ 0,00</div>
+                <div class="muted" style="font-size:12px; margin-top:6px;">Entradas − saídas (de hoje até o fim do mês)</div>
+              </div>
+
+              <div style="border:1px solid var(--border); border-radius:16px; padding:12px; background:rgba(127,127,127,.04);">
+                <div class="muted" style="font-size:12px;">Faturas do mês</div>
+                <div class="amount neg" style="font-size:20px; margin-top:6px;" id="projFaturasMes">R$ 0,00</div>
+                <div class="muted" style="font-size:12px; margin-top:6px;">Compras no cartão (mês)</div>
+              </div>
+            </div>
+
+            <div style="height:12px;"></div>
+
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap:12px;">
+              <div style="border:1px solid var(--border); border-radius:16px; padding:12px;">
+                <div class="muted" style="font-size:12px;">Saldo projetado (contas) — fim do mês</div>
+                <div class="amount" style="font-size:24px; margin-top:6px;" id="projSaldoFim">R$ 0,00</div>
+                <div class="muted" style="font-size:12px; margin-top:6px;">Saldo atual + restante no mês</div>
+              </div>
+
+              <div style="border:1px solid var(--border); border-radius:16px; padding:12px;">
+                <div class="muted" style="font-size:12px;">Saldo após pagar cartões</div>
+                <div class="amount" style="font-size:24px; margin-top:6px;" id="projAposCartoes">R$ 0,00</div>
+                <div class="muted" style="font-size:12px; margin-top:6px;">Saldo projetado − faturas do mês</div>
+              </div>
+            </div>
+
+            <div style="height:10px;"></div>
+            <div class="pill">💡 Dica: para a projeção ficar perfeita, registre as contas fixas com “todo mês” (o app pergunta 12 meses).</div>
+          </div>
+        </div>
+
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-head">
+            <h3>Como ler esses números</h3>
+            <span class="muted">MVP</span>
+          </div>
+          <div style="padding:14px 16px; color:var(--muted); line-height:1.4;">
+            <div><strong>Resultado</strong> considera tudo (conta + cartão) no mês.</div>
+            <div style="margin-top:6px;"><strong>Líquido do mês</strong> mostra o que sobrou nas contas (sem descontar cartão). As compras no cartão aparecem em <strong>Cartões / Faturas</strong>.</div>
+          </div>
+        </div>
+      </section>
+
 
       <!-- CONTAS -->
       <section class="view" id="view-accounts">
@@ -474,6 +611,7 @@
     const views = {
       chat: document.getElementById("view-chat"),
       tx: document.getElementById("view-tx"),
+      saldo: document.getElementById("view-saldo"),
       accounts: document.getElementById("view-accounts"),
       charts: document.getElementById("view-charts"),
     };
@@ -492,7 +630,12 @@
         pageTitle.textContent = "Transações";
         pageSubtitle.textContent = "Editar / excluir por linha";
         renderTx();
+      }else if(key === "saldo"){
+        pageTitle.textContent = "Saldo";
+        pageSubtitle.textContent = "Resumo do mês (líquido pós-cartão)";
+        renderSaldo();
       }else if(key === "accounts"){
+
         pageTitle.textContent = "Contas e Cartões";
         pageSubtitle.textContent = "Saldo e fatura por mês";
         recomputeBalances();
@@ -849,6 +992,119 @@
       updateBadges();
     }
 
+
+    // =========================
+    // Saldo (cards)
+    // =========================
+    const saldoCardsBody = document.getElementById("saldoCardsBody");
+
+    function monthTx(m){
+      return state.tx.filter(t => getMonthFromISO(t.date) === m);
+    }
+
+    function sumBy(filterFn, m){
+      return monthTx(m).filter(filterFn).reduce((s,t)=>s+(t.amount||0),0);
+    }
+
+    function renderSaldo(){
+      const m = state.ui.filterMonth ?? currentMonth();
+      ["saldoMonth1","saldoMonth2","saldoMonth3","saldoMonth4","saldoMonth5"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = "Mês: " + m;
+      });
+
+      const incomeTotal = sumBy(t => t.type === "income", m);
+      const expenseTotal = sumBy(t => t.type === "expense", m);
+      const result = incomeTotal - expenseTotal;
+
+      // Líquido pós-cartão: só conta
+      const incomeAcc = sumBy(t => t.type === "income" && t.method?.kind === "account", m);
+      const expenseAcc = sumBy(t => t.type === "expense" && t.method?.kind === "account", m);
+      const net = incomeAcc - expenseAcc;
+
+      document.getElementById("cardIncome").textContent = "R$ " + formatBRL(incomeTotal);
+      document.getElementById("cardExpense").textContent = "R$ " + formatBRL(expenseTotal);
+
+      const resultEl = document.getElementById("cardResult");
+      const netEl = document.getElementById("cardNet");
+
+      resultEl.textContent = "R$ " + formatBRL(result);
+      netEl.textContent = "R$ " + formatBRL(net);
+
+      resultEl.className = "";
+      netEl.className = "";
+      resultEl.classList.add("amount", result >= 0 ? "pos" : "neg");
+      netEl.classList.add("amount", net >= 0 ? "pos" : "neg");
+
+      // Cartões / faturas do mês
+      if(saldoCardsBody){
+        saldoCardsBody.innerHTML = "";
+        let cardsTotal = 0;
+        state.cards.forEach(c => {
+          const total = cardMonthTotal(c.id);
+          cardsTotal += total;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td style="font-weight:800;">${escapeHtml(c.name)}</td><td class="amount neg">R$ ${formatBRL(total)}</td>`;
+          saldoCardsBody.appendChild(tr);
+        });
+        const totalEl = document.getElementById("cardCardsTotal");
+        if(totalEl) totalEl.textContent = "R$ " + formatBRL(cardsTotal);
+
+      // Projeção do mês (fim do mês) — baseada nas transações já registradas
+      const projLabel = document.getElementById("saldoMonthProj");
+      if(projLabel) projLabel.textContent = "Mês: " + m;
+
+      // Saldo atual em contas = soma dos saldos (todas as transações até agora)
+      const saldoAtual = (state.accounts || []).reduce((s,a)=>s+(a.balance||0),0);
+
+      // Restante do mês (contas): entradas/saídas em CONTA com data >= hoje (se mês atual)
+      // Se não for mês atual, considera todo o mês como "restante"
+      const todayIso = (() => {
+        const now = new Date();
+        const off = now.getTimezoneOffset();
+        const local = new Date(now.getTime() - off*60000);
+        return local.toISOString().slice(0,10);
+      })();
+
+      const isCurrentMonth = (m === currentMonth());
+      const txMonth = state.tx.filter(t => getMonthFromISO(t.date) === m);
+
+      const remainingAcc = txMonth
+        .filter(t => t.method?.kind === "account")
+        .filter(t => !isCurrentMonth ? true : (t.date >= todayIso))
+        .reduce((s,t) => {
+          if(t.type === "income") return s + (t.amount||0);
+          if(t.type === "expense") return s - (t.amount||0);
+          return s;
+        }, 0);
+
+      const faturasMes = (state.cards || []).reduce((s,c)=>s + cardMonthTotal(c.id), 0);
+
+      const saldoFim = saldoAtual + remainingAcc;
+      const aposCartoes = saldoFim - faturasMes;
+
+      const setVal = (id, val, clsPosNeg=true) => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.textContent = "R$ " + formatBRL(val);
+        if(clsPosNeg){
+          el.classList.remove("pos","neg");
+          el.classList.add(val >= 0 ? "pos" : "neg");
+        }
+      };
+
+      setVal("projSaldoAtual", saldoAtual, true);
+      setVal("projRestanteContas", remainingAcc, true);
+
+      const fEl = document.getElementById("projFaturasMes");
+      if(fEl) fEl.textContent = "R$ " + formatBRL(faturasMes);
+
+      setVal("projSaldoFim", saldoFim, true);
+      setVal("projAposCartoes", aposCartoes, true);
+
+    }
+    }
+
     // =========================
     // Charts
     // =========================
@@ -1103,6 +1359,7 @@
       recomputeBalances();
       renderTx();
       renderAccountsCards();
+      renderSaldo();
       drawCharts();
       updateBadges();
     }
@@ -1173,6 +1430,7 @@
       save();
       renderTx();
       renderAccountsCards();
+      renderSaldo();
       drawCharts();
     });
     filterType.addEventListener("change", () => { state.ui.filterType = filterType.value; save(); renderTx(); });
@@ -1370,6 +1628,7 @@
       recomputeBalances();
       renderTx();
       renderAccountsCards();
+      renderSaldo();
       drawCharts();
     }
 
@@ -1409,6 +1668,7 @@
       recomputeBalances();
       renderTx();
       renderAccountsCards();
+      renderSaldo();
       drawCharts();
       updateBadges();
     }
@@ -1427,6 +1687,7 @@
       renderTx();
       recomputeBalances();
       renderAccountsCards();
+      renderSaldo();
       drawCharts();
       updateBadges();
     }
