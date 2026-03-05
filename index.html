@@ -6,7 +6,7 @@
   <title>Finanças • Chat</title>
 
   <!-- Chart.js (se Relatórios estiver ativo) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
@@ -363,46 +363,31 @@
       max-width:92vw;
       text-align:center;
     }
-  /* =========================
-   Mobile fix: viewport height + safe areas
-   (evita espaço vazio e cortes no PWA)
-========================= */
-@supports (height: 100dvh) {
-  .layout { min-height: 100dvh; }
-  .main { min-height: 100dvh; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
-  .drawer .panel { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
-}
-
-/* Chat ocupa a tela de forma estável no mobile */
-@media (max-width: 919px) {
-  .container { padding-top: 10px; }
-  #tab-chat .panelbox {
-    height: calc(100dvh - 92px); /* topbar + respiro */
-    display: flex;
-    flex-direction: column;
-  }
-  .chatWrap { flex: 1; min-height: 0; }
-  .chatBox { flex: 1; min-height: 0; }
-}
-
-
-@media (max-width: 919px) {
-  .chatComposer{
-    position: sticky;
-    bottom: 0;
-    background: rgba(246,248,251,.92);
-    padding-top: 10px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    border-top: 1px solid rgba(15,23,42,.08);
-    margin: 0 -14px -14px;
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-}
-</style>
+  </style>
 </head>
 
 <body>
+<!-- DEBUG overlay (auto) -->
+<div id="errOverlay" style="display:none;position:fixed;inset:auto 10px 10px 10px;z-index:99999;background:rgba(15,23,42,.92);color:#fff;padding:10px 12px;border-radius:14px;font-size:12px;line-height:1.35;max-height:42vh;overflow:auto;"></div>
+<script>
+(function(){
+  const box = document.getElementById("errOverlay");
+  function show(msg){
+    if(!box) return;
+    box.style.display = "block";
+    box.textContent = msg;
+  }
+  window.addEventListener("error", (e)=>{
+    const msg = "Erro JS: " + (e.message || "desconhecido") + "
+" + (e.filename||"") + ":" + (e.lineno||0);
+    show(msg);
+  });
+  window.addEventListener("unhandledrejection", (e)=>{
+    const msg = "Promise rejeitada: " + (e.reason?.message || String(e.reason||""));
+    show(msg);
+  });
+})();
+</script>
 <div class="layout">
   <aside class="sidebar" aria-label="Menu lateral">
     <div class="brand">
@@ -1563,6 +1548,9 @@ function renderRankCats(ym){
   }).join("");
 }
 function renderCharts(){
+  try{
+    if(typeof Chart==="undefined"){ toast("Gráficos indisponíveis (sem internet)."); return; }
+
   const ym = monthNow();
   renderRankCats(ym);
 
@@ -1605,6 +1593,7 @@ function renderCharts(){
   const ctxL = $("lineBen");
   if(line) line.destroy();
   line = new Chart(ctxL, { type:"line", data:{ labels: dayLabels, datasets }, options:{ responsive:true, plugins:{ legend:{ position:"bottom" } }, scales:{ y:{ beginAtZero:true } } } });
+  }catch(err){ console.error(err); toast("Falha ao renderizar gráficos"); }
 }
 
 /* Boot */
@@ -1670,5 +1659,3 @@ openDraftFromMessage = function(msg){
 </script>
 </body>
 </html>
-
-
