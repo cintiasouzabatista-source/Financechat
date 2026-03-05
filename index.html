@@ -431,8 +431,14 @@
             <!-- Composer (mantém a estrutura do index e deixa o chat mais interativo) -->
             <div class="composerCard" aria-label="Compor mensagem">
               <div class="composerRow">
+                <button class="iconBtn" id="btnMic" title="Falar (beta)" aria-label="Falar (beta)">🎙️</button>
                 <textarea id="chatInput" placeholder='Ex: "Gastei 100 mercado pix" | "Gastei 200 roupa cartão nubank 2x"'></textarea>
                 <button class="sendBtn" id="btnSend" title="Enviar" aria-label="Enviar">➤</button>
+              </div>
+
+              <div class="actionsRow">
+                <button class="btn secondary" id="btnQuick" type="button">➕ Atalhos</button>
+                <button class="btn secondary" id="btnExample" type="button">✨ Exemplo</button>
               </div>
 
               <div class="divider" style="margin:8px 0"></div>
@@ -1221,9 +1227,41 @@ $("chatInput").addEventListener("keydown", (e)=>{
   }
 });
 
+$("btnQuick").addEventListener("click", ()=>{
+  botSay('Atalhos:\n- "gastei 35 mercado pix nubank"\n- "gastei 200 roupa cartão nubank 2x"\n- "paguei energia 200 pix mercado pago"\n- "recebi salario 4400 nubank"');
 });
-toast("Exemplo preenchido");
+$("btnExample").addEventListener("click", ()=>{
+  const examples = [
+    "Gastei 100 mercado pix nubank",
+    "Gastei 200 roupa cartão nubank 2x",
+    "Paguei energia 200 pix mercado pago",
+    "Recebi salário 4400 Nubank"
+  ];
+  const pick = examples[Math.floor(Math.random()*examples.length)];
+  $("chatInput").value = pick;
+  autoSizeTA();
+  toast("Exemplo preenchido");
   $("chatInput").focus();
+});
+
+/* Voice (beta) */
+let rec = null;
+$("btnMic").addEventListener("click", ()=>{
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ toast("Seu navegador não suporta voz aqui."); return; }
+  if(rec){ rec.stop(); rec=null; toast("Parado"); return; }
+  rec = new SR();
+  rec.lang = "pt-BR";
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onresult = (ev)=>{
+    const text = ev.results?.[0]?.[0]?.transcript || "";
+    if(text){ $("chatInput").value = text; autoSizeTA(); toast("Reconhecido ✓"); }
+  };
+  rec.onerror = ()=>toast("Erro no microfone");
+  rec.onend = ()=>{ rec=null; };
+  rec.start();
+  toast("Falando…");
 });
 
 /* Painel */
@@ -1583,30 +1621,34 @@ function renderAll(){
   autoSizeTA();
 })();
 
-
-/* ===== RESUMO EM ORDEM (sem microfone/atalhos) =====
-   Objetivo: você digita, ele entende e mostra em ordem:
-   Tipo (Receita/Despesa)
-   Categoria
-   Valor
-   Conta/Cartão/Benefício
-   Data
-   Depois salva automaticamente.
-*/
-function renderOrderedSummary(d){
-  botSay(`✅ Entendi:\n${d.tipo}\n${d.categoria}\n${brl(d.valor)}\n${d.ref||"—"}\n${d.data}`);
+/* ===== CONFIRMAÇÃO INLINE ESTILO CHAT (mantém sua ideia, sem quebrar o fluxo) ===== */
+function renderInlineConfirm(d){
+  const box = document.getElementById("chatBox");
+  const wrap = document.createElement("div");
+  wrap.className = "msg bot";
+  wrap.innerHTML = `
+    <div>🧾 Confirmar lançamento</div>
+    <div style="margin-top:6px;font-size:13px">
+      ${d.tipo} • ${d.categoria} • ${d.meio} • ${d.ref||"—"} • ${brl(d.valor)} • ${d.data}
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn" onclick="finalizeDraft()">Finalizar</button>
+      <button class="btn secondary" onclick="editDraft()">Editar</button>
+      <button class="btn danger" onclick="cancelDraft()">Excluir</button>
+    </div>
+  `;
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
 }
 
-/* Hook: quando a mensagem já tem tudo, mostra o resumo e salva. */
+/* Sobrescreve só para mostrar a confirmação inline no chat (em vez do box separado) */
 const _originalOpenDraft = openDraftFromMessage;
 openDraftFromMessage = function(msg){
   draft = parseMessage(msg);
   const q = askMissing(draft);
   if(q){ botSay(q); return; }
-  renderOrderedSummary(draft);
-  finalizeDraft(); // salva e limpa o draft
+  renderInlineConfirm(draft);
 };
-
 
 </script>
 </body>
