@@ -4,15 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Controle Finanças</title>
-
   <style>
     :root{
       --bg:#071225;
       --panel:#0b1b33;
       --card:#0f2446;
+      --stroke:rgba(255,255,255,.10);
       --text:#eaf1ff;
       --muted:rgba(234,241,255,.72);
-      --stroke:rgba(255,255,255,.10);
       --accent:#2b6dff;
       --accent2:#1f55cc;
       --ok:#29d17c;
@@ -28,44 +27,21 @@
       color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
-    .app{
-      max-width:980px;
-      margin:0 auto;
-      padding:18px 14px 28px;
+    .app{max-width:1100px;margin:0 auto;padding:18px 14px 92px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .title{display:flex;align-items:flex-start;gap:10px}
+    .title .emoji{font-size:26px;line-height:1;margin-top:4px}
+    .title h1{margin:0;font-size:22px;line-height:1.1}
+    .title p{margin:6px 0 0;color:var(--muted);font-weight:800;font-size:12px}
+    .pill{background:rgba(255,255,255,.06);border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;color:var(--muted);font-weight:900;font-size:12px;display:flex;gap:8px;align-items:center}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(41,209,124,.18)}
+    .grid-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 14px}
+    @media (min-width:860px){
+      .grid-cards{grid-template-columns:repeat(4,1fr)}
+      .app{padding-bottom:28px}
+      .bottom-nav{display:none}
+      .tabs-desktop{display:flex}
     }
-
-    header{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      margin-bottom:14px;
-    }
-    .title{display:flex; gap:10px; align-items:flex-start}
-    .title .emoji{font-size:26px; line-height:1; margin-top:4px}
-    .title h1{margin:0; font-size:22px; line-height:1.1}
-    .title p{margin:6px 0 0; color:var(--muted); font-weight:800; font-size:12px}
-
-    .pill{
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--stroke);
-      padding:8px 10px;
-      border-radius:999px;
-      color:var(--muted);
-      font-weight:900;
-      font-size:12px;
-      display:flex; gap:8px; align-items:center;
-      white-space:nowrap;
-    }
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok); box-shadow:0 0 0 3px rgba(41,209,124,.18)}
-
-    .grid-cards{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin:12px 0 14px;
-    }
-    @media (min-width: 860px){
-      .grid-cards{grid-template-columns:repeat(3,1fr)}
-    }
-
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
       border:1px solid var(--stroke);
@@ -74,12 +50,9 @@
       padding:14px 14px;
       min-height:92px;
     }
-    .card h3{margin:0; font-size:13px; color:var(--muted); font-weight:1000}
-    .card .value{margin-top:10px; font-size:22px; font-weight:1000; letter-spacing:.2px}
-    .card .sub{margin-top:6px; font-size:12px; color:rgba(234,241,255,.62); font-weight:800}
-    .value.pos{color:rgba(41,209,124,.98)}
-    .value.neg{color:rgba(255,71,111,.98)}
-
+    .card h3{margin:0;font-size:13px;color:var(--muted);font-weight:1000}
+    .card .value{margin-top:10px;font-size:20px;font-weight:1000;letter-spacing:.2px}
+    .sub{margin-top:6px;font-size:12px;color:rgba(234,241,255,.62);font-weight:800}
     .panel{
       background:rgba(255,255,255,.03);
       border:1px solid var(--stroke);
@@ -88,10 +61,10 @@
       padding:14px;
       margin:12px 0;
     }
-    .panel h2{margin:0 0 10px; font-size:15px; font-weight:1000}
-    .muted{color:var(--muted); font-weight:800; font-size:12px; margin:0 0 10px}
-
-    label{display:block; font-size:12px; font-weight:900; color:rgba(234,241,255,.78); margin:10px 0 6px}
+    .panel h2{margin:0 0 10px;font-size:15px;font-weight:1000}
+    .muted{color:var(--muted);font-weight:800;font-size:12px;margin:0 0 10px}
+    .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0;border-radius:999px}
+    label{display:block;font-size:12px;font-weight:900;color:rgba(234,241,255,.78);margin:10px 0 6px}
     input,select,button{
       width:100%;
       border-radius:14px;
@@ -103,85 +76,52 @@
       font-weight:900;
       font-size:14px;
     }
-    input::placeholder{color:rgba(234,241,255,.45); font-weight:800}
-    input:focus,select:focus{border-color:rgba(43,109,255,.55); box-shadow:0 0 0 4px rgba(43,109,255,.12)}
-
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width: 420px){ .row{grid-template-columns:1fr} }
-
-    .btn{
-      background:linear-gradient(180deg, var(--accent), var(--accent2));
-      border:1px solid rgba(255,255,255,.14);
-      cursor:pointer;
-      font-weight:1000;
-      padding:12px 12px;
-    }
-    .btn.secondary{
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--stroke);
-      color:var(--text);
-    }
-    .btn.danger{
-      background:rgba(255,71,111,.12);
-      border-color:rgba(255,71,111,.28);
-      color:#ffd7e0;
-    }
+    input::placeholder{color:rgba(234,241,255,.45);font-weight:800}
+    input:focus,select:focus{border-color:rgba(43,109,255,.55);box-shadow:0 0 0 4px rgba(43,109,255,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:420px){.row{grid-template-columns:1fr}}
+    .btn{background:linear-gradient(180deg,var(--accent),var(--accent2));border:1px solid rgba(255,255,255,.14);cursor:pointer;font-weight:1000;padding:12px 12px}
     .btn:active{transform:translateY(1px)}
-
-    .status{
-      margin-top:10px;
-      font-size:12px;
-      font-weight:900;
-      color:rgba(234,241,255,.78);
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      overflow:hidden;
-      border-radius:16px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-    }
-    th,td{
-      padding:10px 10px;
-      text-align:left;
-      font-size:12px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      vertical-align:top;
-    }
-    th{color:rgba(234,241,255,.75); font-weight:1000}
-    td{color:rgba(234,241,255,.9); font-weight:800}
+    .btn.secondary{background:rgba(255,255,255,.06);border:1px solid var(--stroke);color:var(--text)}
+    .btn.danger{background:rgba(255,71,111,.12);border-color:rgba(255,71,111,.28);color:#ffd7e0}
+    .status{margin-top:10px;font-size:12px;font-weight:900;color:rgba(234,241,255,.78)}
+    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:16px;border:1px solid var(--stroke);background:rgba(255,255,255,.03)}
+    th,td{padding:10px 10px;text-align:left;font-size:12px;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:top}
+    th{color:rgba(234,241,255,.75);font-weight:1000}
+    td{color:rgba(234,241,255,.9);font-weight:800}
     tr:last-child td{border-bottom:none}
-    .badge{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:1000;
-      font-size:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      color:var(--muted);
+    .tabs-desktop{display:none;gap:10px;align-items:center}
+    .tab-btn{width:auto;padding:10px 12px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:var(--muted);font-weight:1000;cursor:pointer}
+    .tab-btn.active{background:rgba(43,109,255,.16);border-color:rgba(43,109,255,.35);color:var(--text)}
+    .bottom-nav{
+      position:fixed;left:0;right:0;bottom:0;
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+      background:rgba(6,12,23,.82);
+      border-top:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(14px);
+      display:flex;gap:10px;justify-content:center;z-index:999;
     }
-    .badge.in{border-color:rgba(41,209,124,.30); background:rgba(41,209,124,.10); color:rgba(210,255,232,.95)}
-    .badge.out{border-color:rgba(255,71,111,.30); background:rgba(255,71,111,.10); color:rgba(255,215,224,.95)}
-
+    .nav-btn{
+      width:33%;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      border-radius:16px;padding:12px 10px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
+      color:var(--muted);font-weight:1000;cursor:pointer;
+    }
+    .nav-btn.active{background:rgba(43,109,255,.18);border-color:rgba(43,109,255,.35);color:var(--text)}
+    .hidden{display:none !important}
     #toast{
-      position:fixed;
-      left:50%;
-      bottom:22px;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,.76);
-      color:#fff;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      font-weight:900;
-      font-size:12px;
-      display:none;
-      z-index:2000;
-      max-width:92vw;
-      text-align:center;
+      position:fixed;left:50%;bottom:86px;transform:translateX(-50%);
+      background:rgba(0,0,0,.76);color:#fff;padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);font-weight:900;font-size:12px;display:none;
+      z-index:2000;max-width:92vw;text-align:center;
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      background:rgba(255,255,255,.06);border:1px solid var(--stroke);
+      color:var(--muted);font-weight:900;font-size:12px;
     }
   </style>
 </head>
@@ -189,297 +129,546 @@
   <div class="app">
     <header>
       <div class="title">
-        <div class="emoji">💳</div>
+        <div class="emoji">💰</div>
         <div>
           <h1>Controle Finanças</h1>
-          <p>Mobile-first • simples e rápido</p>
+          <p>Focado no celular • simples e rápido</p>
         </div>
       </div>
+
+      <div class="tabs-desktop" aria-label="Menu desktop">
+        <button class="tab-btn active" data-tab="painel">Painel</button>
+        <button class="tab-btn" data-tab="lancar">Lançar</button>
+        <button class="tab-btn" data-tab="contas">Contas & Cartões</button>
+      </div>
+
       <div class="pill"><span class="dot"></span><span id="pillStatus">Pronto</span></div>
     </header>
 
-    <!-- CARDS -->
-    <section class="grid-cards" aria-label="Resumo do mês">
-      <div class="card">
-        <h3>Receitas (mês)</h3>
-        <div class="value pos" id="cardReceitas">R$ 0,00</div>
-        <div class="sub" id="subMes">—</div>
-      </div>
-      <div class="card">
-        <h3>Despesas (mês)</h3>
-        <div class="value neg" id="cardDespesas">R$ 0,00</div>
-        <div class="sub">Somatório no mês</div>
-      </div>
-      <div class="card">
-        <h3>Saldo atual (mês)</h3>
-        <div class="value" id="cardSaldo">R$ 0,00</div>
-        <div class="sub">Receitas - Despesas</div>
-      </div>
-    </section>
-
-    <!-- NOVO LANÇAMENTO -->
-    <section class="panel" aria-label="Novo lançamento">
-      <h2>➕ Novo lançamento</h2>
-      <p class="muted">Dica: deixe “Categoria” com nomes simples (Mercado, Transporte, Saúde...).</p>
-
-      <div class="row">
-        <div>
-          <label for="data">Data</label>
-          <input id="data" type="date" />
+    <section id="tab-painel">
+      <div class="grid-cards">
+        <div class="card">
+          <h3>Receitas (mês)</h3>
+          <div class="value" id="cardReceitas">R$ 0,00</div>
+          <div class="sub">Entradas no mês</div>
         </div>
-        <div>
-          <label for="tipo">Tipo</label>
-          <select id="tipo">
-            <option value="Despesa">Despesa</option>
-            <option value="Receita">Receita</option>
-          </select>
+        <div class="card">
+          <h3>Despesas (mês)</h3>
+          <div class="value" id="cardDespesas">R$ 0,00</div>
+          <div class="sub">Só débito/PIX/dinheiro</div>
+        </div>
+        <div class="card">
+          <h3>Cartão (mês)</h3>
+          <div class="value" id="cardCartao">R$ 0,00</div>
+          <div class="sub">Compras no crédito</div>
+        </div>
+        <div class="card">
+          <h3>Saldo (mês)</h3>
+          <div class="value" id="cardSaldo">R$ 0,00</div>
+          <div class="sub">Receitas - Despesas</div>
         </div>
       </div>
 
-      <label for="categoria">Categoria</label>
-      <input id="categoria" placeholder="Ex: Mercado" />
-
-      <label for="valor">Valor (R$)</label>
-      <input id="valor" inputmode="decimal" placeholder="Ex: 12,50" />
-
-      <div class="row" style="margin-top:10px">
-        <button class="btn" id="btnSalvar" type="button">Salvar</button>
-        <button class="btn danger" id="btnLimpar" type="button">Limpar tudo</button>
-      </div>
-
-      <div class="status" id="saveStatus">—</div>
-    </section>
-
-    <!-- RESUMO -->
-    <section class="panel" aria-label="Resumo do mês">
-      <h2>📌 Resumo do mês</h2>
-      <div class="status" id="resumoMes">—</div>
-    </section>
-
-    <!-- HISTÓRICO -->
-    <section class="panel" aria-label="Histórico">
-      <h2>🧾 Histórico</h2>
-      <div style="overflow:auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Tipo</th>
-              <th>Categoria</th>
-              <th>Valor</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
+      <div class="panel">
+        <h2>Resumo do mês</h2>
+        <p class="muted">Regra: <b>compras no cartão</b> entram no card “Cartão” e <b>não contam</b> como “Despesas”.</p>
+        <div class="row">
+          <div class="chip" id="chipMes">📅 —</div>
+          <div class="chip" id="chipContas">🏦 0 contas</div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="chip" id="chipCartoes">💳 0 cartões</div>
+          <div class="chip" id="chipLanc">🧾 0 lançamentos</div>
+        </div>
       </div>
     </section>
+
+    <section id="tab-lancar" class="hidden">
+      <div class="panel">
+        <h2>Novo lançamento</h2>
+
+        <div class="row">
+          <div>
+            <label for="data">Data</label>
+            <input id="data" type="date" />
+          </div>
+          <div>
+            <label for="tipo">Tipo</label>
+            <select id="tipo">
+              <option value="Despesa">Despesa</option>
+              <option value="Receita">Receita</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="categoria">Categoria</label>
+        <input id="categoria" placeholder="Ex: Mercado, Aluguel, Salário..." />
+
+        <div class="row">
+          <div>
+            <label for="valor">Valor (R$)</label>
+            <input id="valor" inputmode="decimal" placeholder="Ex: 12,50" />
+          </div>
+          <div>
+            <label for="meio">Meio</label>
+            <select id="meio">
+              <option value="debito">Débito/PIX/Dinheiro (conta)</option>
+              <option value="credito">Crédito (cartão)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" id="rowConta">
+          <div>
+            <label for="contaId">Conta</label>
+            <select id="contaId"></select>
+          </div>
+          <div>
+            <label for="observacao">Obs (opcional)</label>
+            <input id="observacao" placeholder="Ex: feira, farmácia..." />
+          </div>
+        </div>
+
+        <div class="row hidden" id="rowCartao">
+          <div>
+            <label for="cartaoId">Cartão</label>
+            <select id="cartaoId"></select>
+          </div>
+          <div>
+            <label for="nfLink">Link NF (opcional)</label>
+            <input id="nfLink" placeholder="Cole o link da nota" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="btnSalvar" type="button">Salvar</button>
+          <button class="btn danger" id="btnLimpar" type="button">Limpar tudo</button>
+        </div>
+
+        <div class="status" id="saveStatus">—</div>
+      </div>
+
+      <div class="panel">
+        <h2>Histórico (mês)</h2>
+        <p class="muted">Mostra lançamentos do mês atual.</p>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Categoria</th>
+                <th>Meio</th>
+                <th>Conta/Cartão</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyMes"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-contas" class="hidden">
+      <div class="panel">
+        <h2>🏦 Contas</h2>
+        <p class="muted">Cadastre suas contas (ex: Mercado Pago, Dinheiro, VR, VA...).</p>
+
+        <label for="contaNome">Nome da conta</label>
+        <input id="contaNome" placeholder="Ex: Mercado Pago" />
+
+        <label for="contaTipo">Tipo</label>
+        <select id="contaTipo">
+          <option value="banco">Banco/Carteira</option>
+          <option value="dinheiro">Dinheiro</option>
+          <option value="beneficio">Benefício (VR/VA/Combustível)</option>
+        </select>
+
+        <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
+        <div class="status" id="contaStatus">—</div>
+
+        <div class="divider"></div>
+
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Conta</th><th>Tipo</th><th>Ações</th></tr></thead>
+            <tbody id="tbodyContas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>💳 Cartões</h2>
+        <p class="muted">Cadastre seus cartões (ex: Nubank, Mercado Pago). Compras no crédito vão para o card “Cartão”.</p>
+
+        <label for="cartaoNome">Nome do cartão</label>
+        <input id="cartaoNome" placeholder="Ex: Nubank" />
+
+        <div class="row">
+          <div>
+            <label for="cartaoLimite">Limite (opcional)</label>
+            <input id="cartaoLimite" inputmode="decimal" placeholder="Ex: 3000" />
+          </div>
+          <div>
+            <label for="cartaoFechamento">Fechamento (dia)</label>
+            <input id="cartaoFechamento" inputmode="numeric" placeholder="Ex: 10" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="cartaoVenc">Vencimento (dia)</label>
+            <input id="cartaoVenc" inputmode="numeric" placeholder="Ex: 17" />
+          </div>
+          <div>
+            <label for="cartaoObs">Obs (opcional)</label>
+            <input id="cartaoObs" placeholder="Ex: cartão principal" />
+          </div>
+        </div>
+
+        <button class="btn" id="btnAddCartao" type="button" style="margin-top:10px">Adicionar cartão</button>
+        <div class="status" id="cartaoStatus">—</div>
+
+        <div class="divider"></div>
+
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Cartão</th><th>Fech/Venc</th><th>Limite</th><th>Ações</th></tr></thead>
+            <tbody id="tbodyCartoes"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>ℹ️ Regra simples</h2>
+        <p class="muted">
+          • Meio <b>Crédito (cartão)</b> → soma no card <b>Cartão</b> e não entra em <b>Despesas</b>.<br/>
+          • Meio <b>Débito/PIX/Dinheiro</b> → entra em <b>Despesas</b>.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div class="bottom-nav" aria-label="Menu">
+    <button class="nav-btn active" data-tab="painel">🏠 Painel</button>
+    <button class="nav-btn" data-tab="lancar">➕ Lançar</button>
+    <button class="nav-btn" data-tab="contas">💳 Contas</button>
   </div>
 
   <div id="toast"></div>
 
 <script>
-  /* ===== Helpers ===== */
-  const STORE_KEY = "financas_lancamentos_v1";
+const TX_KEY = "financas_tx_v2";
+const ACC_KEY = "financas_contas_v1";
+const CARD_KEY = "financas_cartoes_v1";
 
-  const $ = (id)=>document.getElementById(id);
+const $ = (id)=>document.getElementById(id);
 
-  function toast(msg){
-    const t = $("toast");
-    t.textContent = msg;
-    t.style.display = "block";
-    clearTimeout(toast._tm);
-    toast._tm = setTimeout(()=>t.style.display="none", 2400);
-  }
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.style.display="block";
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=>{ t.style.display="none"; }, 2200);
+}
+function parseBRNumber(s){
+  if(s === null || s === undefined) return null;
+  const v = String(s).trim();
+  if(!v) return null;
+  const norm = v.replace(/\./g,"").replace(",", ".");
+  const n = Number(norm);
+  return Number.isFinite(n) ? n : null;
+}
+function formatBRL(n){
+  const v = Number(n);
+  if(!Number.isFinite(v)) return "R$ 0,00";
+  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+function loadJSON(key, fallback){
+  try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+function uid(prefix="id"){ return prefix + "_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16); }
+function ymFromISO(iso){
+  const parts = String(iso||"").split("-");
+  if(parts.length<2) return null;
+  return parts[0]+"-"+parts[1];
+}
+function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const dd= String(d.getDate()).padStart(2,"0");
+  return y+"-"+m+"-"+dd;
+}
+function escapeHtml(s){
+  return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
 
-  function parseBRNumber(s){
-    if(s === null || s === undefined) return null;
-    const v = String(s).trim();
-    if(!v) return null;
-    const norm = v.replace(/\./g,"").replace(",", ".");
-    const n = Number(norm);
-    return Number.isFinite(n) ? n : null;
-  }
+let tx = loadJSON(TX_KEY, []);
+let contas = loadJSON(ACC_KEY, []);
+let cartoes = loadJSON(CARD_KEY, []);
 
-  function formatBRL(n){
-    const v = Number(n);
-    if(!Number.isFinite(v)) return "R$ 0,00";
-    return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-  }
+if(contas.length === 0){
+  contas = [
+    {id: uid("acc"), nome:"Mercado Pago", tipo:"banco"},
+    {id: uid("acc"), nome:"Dinheiro", tipo:"dinheiro"},
+  ];
+  saveJSON(ACC_KEY, contas);
+}
+if(cartoes.length === 0){
+  cartoes = [
+    {id: uid("card"), nome:"Nubank", limite:null, fechamento:10, venc:17, obs:""},
+    {id: uid("card"), nome:"Mercado Pago", limite:null, fechamento:0, venc:0, obs:""},
+  ];
+  saveJSON(CARD_KEY, cartoes);
+}
 
-  function ymFromISO(iso){
-    const [y,m] = String(iso||"").split("-");
-    if(!y || !m) return null;
-    return `${y}-${m}`;
-  }
-
-  function ymLabel(ym){
-    const [y,m] = ym.split("-");
-    return `${m}/${y}`;
-  }
-
-  function todayISO(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function loadItems(){
-    try{ return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); }
-    catch(e){ return []; }
-  }
-  function saveItems(items){
-    localStorage.setItem(STORE_KEY, JSON.stringify(items));
-  }
-
-  let items = loadItems();
-
-  /* ===== UI: default date ===== */
-  if($("data")) $("data").value = todayISO();
-
-  /* ===== Calculations ===== */
-  function calcMonthTotals(targetYm){
-    let receitas = 0;
-    let despesas = 0;
-    for(const it of items){
-      const ym = ymFromISO(it.data);
-      if(!ym || ym !== targetYm) continue;
-      const v = Number(it.valor) || 0;
-      if(it.tipo === "Receita") receitas += v;
-      else despesas += v;
-    }
-    return {receitas, despesas, saldo: receitas - despesas};
-  }
-
-  function renderCards(){
-    const ym = ymFromISO($("data").value) || ymFromISO(todayISO());
-    const {receitas, despesas, saldo} = calcMonthTotals(ym);
-
-    $("cardReceitas").textContent = formatBRL(receitas);
-    $("cardDespesas").textContent = formatBRL(despesas);
-
-    const saldoEl = $("cardSaldo");
-    saldoEl.textContent = formatBRL(saldo);
-    saldoEl.classList.remove("pos","neg");
-    if(saldo > 0) saldoEl.classList.add("pos");
-    else if(saldo < 0) saldoEl.classList.add("neg");
-
-    $("subMes").textContent = `Mês: ${ymLabel(ym)}`;
-
-    const resumo = `Receitas: ${formatBRL(receitas)} • Despesas: ${formatBRL(despesas)} • Saldo: ${formatBRL(saldo)} (${ymLabel(ym)})`;
-    $("resumoMes").textContent = resumo;
-
-    $("pillStatus").textContent = "Pronto";
-  }
-
-  function renderTable(){
-    const tbody = $("tbody");
-    tbody.innerHTML = "";
-
-    // ordena desc por data (e por createdAt como desempate)
-    const sorted = [...items].sort((a,b)=>{
-      if(a.data === b.data) return (b.createdAt||0) - (a.createdAt||0);
-      return (b.data||"").localeCompare(a.data||"");
-    });
-
-    for(const it of sorted){
-      const tr = document.createElement("tr");
-
-      const tdData = document.createElement("td");
-      tdData.textContent = it.data || "—";
-
-      const tdTipo = document.createElement("td");
-      const badge = document.createElement("span");
-      badge.className = "badge " + (it.tipo === "Receita" ? "in":"out");
-      badge.textContent = it.tipo;
-      tdTipo.appendChild(badge);
-
-      const tdCat = document.createElement("td");
-      tdCat.textContent = it.categoria || "—";
-
-      const tdVal = document.createElement("td");
-      tdVal.textContent = formatBRL(it.valor);
-
-      const tdDel = document.createElement("td");
-      const btn = document.createElement("button");
-      btn.className = "btn secondary";
-      btn.style.width = "auto";
-      btn.style.padding = "8px 10px";
-      btn.style.borderRadius = "12px";
-      btn.textContent = "🗑️";
-      btn.title = "Excluir";
-      btn.onclick = ()=>{
-        items = items.filter(x=>x.id !== it.id);
-        saveItems(items);
-        toast("Excluído.");
-        renderAll();
-      };
-      tdDel.appendChild(btn);
-
-      tr.appendChild(tdData);
-      tr.appendChild(tdTipo);
-      tr.appendChild(tdCat);
-      tr.appendChild(tdVal);
-      tr.appendChild(tdDel);
-
-      tbody.appendChild(tr);
-    }
-  }
-
-  function renderAll(){
-    renderCards();
-    renderTable();
-  }
-
-  /* ===== Events ===== */
-  $("data").addEventListener("change", ()=>renderCards());
-
-  $("btnSalvar").addEventListener("click", ()=>{
-    const data = ($("data").value || "").trim();
-    const tipo = ($("tipo").value || "").trim();
-    const categoria = ($("categoria").value || "").trim() || "Sem categoria";
-    const valor = parseBRNumber($("valor").value);
-
-    if(!data){ toast("Informe a data."); return; }
-    if(!tipo){ toast("Selecione o tipo."); return; }
-    if(valor === null){ toast("Informe um valor válido."); return; }
-    if(valor <= 0){ toast("Valor deve ser maior que zero."); return; }
-
-    const item = {
-      id: crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()) + "_" + Math.random().toString(16).slice(2),
-      data,
-      tipo,
-      categoria,
-      valor,
-      createdAt: Date.now()
-    };
-    items.push(item);
-    saveItems(items);
-
-    $("saveStatus").textContent = `Salvo ✅ (${tipo} • ${formatBRL(valor)} • ${categoria})`;
-    toast("Salvo ✅");
-
-    // limpa valor/categoria para agilizar
-    $("valor").value = "";
-    $("categoria").value = categoria === "Sem categoria" ? "" : categoria;
-
-    renderAll();
+/* Tabs */
+function setActiveTab(tab){
+  ["painel","lancar","contas"].forEach(t=>{
+    const el = document.getElementById("tab-"+t);
+    if(el) el.classList.toggle("hidden", t !== tab);
   });
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab === tab));
+  $("pillStatus").textContent = (tab==="painel"?"Painel":tab==="lancar"?"Lançar":"Contas");
+}
+document.addEventListener("click",(e)=>{
+  const btn = e.target.closest("[data-tab]");
+  if(btn) setActiveTab(btn.dataset.tab);
+});
 
-  $("btnLimpar").addEventListener("click", ()=>{
-    const ok = confirm("Tem certeza que deseja apagar TODOS os lançamentos?");
-    if(!ok) return;
-    items = [];
-    saveItems(items);
-    $("saveStatus").textContent = "Histórico apagado.";
-    toast("Histórico apagado.");
-    renderAll();
+/* selects */
+function renderSelects(){
+  const selConta = $("contaId");
+  const selCartao = $("cartaoId");
+  selConta.innerHTML = "";
+  contas.forEach(c=>{
+    const o = document.createElement("option");
+    o.value = c.id; o.textContent = c.nome;
+    selConta.appendChild(o);
   });
+  selCartao.innerHTML = "";
+  cartoes.forEach(c=>{
+    const o = document.createElement("option");
+    o.value = c.id; o.textContent = c.nome;
+    selCartao.appendChild(o);
+  });
+}
+function toggleMeio(){
+  const meio = $("meio").value;
+  $("rowConta").classList.toggle("hidden", meio === "credito");
+  $("rowCartao").classList.toggle("hidden", meio !== "credito");
+}
+$("meio").addEventListener("change", toggleMeio);
 
-  /* ===== Init ===== */
-  renderAll();
+/* painel */
+function calcMonthMetrics(){
+  const ym = ymFromISO(($("data").value || todayISO()));
+  const monthTx = tx.filter(t => ymFromISO(t.data) === ym);
+
+  const receitas = monthTx.filter(t => t.tipo === "Receita").reduce((a,b)=>a+(Number(b.valor)||0),0);
+  const despesas = monthTx.filter(t => t.tipo === "Despesa" && t.meio !== "credito").reduce((a,b)=>a+(Number(b.valor)||0),0);
+  const cartao = monthTx.filter(t => t.tipo === "Despesa" && t.meio === "credito").reduce((a,b)=>a+(Number(b.valor)||0),0);
+  const saldo = receitas - despesas;
+
+  return {ym, receitas, despesas, cartao, saldo, count: monthTx.length};
+}
+function renderPainel(){
+  const m = calcMonthMetrics();
+  $("cardReceitas").textContent = formatBRL(m.receitas);
+  $("cardDespesas").textContent = formatBRL(m.despesas);
+  $("cardCartao").textContent = formatBRL(m.cartao);
+
+  $("cardSaldo").textContent = formatBRL(m.saldo);
+  $("cardSaldo").style.color = m.saldo >= 0 ? "#d9ffe9" : "#ffd7e0";
+
+  $("chipMes").textContent = "📅 " + (m.ym ? m.ym.split("-").reverse().join("/") : "—");
+  $("chipContas").textContent = "🏦 " + contas.length + " contas";
+  $("chipCartoes").textContent = "💳 " + cartoes.length + " cartões";
+  $("chipLanc").textContent = "🧾 " + tx.length + " lançamentos";
+}
+
+/* tabelas */
+function nameById(list, id){
+  const it = list.find(x=>x.id===id);
+  return it ? it.nome : "—";
+}
+function renderTabelaMes(){
+  const ym = ymFromISO(($("data").value || todayISO()));
+  const monthTx = tx.filter(t => ymFromISO(t.data) === ym).sort((a,b)=> (a.data<b.data?1:-1));
+
+  const tbody = $("tbodyMes");
+  tbody.innerHTML = "";
+  monthTx.forEach(t=>{
+    const meioLabel = t.meio === "credito" ? "Crédito" : "Conta";
+    const alvo = t.meio === "credito" ? nameById(cartoes, t.cartaoId) : nameById(contas, t.contaId);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${t.data}</td>
+      <td>${t.tipo}</td>
+      <td>${escapeHtml(t.categoria||"")}</td>
+      <td>${meioLabel}</td>
+      <td>${escapeHtml(alvo||"—")}</td>
+      <td>${formatBRL(t.valor)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function renderContas(){
+  const tbody = $("tbodyContas");
+  tbody.innerHTML = "";
+  contas.forEach(c=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(c.nome)}</td>
+      <td>${escapeHtml(c.tipo)}</td>
+      <td><button class="btn danger" data-del-acc="${c.id}" type="button">Excluir</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function renderCartoes(){
+  const tbody = $("tbodyCartoes");
+  tbody.innerHTML = "";
+  cartoes.forEach(c=>{
+    const fv = (c.fechamento||0) ? (c.fechamento + "/" + (c.venc||0)) : "—";
+    const lim = c.limite ? formatBRL(c.limite) : "—";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(c.nome)}</td>
+      <td>${escapeHtml(fv)}</td>
+      <td>${escapeHtml(lim)}</td>
+      <td><button class="btn danger" data-del-card="${c.id}" type="button">Excluir</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* lançamentos */
+function saveTx(){
+  saveJSON(TX_KEY, tx);
+  renderPainel();
+  renderTabelaMes();
+  toast("Salvo ✅");
+}
+function resetForm(){
+  $("categoria").value="";
+  $("valor").value="";
+  $("observacao").value="";
+  $("nfLink").value="";
+  $("tipo").value="Despesa";
+  $("meio").value="debito";
+  toggleMeio();
+  $("saveStatus").textContent="—";
+}
+$("btnSalvar").addEventListener("click", ()=>{
+  const data = $("data").value || todayISO();
+  const tipo = $("tipo").value;
+  const categoria = ($("categoria").value||"").trim();
+  const valor = parseBRNumber($("valor").value);
+  const meio = $("meio").value;
+
+  if(!categoria){ $("saveStatus").textContent="Informe a categoria."; toast("Informe a categoria"); return; }
+  if(!Number.isFinite(valor) || valor<=0){ $("saveStatus").textContent="Informe o valor."; toast("Informe o valor"); return; }
+
+  const t = { id: uid("tx"), data, tipo, categoria, valor, meio, createdAt: Date.now() };
+
+  if(meio === "credito"){
+    t.cartaoId = $("cartaoId").value || null;
+    t.nfLink = ($("nfLink").value||"").trim() || null;
+  }else{
+    t.contaId = $("contaId").value || null;
+    t.obs = ($("observacao").value||"").trim() || null;
+  }
+
+  tx.push(t);
+  saveTx();
+  $("saveStatus").textContent = "Salvo ✅";
+  resetForm();
+});
+$("btnLimpar").addEventListener("click", ()=>{
+  if(!confirm("Tem certeza que quer apagar TUDO?")) return;
+  localStorage.removeItem(TX_KEY);
+  tx = [];
+  renderPainel();
+  renderTabelaMes();
+  $("saveStatus").textContent="Tudo apagado.";
+  toast("Tudo apagado");
+});
+
+/* contas & cartões */
+$("btnAddConta").addEventListener("click", ()=>{
+  const nome = ($("contaNome").value||"").trim();
+  const tipo = $("contaTipo").value;
+  if(!nome){ $("contaStatus").textContent="Informe o nome da conta."; toast("Informe o nome"); return; }
+  contas.push({id: uid("acc"), nome, tipo});
+  saveJSON(ACC_KEY, contas);
+  $("contaNome").value="";
+  $("contaStatus").textContent="Conta adicionada ✅";
+  renderSelects(); renderContas(); renderPainel();
+});
+$("btnAddCartao").addEventListener("click", ()=>{
+  const nome = ($("cartaoNome").value||"").trim();
+  if(!nome){ $("cartaoStatus").textContent="Informe o nome do cartão."; toast("Informe o nome"); return; }
+
+  const limite = parseBRNumber($("cartaoLimite").value);
+  const fechamento = parseInt(($("cartaoFechamento").value||"").trim(),10);
+  const venc = parseInt(($("cartaoVenc").value||"").trim(),10);
+  const obs = ($("cartaoObs").value||"").trim();
+
+  cartoes.push({
+    id: uid("card"),
+    nome,
+    limite: Number.isFinite(limite) ? limite : null,
+    fechamento: Number.isFinite(fechamento) ? fechamento : 0,
+    venc: Number.isFinite(venc) ? venc : 0,
+    obs: obs || ""
+  });
+  saveJSON(CARD_KEY, cartoes);
+
+  $("cartaoNome").value="";
+  $("cartaoLimite").value="";
+  $("cartaoFechamento").value="";
+  $("cartaoVenc").value="";
+  $("cartaoObs").value="";
+  $("cartaoStatus").textContent="Cartão adicionado ✅";
+  renderSelects(); renderCartoes(); renderPainel();
+});
+document.addEventListener("click",(e)=>{
+  const delAcc = e.target.closest("[data-del-acc]");
+  if(delAcc){
+    const id = delAcc.dataset.delAcc;
+    if(!confirm("Excluir esta conta?")) return;
+    contas = contas.filter(c=>c.id!==id);
+    saveJSON(ACC_KEY, contas);
+    renderSelects(); renderContas(); renderPainel();
+    toast("Conta excluída");
+  }
+  const delCard = e.target.closest("[data-del-card]");
+  if(delCard){
+    const id = delCard.dataset.delCard;
+    if(!confirm("Excluir este cartão?")) return;
+    cartoes = cartoes.filter(c=>c.id!==id);
+    saveJSON(CARD_KEY, cartoes);
+    renderSelects(); renderCartoes(); renderPainel();
+    toast("Cartão excluído");
+  }
+});
+
+/* init */
+function init(){
+  $("data").value = todayISO();
+  renderSelects();
+  toggleMeio();
+  renderPainel();
+  renderTabelaMes();
+  renderContas();
+  renderCartoes();
+}
+init();
 </script>
 </body>
 </html>
