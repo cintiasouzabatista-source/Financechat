@@ -163,15 +163,9 @@
           <div class="sub">Compras no crédito</div>
         </div>
         <div class="card">
-          <h3>Saldo atual (mês)</h3>
+          <h3>Saldo (mês)</h3>
           <div class="value" id="cardSaldo">R$ 0,00</div>
           <div class="sub">Receitas - Despesas</div>
-        </div>
-
-        <div class="card">
-          <h3>Saldo projetado</h3>
-          <div class="value" id="cardSaldoProj">R$ 0,00</div>
-          <div class="sub">Receitas - Despesas - Cartão</div>
         </div>
       </div>
 
@@ -479,9 +473,8 @@ function calcMonthMetrics(){
   const despesas = monthTx.filter(t => t.tipo === "Despesa" && t.meio !== "credito").reduce((a,b)=>a+(Number(b.valor)||0),0);
   const cartao = monthTx.filter(t => t.tipo === "Despesa" && t.meio === "credito").reduce((a,b)=>a+(Number(b.valor)||0),0);
   const saldo = receitas - despesas;
-    const saldoProj = receitas - despesas - cartao;
 
-  return {ym, receitas, despesas, cartao, saldo, saldoProj, count: monthTx.length};
+  return {ym, receitas, despesas, cartao, saldo, count: monthTx.length};
 }
 function renderPainel(){
   const m = calcMonthMetrics();
@@ -490,9 +483,7 @@ function renderPainel(){
   $("cardCartao").textContent = formatBRL(m.cartao);
 
   $("cardSaldo").textContent = formatBRL(m.saldo);
-  if($("cardSaldoProj")) $("cardSaldoProj").textContent = formatBRL(m.saldoProj);
   $("cardSaldo").style.color = m.saldo >= 0 ? "#d9ffe9" : "#ffd7e0";
-  if($("cardSaldoProj")) $("cardSaldoProj").style.color = m.saldoProj >= 0 ? "#d9ffe9" : "#ffd7e0";
 
   $("chipMes").textContent = "📅 " + (m.ym ? m.ym.split("-").reverse().join("/") : "—");
   $("chipContas").textContent = "🏦 " + contas.length + " contas";
