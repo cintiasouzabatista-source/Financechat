@@ -2,7 +2,7 @@
   "name": "Finance • Chat",
   "short_name": "Finance",
   "description": "Finance Chat - registrar despesas e receitas via chat.",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=18.1.0",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b1220",
