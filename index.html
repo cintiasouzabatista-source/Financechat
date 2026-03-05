@@ -3,240 +3,99 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Painel Combustível</title>
-
-  <!-- Charts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <title>Controle Finanças</title>
 
   <style>
     :root{
-      --bg:#06101f;
-      --bg2:#071225;
-      --panel:rgba(255,255,255,.04);
-      --card:rgba(255,255,255,.06);
-      --stroke:rgba(255,255,255,.10);
+      --bg:#071225;
+      --panel:#0b1b33;
+      --card:#0f2446;
       --text:#eaf1ff;
-      --muted:rgba(234,241,255,.70);
+      --muted:rgba(234,241,255,.72);
+      --stroke:rgba(255,255,255,.10);
       --accent:#2b6dff;
       --accent2:#1f55cc;
-      --danger:#ff476f;
       --ok:#29d17c;
-      --shadow:0 14px 34px rgba(0,0,0,.28);
+      --danger:#ff476f;
+      --shadow:0 12px 30px rgba(0,0,0,.28);
       --radius:18px;
-      --line:rgba(255,255,255,.08);
-      --sideW: 280px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
+      background:linear-gradient(180deg, #071225 0%, #06101f 70%, #050c17 100%);
       color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1200px 900px at 10% 0%, #0a1c38 0%, var(--bg) 45%, #050c17 100%);
-      overflow-x:hidden;
     }
-    a{color:#bcd0ff}
     .app{
-      min-height:100vh;
-      display:flex;
+      max-width:980px;
+      margin:0 auto;
+      padding:18px 14px 28px;
     }
 
-    /* Sidebar */
-    .sidebar{
-      width:var(--sideW);
-      background:rgba(5,12,23,.86);
-      border-right:1px solid var(--line);
-      padding:14px 12px;
-      position:fixed;
-      top:0; bottom:0; left:0;
-      transform: translateX(-102%);
-      transition: transform .22s ease;
-      z-index:2500;
-      backdrop-filter: blur(14px);
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:14px;
     }
-    .sidebar.open{ transform: translateX(0); }
-    .sidebar .brand{
-      display:flex; align-items:center; gap:10px;
-      padding:10px 10px 14px;
-      border-bottom:1px solid var(--line);
-      margin-bottom:10px;
-    }
-    .brand .logo{font-size:22px}
-    .brand .txt{display:flex; flex-direction:column}
-    .brand .txt .t{font-size:14px; font-weight:900}
-    .brand .txt .s{font-size:12px; color:var(--muted); font-weight:800}
+    .title{display:flex; gap:10px; align-items:flex-start}
+    .title .emoji{font-size:26px; line-height:1; margin-top:4px}
+    .title h1{margin:0; font-size:22px; line-height:1.1}
+    .title p{margin:6px 0 0; color:var(--muted); font-weight:800; font-size:12px}
 
-    .nav{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      padding:10px 6px;
-    }
-    .nav button{
-      width:100%;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-      padding:12px 12px;
-      cursor:pointer;
-      font-weight:900;
-      font-size:13px;
-      text-align:left;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .nav button.active{
-      background:rgba(43,109,255,.16);
-      border-color:rgba(43,109,255,.35);
-      color:var(--text);
-    }
-    .nav .ic{width:22px; display:inline-flex; justify-content:center}
-    .side-footer{
-      position:absolute;
-      left:12px; right:12px; bottom:12px;
-      border-top:1px solid var(--line);
-      padding-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
-    }
-
-    .overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.45);
-      backdrop-filter: blur(6px);
-      display:none;
-      z-index:2400;
-    }
-    .overlay.show{display:block}
-
-    /* Main */
-    .main{
-      width:100%;
-      padding:16px 14px 28px;
-      margin-left:0;
-    }
-    @media (min-width: 980px){
-      .sidebar{ transform: translateX(0); position:sticky; z-index:1; }
-      .overlay{display:none !important;}
-      .main{ margin-left:0; padding-left:18px; }
-      .topbar .menuBtn{ display:none; }
-      .app{ gap:0; }
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
-    }
-    .menuBtn{
-      width:auto;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      padding:10px 12px;
-      cursor:pointer;
-      font-weight:900;
-    }
-    .statusPill{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
+    .pill{
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--stroke);
+      padding:8px 10px;
       border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
       color:var(--muted);
       font-weight:900;
       font-size:12px;
+      display:flex; gap:8px; align-items:center;
       white-space:nowrap;
     }
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(41,209,124,.18)}
-    h1{
-      margin:0;
-      font-size:24px;
-      font-weight:950;
-      letter-spacing:.2px;
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok); box-shadow:0 0 0 3px rgba(41,209,124,.18)}
+
+    .grid-cards{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin:12px 0 14px;
     }
-    .subtitle{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
+    @media (min-width: 860px){
+      .grid-cards{grid-template-columns:repeat(3,1fr)}
     }
 
-    /* Sections */
-    .section{
-      background:var(--panel);
-      border:1px solid var(--line);
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:14px;
-      margin:14px 0;
-    }
-    .sectionTitle{
-      margin:0 0 10px;
-      font-size:14px;
-      font-weight:950;
-    }
-    .divider{
-      height:1px;
-      background:var(--line);
-      margin:14px 0;
-    }
-
-    /* Cards */
-    .cards{
-      display:grid;
-      grid-template-columns:1fr 1fr; /* 2 por linha já no celular */
-      gap:12px;
-    }
-    @media (min-width: 980px){
-      .cards{ grid-template-columns:repeat(4, 1fr); }
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
-      border:1px solid var(--line);
-      border-radius:18px;
       padding:14px 14px;
       min-height:92px;
     }
-    .card .label{
-      margin:0;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:850;
-    }
-    .card .val{
-      margin-top:10px;
-      font-size:22px;
-      font-weight:950;
-    }
-    .small{
-      margin-top:6px;
-      color:rgba(234,241,255,.55);
-      font-size:12px;
-      font-weight:800;
-    }
+    .card h3{margin:0; font-size:13px; color:var(--muted); font-weight:1000}
+    .card .value{margin-top:10px; font-size:22px; font-weight:1000; letter-spacing:.2px}
+    .card .sub{margin-top:6px; font-size:12px; color:rgba(234,241,255,.62); font-weight:800}
+    .value.pos{color:rgba(41,209,124,.98)}
+    .value.neg{color:rgba(255,71,111,.98)}
 
-    /* Form */
-    label{
-      display:block;
-      margin:10px 0 6px;
-      color:rgba(234,241,255,.78);
-      font-size:12px;
-      font-weight:900;
+    .panel{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      margin:12px 0;
     }
-    input, select, button{
+    .panel h2{margin:0 0 10px; font-size:15px; font-weight:1000}
+    .muted{color:var(--muted); font-weight:800; font-size:12px; margin:0 0 10px}
+
+    label{display:block; font-size:12px; font-weight:900; color:rgba(234,241,255,.78); margin:10px 0 6px}
+    input,select,button{
       width:100%;
       border-radius:14px;
-      border:1px solid var(--line);
+      border:1px solid var(--stroke);
       background:rgba(255,255,255,.06);
       color:var(--text);
       padding:12px 12px;
@@ -244,58 +103,73 @@
       font-weight:900;
       font-size:14px;
     }
-    input::placeholder{ color:rgba(234,241,255,.45); font-weight:800; }
-    input:focus, select:focus{ border-color:rgba(43,109,255,.55); box-shadow:0 0 0 4px rgba(43,109,255,.12); }
+    input::placeholder{color:rgba(234,241,255,.45); font-weight:800}
+    input:focus,select:focus{border-color:rgba(43,109,255,.55); box-shadow:0 0 0 4px rgba(43,109,255,.12)}
 
-    .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    @media (max-width: 420px){ .row{ grid-template-columns:1fr; } }
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 420px){ .row{grid-template-columns:1fr} }
 
     .btn{
       background:linear-gradient(180deg, var(--accent), var(--accent2));
       border:1px solid rgba(255,255,255,.14);
       cursor:pointer;
-      font-weight:950;
+      font-weight:1000;
+      padding:12px 12px;
     }
     .btn.secondary{
       background:rgba(255,255,255,.06);
-      border:1px solid var(--line);
+      border:1px solid var(--stroke);
       color:var(--text);
     }
     .btn.danger{
       background:rgba(255,71,111,.12);
-      border-color:rgba(255,71,111,.30);
+      border-color:rgba(255,71,111,.28);
       color:#ffd7e0;
     }
-    .btn:active{ transform: translateY(1px); }
+    .btn:active{transform:translateY(1px)}
 
-    .hint{ color:var(--muted); font-size:12px; font-weight:800; margin:0 0 10px; }
-    .statusLine{ color:rgba(234,241,255,.78); font-size:12px; font-weight:900; margin-top:10px; }
+    .status{
+      margin-top:10px;
+      font-size:12px;
+      font-weight:900;
+      color:rgba(234,241,255,.78);
+    }
 
-    /* Table */
     table{
       width:100%;
       border-collapse:collapse;
       overflow:hidden;
       border-radius:16px;
-      border:1px solid var(--line);
+      border:1px solid var(--stroke);
       background:rgba(255,255,255,.03);
     }
-    th, td{
+    th,td{
       padding:10px 10px;
       text-align:left;
       font-size:12px;
       border-bottom:1px solid rgba(255,255,255,.07);
       vertical-align:top;
-      font-weight:800;
     }
-    th{ color:rgba(234,241,255,.70); font-weight:900; }
-    tr:last-child td{ border-bottom:none; }
+    th{color:rgba(234,241,255,.75); font-weight:1000}
+    td{color:rgba(234,241,255,.9); font-weight:800}
+    tr:last-child td{border-bottom:none}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:1000;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--muted);
+    }
+    .badge.in{border-color:rgba(41,209,124,.30); background:rgba(41,209,124,.10); color:rgba(210,255,232,.95)}
+    .badge.out{border-color:rgba(255,71,111,.30); background:rgba(255,71,111,.10); color:rgba(255,215,224,.95)}
 
-    /* Toast */
     #toast{
       position:fixed;
       left:50%;
-      bottom:18px;
+      bottom:22px;
       transform:translateX(-50%);
       background:rgba(0,0,0,.76);
       color:#fff;
@@ -305,101 +179,48 @@
       font-weight:900;
       font-size:12px;
       display:none;
-      z-index:4000;
+      z-index:2000;
       max-width:92vw;
       text-align:center;
     }
   </style>
 </head>
-
 <body>
-<div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="logo">🚗</div>
-      <div class="txt">
-        <div class="t">Painel Combustível</div>
-        <div class="s">focado no celular</div>
-      </div>
-    </div>
-
-    <nav class="nav" aria-label="Menu">
-      <button class="active" data-view="painel"><span class="ic">🏠</span><span>Painel</span></button>
-      <button data-view="abastecer"><span class="ic">⛽</span><span>Abastecer</span></button>
-      <button data-view="historico"><span class="ic">🧾</span><span>Histórico</span></button>
-      <button data-view="relatorios"><span class="ic">📊</span><span>Relatórios</span></button>
-      <button data-view="config"><span class="ic">⚙️</span><span>Configurações</span></button>
-    </nav>
-
-    <div class="side-footer">
-      Dica: NFC-e SP funciona melhor colando o link. QR pode depender do aparelho.
-    </div>
-  </aside>
-
-  <div class="overlay" id="overlay"></div>
-
-  <!-- Main -->
-  <main class="main">
-    <div class="topbar">
-      <button class="menuBtn" id="menuBtn">☰ Menu</button>
-      <div>
-        <h1 id="pageTitle">Painel</h1>
-        <div class="subtitle" id="pageSub">Resumo rápido do consumo</div>
-      </div>
-      <div class="statusPill"><span class="dot"></span><span id="pillStatus">Pronto</span></div>
-    </div>
-
-    <!-- PAINEL -->
-    <section class="section view" id="view-painel">
-      <div class="cards">
-        <div class="card">
-          <div class="label">Km/L Gasolina</div>
-          <div class="val" id="kmlGas">—</div>
-          <div class="small">média (últimos)</div>
-        </div>
-        <div class="card">
-          <div class="label">Km/L Etanol</div>
-          <div class="val" id="kmlEta">—</div>
-          <div class="small">média (últimos)</div>
-        </div>
-        <div class="card">
-          <div class="label">Gasto no mês</div>
-          <div class="val" id="gastoMes">R$ 0,00</div>
-          <div class="small">mês atual</div>
-        </div>
-        <div class="card">
-          <div class="label">Autonomia estimada</div>
-          <div class="val" id="autonomia">—</div>
-          <div class="small">estimativa simples</div>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="emoji">💳</div>
+        <div>
+          <h1>Controle Finanças</h1>
+          <p>Mobile-first • simples e rápido</p>
         </div>
       </div>
+      <div class="pill"><span class="dot"></span><span id="pillStatus">Pronto</span></div>
+    </header>
 
-      <div class="divider"></div>
-
-      <div class="sectionTitle">📄 Nota fiscal (NFC-e)</div>
-      <p class="hint">Cole o link da NFC-e (SP) e toque em “Ler NFC-e e preencher”.</p>
-
-      <div class="row">
-        <button class="btn secondary" id="btnQrInfo" type="button">📷 Ler QR (dica)</button>
-        <button class="btn" id="btnLerNfce" type="button">✅ Ler NFC-e e preencher</button>
+    <!-- CARDS -->
+    <section class="grid-cards" aria-label="Resumo do mês">
+      <div class="card">
+        <h3>Receitas (mês)</h3>
+        <div class="value pos" id="cardReceitas">R$ 0,00</div>
+        <div class="sub" id="subMes">—</div>
       </div>
-
-      <label for="nfceUrl">Link da NFC-e</label>
-      <input id="nfceUrl" placeholder="https://www.nfce.fazenda.sp.gov.br/...ConsultaQRCode.aspx?p=..." />
-
-      <div class="row" style="margin-top:10px">
-        <button class="btn secondary" id="btnUsarLink" type="button">🔗 Usar link no lançamento</button>
-        <button class="btn secondary" id="btnAbrirLink" type="button">🌐 Abrir consulta</button>
+      <div class="card">
+        <h3>Despesas (mês)</h3>
+        <div class="value neg" id="cardDespesas">R$ 0,00</div>
+        <div class="sub">Somatório no mês</div>
       </div>
-
-      <div class="statusLine" id="nfceStatus">—</div>
+      <div class="card">
+        <h3>Saldo atual (mês)</h3>
+        <div class="value" id="cardSaldo">R$ 0,00</div>
+        <div class="sub">Receitas - Despesas</div>
+      </div>
     </section>
 
-    <!-- ABASTECER -->
-    <section class="section view" id="view-abastecer" style="display:none">
-      <div class="sectionTitle">⛽ Novo abastecimento</div>
-      <p class="hint">Para calcular Km/L: informe sempre o odômetro. O app usa a diferença para o abastecimento anterior do mesmo combustível.</p>
+    <!-- NOVO LANÇAMENTO -->
+    <section class="panel" aria-label="Novo lançamento">
+      <h2>➕ Novo lançamento</h2>
+      <p class="muted">Dica: deixe “Categoria” com nomes simples (Mercado, Transporte, Saúde...).</p>
 
       <div class="row">
         <div>
@@ -407,618 +228,258 @@
           <input id="data" type="date" />
         </div>
         <div>
-          <label for="tipo">Combustível</label>
+          <label for="tipo">Tipo</label>
           <select id="tipo">
-            <option value="Gasolina">Gasolina</option>
-            <option value="Etanol">Etanol</option>
+            <option value="Despesa">Despesa</option>
+            <option value="Receita">Receita</option>
           </select>
         </div>
       </div>
 
-      <div class="row">
-        <div>
-          <label for="odometro">Odômetro (km)</label>
-          <input id="odometro" inputmode="numeric" placeholder="Ex: 84092" />
-        </div>
-        <div>
-          <label for="litros">Litros</label>
-          <input id="litros" inputmode="decimal" placeholder="Ex: 8,818" />
-        </div>
-      </div>
+      <label for="categoria">Categoria</label>
+      <input id="categoria" placeholder="Ex: Mercado" />
 
-      <div class="row">
-        <div>
-          <label for="valor">Valor (R$)</label>
-          <input id="valor" inputmode="decimal" placeholder="Ex: 50,00" />
-        </div>
-        <div>
-          <label for="nfceLink">Link NFC-e (opcional)</label>
-          <input id="nfceLink" placeholder="Fica salvo no histórico" />
-        </div>
-      </div>
-
-      <label for="kmAntes">Km que o painel mostrava ANTES (opcional)</label>
-      <input id="kmAntes" inputmode="numeric" placeholder="Ex: 18" />
+      <label for="valor">Valor (R$)</label>
+      <input id="valor" inputmode="decimal" placeholder="Ex: 12,50" />
 
       <div class="row" style="margin-top:10px">
         <button class="btn" id="btnSalvar" type="button">Salvar</button>
-        <button class="btn secondary" id="btnLimparForm" type="button">Limpar</button>
+        <button class="btn danger" id="btnLimpar" type="button">Limpar tudo</button>
       </div>
 
-      <div class="row" style="margin-top:10px">
-        <button class="btn danger" id="btnApagarTudo" type="button">🧹 Apagar tudo</button>
-        <button class="btn secondary" id="btnExportarJson" type="button">⬇️ Exportar backup (JSON)</button>
-      </div>
-
-      <div class="statusLine" id="saveStatus">—</div>
+      <div class="status" id="saveStatus">—</div>
     </section>
 
-    <!-- HISTORICO -->
-    <section class="section view" id="view-historico" style="display:none">
-      <div class="sectionTitle">🧾 Histórico de consumo</div>
-      <p class="hint">Toque no link da NFC-e para abrir quando quiser.</p>
+    <!-- RESUMO -->
+    <section class="panel" aria-label="Resumo do mês">
+      <h2>📌 Resumo do mês</h2>
+      <div class="status" id="resumoMes">—</div>
+    </section>
 
+    <!-- HISTÓRICO -->
+    <section class="panel" aria-label="Histórico">
+      <h2>🧾 Histórico</h2>
       <div style="overflow:auto">
         <table>
           <thead>
             <tr>
               <th>Data</th>
-              <th>Km</th>
-              <th>Litros</th>
-              <th>R$</th>
               <th>Tipo</th>
-              <th>Km/L</th>
-              <th>NFC-e</th>
+              <th>Categoria</th>
+              <th>Valor</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <div class="statusLine" id="histStatus">—</div>
     </section>
+  </div>
 
-    <!-- RELATORIOS -->
-    <section class="section view" id="view-relatorios" style="display:none">
-      <div class="sectionTitle">📊 Relatórios</div>
-      <p class="hint">Consumo (Km/L) por abastecimento e gasto mensal.</p>
-
-      <div class="divider"></div>
-      <div class="sectionTitle">Consumo (Km/L)</div>
-      <canvas id="chartKml" height="200"></canvas>
-
-      <div class="divider"></div>
-      <div class="sectionTitle">Gasto mensal (R$)</div>
-      <canvas id="chartMes" height="200"></canvas>
-
-      <div class="statusLine" id="relStatus">—</div>
-    </section>
-
-    <!-- CONFIG -->
-    <section class="section view" id="view-config" style="display:none">
-      <div class="sectionTitle">⚙️ Configurações</div>
-      <p class="hint">Ajuste tanque e janela de média. A autonomia usa: (kmAntes informado) + (litros * média Km/L).</p>
-
-      <div class="row">
-        <div>
-          <label for="tank">Capacidade do tanque (L)</label>
-          <input id="tank" inputmode="decimal" placeholder="Ex: 52" />
-        </div>
-        <div>
-          <label for="kmlWindow">Média por quantos lançamentos</label>
-          <input id="kmlWindow" inputmode="numeric" placeholder="Ex: 6" />
-        </div>
-      </div>
-
-      <button class="btn" id="btnSalvarCfg" type="button" style="margin-top:10px">Salvar configurações</button>
-      <div class="statusLine" id="cfgStatus">—</div>
-
-      <div class="divider"></div>
-      <div class="sectionTitle">ℹ️ Como a autonomia é calculada</div>
-      <p class="hint">
-        O painel do carro pode variar muito (trânsito, estilo de direção). Aqui usamos uma estimativa simples:
-        <br><br>
-        <b>Autonomia ≈ (km antes, se você informar) + (litros abastecidos × sua média Km/L)</b>.
-        <br><br>
-        Se você não informar “km antes”, mostramos apenas <b>litros × média</b> do combustível.
-      </p>
-    </section>
-  </main>
-</div>
-
-<div id="toast"></div>
+  <div id="toast"></div>
 
 <script>
-/* =========================
-   Storage
-========================= */
-const STORE_KEY = "cb_abastecimentos_v3";
-const CFG_KEY   = "cb_cfg_v3";
+  /* ===== Helpers ===== */
+  const STORE_KEY = "financas_lancamentos_v1";
 
-const $ = (id)=>document.getElementById(id);
+  const $ = (id)=>document.getElementById(id);
 
-function toast(msg){
-  const t = $("toast");
-  t.textContent = msg;
-  t.style.display="block";
-  clearTimeout(toast._tm);
-  toast._tm = setTimeout(()=>{ t.style.display="none"; }, 2500);
-}
-function setPill(msg){ $("pillStatus").textContent = msg; }
-
-function parseBRNumber(s){
-  if(s === null || s === undefined) return null;
-  const v = String(s).trim();
-  if(!v) return null;
-  const norm = v.replace(/\./g,"").replace(",", ".");
-  const n = Number(norm);
-  return Number.isFinite(n) ? n : null;
-}
-function formatBRL(n){
-  const v = Number(n);
-  if(!Number.isFinite(v)) return "R$ 0,00";
-  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
-function formatNum(n, digits=2){
-  const v = Number(n);
-  if(!Number.isFinite(v)) return "—";
-  return v.toLocaleString("pt-BR",{minimumFractionDigits:digits, maximumFractionDigits:digits});
-}
-function formatInt(n){
-  const v = Number(n);
-  if(!Number.isFinite(v)) return "—";
-  return Math.round(v).toLocaleString("pt-BR");
-}
-function ymFromDateISO(iso){
-  const [y,m] = String(iso||"").split("-");
-  if(!y || !m) return null;
-  return `${y}-${m}`;
-}
-function ymLabel(ym){
-  const [y,m] = ym.split("-");
-  return `${m}/${y}`;
-}
-
-function loadItems(){
-  try{ return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); }
-  catch(e){ return []; }
-}
-function saveItems(items){ localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
-
-function loadCfg(){
-  try{ return JSON.parse(localStorage.getItem(CFG_KEY) || "{}"); }
-  catch(e){ return {}; }
-}
-function saveCfg(cfg){ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
-
-let items = loadItems();
-let cfg = Object.assign({ tank: 52, kmlWindow: 6 }, loadCfg());
-
-/* =========================
-   Menu / Views
-========================= */
-const views = ["painel","abastecer","historico","relatorios","config"];
-function showView(name){
-  for(const v of views){
-    const el = document.getElementById("view-"+v);
-    if(!el) continue;
-    el.style.display = (v===name) ? "block" : "none";
+  function toast(msg){
+    const t = $("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(toast._tm);
+    toast._tm = setTimeout(()=>t.style.display="none", 2400);
   }
-  // sidebar active
-  document.querySelectorAll(".nav button").forEach(b=>{
-    b.classList.toggle("active", b.dataset.view===name);
-  });
-  // title
-  const titles = {
-    painel: ["Painel","Resumo rápido do consumo"],
-    abastecer: ["Abastecer","Novo abastecimento"],
-    historico: ["Histórico","Seus lançamentos"],
-    relatorios: ["Relatórios","Consumo e gasto mensal"],
-    config: ["Configurações","Ajustes do app"]
-  };
-  $("pageTitle").textContent = titles[name][0];
-  $("pageSub").textContent = titles[name][1];
 
-  // close mobile sidebar
-  closeSidebar();
-
-  // lazy render charts when open
-  if(name==="relatorios") renderCharts();
-}
-function openSidebar(){
-  $("sidebar").classList.add("open");
-  $("overlay").classList.add("show");
-}
-function closeSidebar(){
-  $("sidebar").classList.remove("open");
-  $("overlay").classList.remove("show");
-}
-$("menuBtn").addEventListener("click", openSidebar);
-$("overlay").addEventListener("click", closeSidebar);
-document.querySelectorAll(".nav button").forEach(b=>{
-  b.addEventListener("click", ()=>showView(b.dataset.view));
-});
-document.addEventListener("keydown", (e)=>{
-  if(e.key==="Escape") closeSidebar();
-});
-
-/* =========================
-   NFC-e (link)
-========================= */
-async function lerNfce(){
-  const url = ($("nfceUrl").value || "").trim();
-  if(!url){
-    $("nfceStatus").textContent = "Cole o link da NFC-e primeiro.";
-    toast("Cole o link da NFC-e.");
-    return;
+  function parseBRNumber(s){
+    if(s === null || s === undefined) return null;
+    const v = String(s).trim();
+    if(!v) return null;
+    const norm = v.replace(/\./g,"").replace(",", ".");
+    const n = Number(norm);
+    return Number.isFinite(n) ? n : null;
   }
-  $("nfceStatus").textContent = "Lendo NFC-e…";
-  setPill("Lendo NFC-e…");
 
-  try{
-    const r = await fetch(`/api/nfce?url=${encodeURIComponent(url)}`);
-    const data = await r.json();
+  function formatBRL(n){
+    const v = Number(n);
+    if(!Number.isFinite(v)) return "R$ 0,00";
+    return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  }
 
-    if(!data.ok){
-      $("nfceStatus").textContent = `Erro: ${data.error || "não foi possível ler"}`;
-      setPill("Erro");
-      toast("Erro ao ler NFC-e");
-      return;
+  function ymFromISO(iso){
+    const [y,m] = String(iso||"").split("-");
+    if(!y || !m) return null;
+    return `${y}-${m}`;
+  }
+
+  function ymLabel(ym){
+    const [y,m] = ym.split("-");
+    return `${m}/${y}`;
+  }
+
+  function todayISO(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function loadItems(){
+    try{ return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); }
+    catch(e){ return []; }
+  }
+  function saveItems(items){
+    localStorage.setItem(STORE_KEY, JSON.stringify(items));
+  }
+
+  let items = loadItems();
+
+  /* ===== UI: default date ===== */
+  if($("data")) $("data").value = todayISO();
+
+  /* ===== Calculations ===== */
+  function calcMonthTotals(targetYm){
+    let receitas = 0;
+    let despesas = 0;
+    for(const it of items){
+      const ym = ymFromISO(it.data);
+      if(!ym || ym !== targetYm) continue;
+      const v = Number(it.valor) || 0;
+      if(it.tipo === "Receita") receitas += v;
+      else despesas += v;
     }
+    return {receitas, despesas, saldo: receitas - despesas};
+  }
 
-    const n = data.normalized || {};
-    if(n.dataHora){
-      const d = n.dataHora.slice(0,10).split("/");
-      if(d.length === 3) $("data").value = `${d[2]}-${d[1]}-${d[0]}`;
+  function renderCards(){
+    const ym = ymFromISO($("data").value) || ymFromISO(todayISO());
+    const {receitas, despesas, saldo} = calcMonthTotals(ym);
+
+    $("cardReceitas").textContent = formatBRL(receitas);
+    $("cardDespesas").textContent = formatBRL(despesas);
+
+    const saldoEl = $("cardSaldo");
+    saldoEl.textContent = formatBRL(saldo);
+    saldoEl.classList.remove("pos","neg");
+    if(saldo > 0) saldoEl.classList.add("pos");
+    else if(saldo < 0) saldoEl.classList.add("neg");
+
+    $("subMes").textContent = `Mês: ${ymLabel(ym)}`;
+
+    const resumo = `Receitas: ${formatBRL(receitas)} • Despesas: ${formatBRL(despesas)} • Saldo: ${formatBRL(saldo)} (${ymLabel(ym)})`;
+    $("resumoMes").textContent = resumo;
+
+    $("pillStatus").textContent = "Pronto";
+  }
+
+  function renderTable(){
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+
+    // ordena desc por data (e por createdAt como desempate)
+    const sorted = [...items].sort((a,b)=>{
+      if(a.data === b.data) return (b.createdAt||0) - (a.createdAt||0);
+      return (b.data||"").localeCompare(a.data||"");
+    });
+
+    for(const it of sorted){
+      const tr = document.createElement("tr");
+
+      const tdData = document.createElement("td");
+      tdData.textContent = it.data || "—";
+
+      const tdTipo = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "badge " + (it.tipo === "Receita" ? "in":"out");
+      badge.textContent = it.tipo;
+      tdTipo.appendChild(badge);
+
+      const tdCat = document.createElement("td");
+      tdCat.textContent = it.categoria || "—";
+
+      const tdVal = document.createElement("td");
+      tdVal.textContent = formatBRL(it.valor);
+
+      const tdDel = document.createElement("td");
+      const btn = document.createElement("button");
+      btn.className = "btn secondary";
+      btn.style.width = "auto";
+      btn.style.padding = "8px 10px";
+      btn.style.borderRadius = "12px";
+      btn.textContent = "🗑️";
+      btn.title = "Excluir";
+      btn.onclick = ()=>{
+        items = items.filter(x=>x.id !== it.id);
+        saveItems(items);
+        toast("Excluído.");
+        renderAll();
+      };
+      tdDel.appendChild(btn);
+
+      tr.appendChild(tdData);
+      tr.appendChild(tdTipo);
+      tr.appendChild(tdCat);
+      tr.appendChild(tdVal);
+      tr.appendChild(tdDel);
+
+      tbody.appendChild(tr);
     }
-    if(n.tipo) $("tipo").value = n.tipo;
-    if(Number.isFinite(n.litros)) $("litros").value = String(n.litros).replace(".", ",");
-    if(Number.isFinite(n.valor)) $("valor").value = String(n.valor).replace(".", ",");
-
-    $("nfceLink").value = url;
-
-    $("nfceStatus").textContent = "OK ✅ Dados preenchidos. Agora informe o odômetro e salve.";
-    setPill("Pronto");
-    toast("Dados preenchidos ✅");
-    // abre tela de abastecer
-    showView("abastecer");
-  }catch(e){
-    $("nfceStatus").textContent = "Falha ao chamar /api/nfce. Confira se a API está no ar.";
-    setPill("Falha");
-    toast("Falha na API");
   }
-}
-function usarLinkNoLancamento(){
-  const url = ($("nfceUrl").value || "").trim();
-  if(!url){ toast("Cole o link da NFC-e primeiro."); return; }
-  $("nfceLink").value = url;
-  toast("Link colocado no lançamento.");
-}
-function abrirLink(){
-  const url = ($("nfceUrl").value || "").trim();
-  if(!url){ toast("Cole o link da NFC-e."); return; }
-  window.open(url, "_blank", "noopener");
-}
-$("btnLerNfce").addEventListener("click", lerNfce);
-$("btnUsarLink").addEventListener("click", usarLinkNoLancamento);
-$("btnAbrirLink").addEventListener("click", abrirLink);
-$("btnQrInfo").addEventListener("click", ()=>{
-  toast("No Xiaomi pode falhar. Use a câmera/Lens para abrir o link e cole aqui.");
-});
 
-/* =========================
-   Save abastecimento
-========================= */
-function sortItems(){
-  // order by date then odometer
-  items.sort((a,b)=>{
-    const da = (a.data||"");
-    const db = (b.data||"");
-    if(da<db) return -1;
-    if(da>db) return 1;
-    return (Number(a.odometro)||0) - (Number(b.odometro)||0);
-  });
-}
-
-function lastItemOfType(tipo, currentOdo){
-  const filtered = items
-    .filter(x => x.tipo===tipo && Number.isFinite(Number(x.odometro)) && Number(x.odometro) < currentOdo);
-  if(filtered.length===0) return null;
-  filtered.sort((a,b)=>Number(a.odometro)-Number(b.odometro));
-  return filtered[filtered.length-1];
-}
-
-function computeKmlForEntry(tipo, odometro, litros){
-  const odo = Number(odometro);
-  const l = Number(litros);
-  if(!Number.isFinite(odo) || !Number.isFinite(l) || l<=0) return null;
-
-  const prev = lastItemOfType(tipo, odo);
-  if(!prev) return null;
-
-  const delta = odo - Number(prev.odometro);
-  if(!Number.isFinite(delta) || delta<=0) return null;
-
-  return { kml: delta / l, deltaKm: delta };
-}
-
-function avgKml(tipo){
-  const w = Number(cfg.kmlWindow) || 6;
-  const list = items
-    .filter(x => x.tipo===tipo && Number.isFinite(Number(x.kml)))
-    .sort((a,b)=> (a.data||"").localeCompare(b.data||""));
-  const last = list.slice(-w);
-  if(last.length===0) return null;
-  const sum = last.reduce((acc,x)=>acc+Number(x.kml),0);
-  return sum / last.length;
-}
-
-function estimateAutonomy(tipo, litros, kmAntes){
-  const av = avgKml(tipo);
-  if(!Number.isFinite(Number(litros)) || !(Number(litros)>0) || !Number.isFinite(av)) return null;
-  const add = Number(litros) * av;
-  const before = Number(kmAntes);
-  if(Number.isFinite(before) && before>=0) return before + add;
-  return add;
-}
-
-function saveForm(){
-  const data = $("data").value;
-  const tipo = $("tipo").value;
-  const odometro = parseBRNumber($("odometro").value);
-  const litros = parseBRNumber($("litros").value);
-  const valor = parseBRNumber($("valor").value);
-  const nfceLink = ($("nfceLink").value || "").trim();
-  const kmAntes = parseBRNumber($("kmAntes").value);
-
-  if(!data){ toast("Informe a data."); return; }
-  if(!Number.isFinite(odometro)){ toast("Informe o odômetro."); return; }
-  if(!Number.isFinite(litros) || litros<=0){ toast("Informe os litros."); return; }
-  if(!Number.isFinite(valor) || valor<0){ toast("Informe o valor."); return; }
-
-  const kmlObj = computeKmlForEntry(tipo, odometro, litros);
-  const kml = kmlObj ? kmlObj.kml : null;
-  const deltaKm = kmlObj ? kmlObj.deltaKm : null;
-
-  const autonomiaEst = estimateAutonomy(tipo, litros, kmAntes);
-
-  const item = {
-    id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
-    data, tipo,
-    odometro, litros, valor,
-    nfceLink: nfceLink || null,
-    kmAntes: Number.isFinite(kmAntes) ? kmAntes : null,
-    kml: (Number.isFinite(kml) ? kml : null),
-    deltaKm: (Number.isFinite(deltaKm) ? deltaKm : null),
-    autonomiaEst: (Number.isFinite(autonomiaEst) ? autonomiaEst : null)
-  };
-
-  items.push(item);
-  sortItems();
-  saveItems(items);
-
-  $("saveStatus").textContent = (item.kml ? `Salvo ✅ Km/L calculado: ${formatNum(item.kml,2)} (Δ ${formatInt(item.deltaKm)} km)` : "Salvo ✅ (Km/L será calculado a partir do 2º abastecimento do mesmo combustível)");
-  toast("Salvo ✅");
-  setPill("Pronto");
-
-  clearForm(false);
-  renderAll();
-}
-
-function clearForm(clearNf=false){
-  $("odometro").value = "";
-  $("litros").value = "";
-  $("valor").value = "";
-  $("kmAntes").value = "";
-  if(clearNf){
-    $("nfceLink").value = "";
-    $("nfceUrl").value = "";
+  function renderAll(){
+    renderCards();
+    renderTable();
   }
-}
-$("btnSalvar").addEventListener("click", saveForm);
-$("btnLimparForm").addEventListener("click", ()=>{ clearForm(false); toast("Campos limpos"); });
 
-$("btnApagarTudo").addEventListener("click", ()=>{
-  if(!confirm("Apagar TODO o histórico?")) return;
-  items = [];
-  saveItems(items);
-  renderAll();
-  toast("Histórico apagado");
-});
+  /* ===== Events ===== */
+  $("data").addEventListener("change", ()=>renderCards());
 
-$("btnExportarJson").addEventListener("click", ()=>{
-  const payload = { exportedAt: new Date().toISOString(), cfg, items };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `backup_combustivel_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1500);
-  toast("Backup baixado");
-});
+  $("btnSalvar").addEventListener("click", ()=>{
+    const data = ($("data").value || "").trim();
+    const tipo = ($("tipo").value || "").trim();
+    const categoria = ($("categoria").value || "").trim() || "Sem categoria";
+    const valor = parseBRNumber($("valor").value);
 
-/* =========================
-   Config
-========================= */
-function loadCfgToUI(){
-  $("tank").value = (cfg.tank ?? 52);
-  $("kmlWindow").value = (cfg.kmlWindow ?? 6);
-}
-function saveCfgFromUI(){
-  const tank = parseBRNumber($("tank").value);
-  const kmlWindow = parseBRNumber($("kmlWindow").value);
-  if(!Number.isFinite(tank) || tank<=0){ toast("Tanque inválido"); return; }
-  if(!Number.isFinite(kmlWindow) || kmlWindow<1){ toast("Janela inválida"); return; }
-  cfg.tank = tank;
-  cfg.kmlWindow = Math.round(kmlWindow);
-  saveCfg(cfg);
-  $("cfgStatus").textContent = "Configurações salvas ✅";
-  toast("Config salva ✅");
-  renderAll();
-}
-$("btnSalvarCfg").addEventListener("click", saveCfgFromUI);
+    if(!data){ toast("Informe a data."); return; }
+    if(!tipo){ toast("Selecione o tipo."); return; }
+    if(valor === null){ toast("Informe um valor válido."); return; }
+    if(valor <= 0){ toast("Valor deve ser maior que zero."); return; }
 
-/* =========================
-   Render (cards, table, charts)
-========================= */
-function gastoMesAtual(){
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
-  const sum = items
-    .filter(x => ymFromDateISO(x.data)===ym && Number.isFinite(Number(x.valor)))
-    .reduce((acc,x)=>acc+Number(x.valor),0);
-  return sum;
-}
-function autonomiaAtual(){
-  // preferência: usar a última autonomiaEst calculada
-  const last = [...items].sort((a,b)=>(a.data||"").localeCompare(b.data||"")).slice(-1)[0];
-  if(!last) return null;
-  if(Number.isFinite(Number(last.autonomiaEst))) return Number(last.autonomiaEst);
+    const item = {
+      id: crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()) + "_" + Math.random().toString(16).slice(2),
+      data,
+      tipo,
+      categoria,
+      valor,
+      createdAt: Date.now()
+    };
+    items.push(item);
+    saveItems(items);
 
-  // fallback: tanque * média geral do tipo do último abastecimento
-  const av = avgKml(last.tipo);
-  if(!Number.isFinite(av)) return null;
-  const tank = Number(cfg.tank) || 52;
-  return tank * av;
-}
+    $("saveStatus").textContent = `Salvo ✅ (${tipo} • ${formatBRL(valor)} • ${categoria})`;
+    toast("Salvo ✅");
 
-function renderCards(){
-  const gas = avgKml("Gasolina");
-  const eta = avgKml("Etanol");
-  $("kmlGas").textContent = gas ? formatNum(gas,2) : "—";
-  $("kmlEta").textContent = eta ? formatNum(eta,2) : "—";
-  $("gastoMes").textContent = formatBRL(gastoMesAtual());
+    // limpa valor/categoria para agilizar
+    $("valor").value = "";
+    $("categoria").value = categoria === "Sem categoria" ? "" : categoria;
 
-  const aut = autonomiaAtual();
-  $("autonomia").textContent = aut ? `${formatInt(aut)} km` : "—";
-}
-
-function renderTable(){
-  const tb = $("tbody");
-  tb.innerHTML = "";
-  if(items.length===0){
-    $("histStatus").textContent = "Sem lançamentos ainda.";
-    return;
-  }
-  const rows = [...items].sort((a,b)=>(b.data||"").localeCompare(a.data||""));
-  for(const x of rows){
-    const tr = document.createElement("tr");
-    const nf = x.nfceLink ? `<a href="${x.nfceLink}" target="_blank" rel="noopener">abrir</a>` : "—";
-    tr.innerHTML = `
-      <td>${x.data || "—"}</td>
-      <td>${Number.isFinite(Number(x.odometro)) ? formatInt(x.odometro) : "—"}</td>
-      <td>${Number.isFinite(Number(x.litros)) ? formatNum(x.litros,3) : "—"}</td>
-      <td>${Number.isFinite(Number(x.valor)) ? formatBRL(x.valor) : "—"}</td>
-      <td>${x.tipo || "—"}</td>
-      <td>${Number.isFinite(Number(x.kml)) ? formatNum(x.kml,2) : "—"}</td>
-      <td>${nf}</td>
-    `;
-    tb.appendChild(tr);
-  }
-  $("histStatus").textContent = `${items.length} lançamento(s).`;
-}
-
-let chartKml = null;
-let chartMes = null;
-
-function buildKmlSeries(){
-  const rows = [...items].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
-  const labels = rows.map(x=>x.data);
-  const gas = rows.map(x=>(x.tipo==="Gasolina" && Number.isFinite(Number(x.kml))) ? Number(x.kml) : null);
-  const eta = rows.map(x=>(x.tipo==="Etanol" && Number.isFinite(Number(x.kml))) ? Number(x.kml) : null);
-  return { labels, gas, eta };
-}
-function buildMonthlySpend(){
-  const map = new Map();
-  for(const x of items){
-    const ym = ymFromDateISO(x.data);
-    if(!ym) continue;
-    const v = Number(x.valor);
-    if(!Number.isFinite(v)) continue;
-    map.set(ym, (map.get(ym)||0)+v);
-  }
-  const keys = [...map.keys()].sort();
-  return { labels: keys.map(ymLabel), values: keys.map(k=>map.get(k)) };
-}
-
-function renderCharts(){
-  const kml = buildKmlSeries();
-  const ms = buildMonthlySpend();
-
-  const ctx1 = document.getElementById("chartKml");
-  const ctx2 = document.getElementById("chartMes");
-
-  if(chartKml) chartKml.destroy();
-  if(chartMes) chartMes.destroy();
-
-  chartKml = new Chart(ctx1, {
-    type:"line",
-    data:{
-      labels: kml.labels,
-      datasets:[
-        { label:"Gasolina (Km/L)", data:kml.gas, spanGaps:true, tension:.25 },
-        { label:"Etanol (Km/L)", data:kml.eta, spanGaps:true, tension:.25 },
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ color:"#eaf1ff" } } },
-      scales:{
-        x:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } },
-        y:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } }
-      }
-    }
+    renderAll();
   });
 
-  chartMes = new Chart(ctx2, {
-    type:"bar",
-    data:{
-      labels: ms.labels,
-      datasets:[
-        { label:"Gasto (R$)", data: ms.values }
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ color:"#eaf1ff" } } },
-      scales:{
-        x:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } },
-        y:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } }
-      }
-    }
+  $("btnLimpar").addEventListener("click", ()=>{
+    const ok = confirm("Tem certeza que deseja apagar TODOS os lançamentos?");
+    if(!ok) return;
+    items = [];
+    saveItems(items);
+    $("saveStatus").textContent = "Histórico apagado.";
+    toast("Histórico apagado.");
+    renderAll();
   });
 
-  $("relStatus").textContent = items.length ? "Atualizado." : "Sem dados para gráficos.";
-}
-
-function renderAll(){
-  loadCfgToUI();
-  renderCards();
-  renderTable();
-  // charts render only when tab open; but if already open, refresh
-  const isRelOpen = document.getElementById("view-relatorios").style.display !== "none";
-  if(isRelOpen) renderCharts();
-}
-
-/* =========================
-   Init
-========================= */
-(function init(){
-  // default date
-  const today = new Date();
-  $("data").value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
-
-  $("nfceStatus").textContent = "Cole o link da NFC-e e toque em “Ler NFC-e e preencher”.";
-  $("saveStatus").textContent = "—";
-  $("cfgStatus").textContent = "—";
-  $("histStatus").textContent = "—";
-  $("relStatus").textContent = "—";
-
+  /* ===== Init ===== */
   renderAll();
-  showView("painel");
-})();
 </script>
 </body>
 </html>
