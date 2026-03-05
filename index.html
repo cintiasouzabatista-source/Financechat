@@ -1,1102 +1,852 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Painel Combustível</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Finance</title>
+<meta name="theme-color" content="#f4f6f8" />
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#fff; --text:#0f172a; --muted:#6b7280; --line:#e5e7eb;
+    --okbg:#d9f2e6; --okbtn:#cfe8da; --danger:#9f1239; --dangerbg:#fff1f2;
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+  }
+  body.dark{
+    --bg:#0b1220; --card:#0f172a; --text:#e5e7eb; --muted:#9ca3af; --line:#1f2937;
+    --okbg:#0f2a22; --okbtn:#12352b; --dangerbg:#2a0f16;
+    --shadow:0 10px 26px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+  header{position:sticky;top:0;z-index:20;background:rgba(244,246,248,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+    padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  header .t{font-weight:900;font-size:28px;letter-spacing:-.02em}
+  header .s{font-size:12px;color:var(--muted);margin-top:-4px}
+  .wrap{max-width:680px;margin:0 auto;padding:16px 14px 26px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:14px;}
+  .muted{color:var(--muted);font-size:12px;line-height:1.35}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > *{flex:1}
+  input{width:100%;padding:12px;border-radius:14px;border:1px solid #d1d5db;outline:none;font-size:14px;background:#fff;}
+  input:focus{border-color:#b7c2ff;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+  button{padding:12px 18px;border-radius:14px;border:1px solid var(--line);background:var(--okbtn);font-weight:800;cursor:pointer;}
+  button:active{transform:translateY(1px)}
+  .btn-secondary{background:#fff}
+  .btn-danger{background:var(--dangerbg);border-color:#fecdd3;color:var(--danger)}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px}
+  .iconbtn{width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;font-weight:900}
+  .kpi{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center}
+  .kpi .h{font-weight:900;font-size:22px;letter-spacing:-.02em}
+  .kpi .v{font-weight:900;font-size:22px;letter-spacing:-.02em}
+  .kpi .l{color:var(--muted);font-size:14px}
+  .sep{height:1px;background:var(--line);margin:10px 0}
+  .small{font-size:12px;color:var(--muted)}
+  .tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted);background:#fff}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .item{border:1px solid var(--line);border-radius:18px;padding:12px;background:#fff}
+  .item .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .item .desc{font-weight:900}
+  .item .amt{font-weight:900}
+  .item .meta{margin-top:4px;color:var(--muted);font-size:12px}
+  .amt.pos{color:#047857}
+  .amt.neg{color:#9f1239}
+  .chatbox{display:flex;flex-direction:column;gap:10px}
+  .messages{display:flex;flex-direction:column;gap:10px;max-height:40vh;overflow:auto;padding:2px 2px 10px;}
+  .msg{padding:12px 14px;border-radius:18px;max-width:88%;border:1px solid var(--line);background:#fff;line-height:1.35}
+  .bot{background:#fff}
+  .user{background:var(--okbg);align-self:flex-end;border-color:#c8ead5}
+  .input-area{display:flex;gap:10px;align-items:center}
+  .input-area input{flex:1}
+  #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(15,23,42,.92);color:#fff;
+    padding:10px 12px;border-radius:14px;font-size:12px;display:none;z-index:999;max-width:92vw;text-align:center}
+  /* side menu */
+  .overlay{position:fixed;inset:0;background:rgba(15,23,42,.25);display:none;z-index:50}
+  .drawer{position:fixed;top:0;left:0;height:100%;width:min(84vw,340px);background:#fff;border-right:1px solid var(--line);
+    transform:translateX(-105%);transition:transform .2s ease;z-index:60;box-shadow:0 12px 30px rgba(15,23,42,.18)}
+  .drawer.open{transform:translateX(0)}
+  .overlay.open{display:block}
+  .drawer header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);backdrop-filter:none}
+  .menu{padding:10px}
+  .menu button{width:100%;justify-content:flex-start;display:flex;gap:10px;background:#fff}
+  .menu button.active{background:#eef2f7}
+  .view{display:none}
+  .view.active{display:block}
 
-  <!-- Charts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-  <style>
-    :root{
-      --bg:#06101f;
-      --bg2:#071225;
-      --panel:rgba(255,255,255,.04);
-      --card:rgba(255,255,255,.06);
-      --stroke:rgba(255,255,255,.10);
-      --text:#eaf1ff;
-      --muted:rgba(234,241,255,.70);
-      --accent:#2b6dff;
-      --accent2:#1f55cc;
-      --danger:#ff476f;
-      --ok:#29d17c;
-      --shadow:0 14px 34px rgba(0,0,0,.28);
-      --radius:18px;
-      --line:rgba(255,255,255,.08);
-      --sideW: 280px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1200px 900px at 10% 0%, #0a1c38 0%, var(--bg) 45%, #050c17 100%);
-      overflow-x:hidden;
-    }
-    a{color:#bcd0ff}
-    .app{
-      min-height:100vh;
-      display:flex;
-    }
-
-    /* Sidebar */
-    .sidebar{
-      width:var(--sideW);
-      background:rgba(5,12,23,.86);
-      border-right:1px solid var(--line);
-      padding:14px 12px;
-      position:fixed;
-      top:0; bottom:0; left:0;
-      transform: translateX(-102%);
-      transition: transform .22s ease;
-      z-index:2500;
-      backdrop-filter: blur(14px);
-    }
-    .sidebar.open{ transform: translateX(0); }
-    .sidebar .brand{
-      display:flex; align-items:center; gap:10px;
-      padding:10px 10px 14px;
-      border-bottom:1px solid var(--line);
-      margin-bottom:10px;
-    }
-    .brand .logo{font-size:22px}
-    .brand .txt{display:flex; flex-direction:column}
-    .brand .txt .t{font-size:14px; font-weight:900}
-    .brand .txt .s{font-size:12px; color:var(--muted); font-weight:800}
-
-    .nav{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      padding:10px 6px;
-    }
-    .nav button{
-      width:100%;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-      padding:12px 12px;
-      cursor:pointer;
-      font-weight:900;
-      font-size:13px;
-      text-align:left;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .nav button.active{
-      background:rgba(43,109,255,.16);
-      border-color:rgba(43,109,255,.35);
-      color:var(--text);
-    }
-    .nav .ic{width:22px; display:inline-flex; justify-content:center}
-    .side-footer{
-      position:absolute;
-      left:12px; right:12px; bottom:12px;
-      border-top:1px solid var(--line);
-      padding-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
-    }
-
-    .overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.45);
-      backdrop-filter: blur(6px);
-      display:none;
-      z-index:2400;
-    }
-    .overlay.show{display:block}
-
-    /* Main */
-    .main{
-      width:100%;
-      padding:16px 14px 28px;
-      margin-left:0;
-    }
-    @media (min-width: 980px){
-      .sidebar{ transform: translateX(0); position:sticky; z-index:1; }
-      .overlay{display:none !important;}
-      .main{ margin-left:0; padding-left:18px; }
-      .topbar .menuBtn{ display:none; }
-      .app{ gap:0; }
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
-    }
-    .menuBtn{
-      width:auto;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      padding:10px 12px;
-      cursor:pointer;
-      font-weight:900;
-    }
-    .statusPill{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-      font-weight:900;
-      font-size:12px;
-      white-space:nowrap;
-    }
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(41,209,124,.18)}
-    h1{
-      margin:0;
-      font-size:24px;
-      font-weight:950;
-      letter-spacing:.2px;
-    }
-    .subtitle{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
-    }
-
-    /* Sections */
-    .section{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px;
-      margin:14px 0;
-    }
-    .sectionTitle{
-      margin:0 0 10px;
-      font-size:14px;
-      font-weight:950;
-    }
-    .divider{
-      height:1px;
-      background:var(--line);
-      margin:14px 0;
-    }
-
-    /* Cards */
-    .cards{
-      display:grid;
-      grid-template-columns:1fr 1fr; /* 2 por linha já no celular */
-      gap:12px;
-    }
-    @media (min-width: 980px){
-      .cards{ grid-template-columns:repeat(4, 1fr); }
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px 14px;
-      min-height:92px;
-    }
-    .card .label{
-      margin:0;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:850;
-    }
-    .card .val{
-      margin-top:10px;
-      font-size:22px;
-      font-weight:950;
-    }
-    .small{
-      margin-top:6px;
-      color:rgba(234,241,255,.55);
-      font-size:12px;
-      font-weight:800;
-    }
-
-    /* Form */
-    label{
-      display:block;
-      margin:10px 0 6px;
-      color:rgba(234,241,255,.78);
-      font-size:12px;
-      font-weight:900;
-    }
-    input, select, button{
-      width:100%;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      padding:12px 12px;
-      outline:none;
-      font-weight:900;
-      font-size:14px;
-    }
-    input::placeholder{ color:rgba(234,241,255,.45); font-weight:800; }
-    input:focus, select:focus{ border-color:rgba(43,109,255,.55); box-shadow:0 0 0 4px rgba(43,109,255,.12); }
-
-    .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    @media (max-width: 420px){ .row{ grid-template-columns:1fr; } }
-
-    .btn{
-      background:linear-gradient(180deg, var(--accent), var(--accent2));
-      border:1px solid rgba(255,255,255,.14);
-      cursor:pointer;
-      font-weight:950;
-    }
-    .btn.secondary{
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--line);
-      color:var(--text);
-    }
-    .btn.danger{
-      background:rgba(255,71,111,.12);
-      border-color:rgba(255,71,111,.30);
-      color:#ffd7e0;
-    }
-    .btn:active{ transform: translateY(1px); }
-
-    .hint{ color:var(--muted); font-size:12px; font-weight:800; margin:0 0 10px; }
-    .statusLine{ color:rgba(234,241,255,.78); font-size:12px; font-weight:900; margin-top:10px; }
-
-    /* Table */
-    table{
-      width:100%;
-      border-collapse:collapse;
-      overflow:hidden;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-    }
-    th, td{
-      padding:10px 10px;
-      text-align:left;
-      font-size:12px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      vertical-align:top;
-      font-weight:800;
-    }
-    th{ color:rgba(234,241,255,.70); font-weight:900; }
-    tr:last-child td{ border-bottom:none; }
-
-    /* Toast */
-    #toast{
-      position:fixed;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,.76);
-      color:#fff;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      font-weight:900;
-      font-size:12px;
-      display:none;
-      z-index:4000;
-      max-width:92vw;
-      text-align:center;
-    }
-  
-    /* Premium report cards */
-    .reportGrid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-      margin-top:10px;
-    }
-    @media (min-width: 980px){
-      .reportGrid{
-        grid-template-columns: 1fr 1fr;
-        gap:14px;
-      }
-    }
-    .reportCard{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
-      border:1px solid var(--line);
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      padding:12px;
-      position:relative;
-      overflow:hidden;
-    }
-    .reportCard:before{
-      content:"";
-      position:absolute;
-      inset:10px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      pointer-events:none;
-    }
-    .reportHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:2px 2px 10px;
-    }
-    .reportTitle{
-      font-size:13px;
-      font-weight:950;
-      color:rgba(234,241,255,.88);
-      margin:0;
-    }
-    .reportSub{
-      font-size:12px;
-      font-weight:800;
-      color:var(--muted);
-      margin:0;
-      text-align:right;
-      white-space:nowrap;
-    }
-    .chartBox{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.07);
-      border-radius:14px;
-      padding:10px;
-      height:220px; /* compacto */
-    }
-    @media (min-width: 980px){
-      .chartBox{ height:240px; }
-    }
-    
-
-  </style>
+/* ===== Desktop layout fix ===== */
+@media (min-width: 900px){
+  /* deixa o app "wide" no PC */
+  .wrap{max-width:1100px;padding:22px 22px 34px;}
+  /* menu lateral sempre visível */
+  .overlay{display:none!important}
+  .drawer{
+    position:fixed;
+    top:0; left:0;
+    height:100vh;
+    transform:none!important;
+    width:280px;
+    border-radius:0;
+    box-shadow:none;
+    border-right:1px solid var(--line);
+  }
+  .drawer header{border-bottom:1px solid var(--line);}
+  #btnClose{display:none!important}
+  #btnMenu{display:none!important}
+  /* empurra header + conteúdo para a direita do menu */
+  body > header{margin-left:280px}
+  .wrap{margin-left:280px}
+  /* melhora leitura */
+  .messages{max-height:55vh}
+  .card{padding:16px}
+}
+</style>
 </head>
-
 <body>
-<div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="logo">🚗</div>
-      <div class="txt">
-        <div class="t">Painel Combustível</div>
-        <div class="s">focado no celular</div>
-      </div>
+
+<div class="overlay" id="ovl"></div>
+<aside class="drawer" id="drawer">
+  <header>
+    <div>
+      <div class="t" style="font-size:20px">Menu</div>
+      <div class="s">Finance • local</div>
     </div>
+    <button class="btn-secondary" id="btnClose" type="button">Fechar</button>
+  </header>
+  <div class="menu">
+    <button id="mChat" class="active" type="button">💬 Chat (principal)</button>
+    <button id="mSaldos" type="button">💳 Saldos iniciais</button>
+    <button id="mBackups" type="button">🧯 Backup / PIN</button>
+    <button id="mFixos" type="button">📅 Contas fixas (em breve)</button>
+  </div>
+</aside>
 
-    <nav class="nav" aria-label="Menu">
-      <button class="active" data-view="painel"><span class="ic">🏠</span><span>Painel</span></button>
-      <button data-view="abastecer"><span class="ic">⛽</span><span>Abastecer</span></button>
-      <button data-view="historico"><span class="ic">🧾</span><span>Histórico</span></button>
-      <button data-view="relatorios"><span class="ic">📊</span><span>Relatórios</span></button>
-      <button data-view="config"><span class="ic">⚙️</span><span>Configurações</span></button>
-    </nav>
-
-    <div class="side-footer">
-      Dica: NFC-e SP funciona melhor colando o link. QR pode depender do aparelho.
+<header>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="iconbtn" id="btnMenu">☰</div>
+    <div>
+      <div class="t">Finance</div>
+      <div class="s" id="hdrSub">chat • motor A (simples)</div>
     </div>
-  </aside>
+  </div>
+  <div class="row" style="flex:0;gap:8px">
+    <span class="pill" id="pillUser">👤 Padrão</span>
+    <button class="btn-secondary" id="btnRestoreLast" type="button">Restaurar</button>
+    <button class="btn-secondary" id="btnTheme" type="button" title="Tema">🌙</button>
+    <button class="btn-secondary" id="btnExport" type="button">Exportar</button>
+  </div>
+</header>
 
-  <div class="overlay" id="overlay"></div>
+<div class="wrap">
 
-  <!-- Main -->
-  <main class="main">
-    <div class="topbar">
-      <button class="menuBtn" id="menuBtn">☰ Menu</button>
-      <div>
-        <h1 id="pageTitle">Painel</h1>
-        <div class="subtitle" id="pageSub">Resumo rápido do consumo</div>
+  <!-- CHAT VIEW -->
+  <section class="view active" id="vChat">
+    <section class="card chatbox">
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <input id="input" placeholder="Informe seus movimentos..." autocomplete="off" />
+        <button id="btnSend" type="button">Enviar</button>
       </div>
-      <div class="statusPill"><span class="dot"></span><span id="pillStatus">Pronto</span></div>
-    </div>
-
-    <!-- PAINEL -->
-    <section class="section view" id="view-painel">
-      <div class="cards">
-        <div class="card">
-          <div class="label">Km/L Gasolina</div>
-          <div class="val" id="kmlGas">—</div>
-          <div class="small">média (últimos)</div>
-        </div>
-        <div class="card">
-          <div class="label">Km/L Etanol</div>
-          <div class="val" id="kmlEta">—</div>
-          <div class="small">média (últimos)</div>
-        </div>
-        <div class="card">
-          <div class="label">Gasto no mês</div>
-          <div class="val" id="gastoMes">R$ 0,00</div>
-          <div class="small">mês atual</div>
-        </div>
-        <div class="card">
-          <div class="label">Autonomia estimada</div>
-          <div class="val" id="autonomia">—</div>
-          <div class="small">estimativa simples</div>
-        </div>
+      <div class="muted">
+        Exemplos: “Recebi 1000 salário Nubank” • “Paguei energia 200 pix Mercado Pago” • “Gastei 50 mercado Dinheiro”
+        • “Gastei 1200 celular cartão Nubank” • “Paguei cartão Nubank”
+        <br>Comandos: “Qual meu saldo atual?” • “Resumo” • “Quanto tenho em benefícios?”
       </div>
-
-      <div class="divider"></div>
-
-      <div class="sectionTitle">📄 Nota fiscal (NFC-e)</div>
-      <p class="hint">Cole o link da NFC-e (SP) e toque em “Ler NFC-e e preencher”.</p>
-
-      <div class="row">
-        <button class="btn secondary" id="btnQrInfo" type="button">📷 Ler QR (dica)</button>
-        <button class="btn" id="btnLerNfce" type="button">✅ Ler NFC-e e preencher</button>
-      </div>
-
-      <label for="nfceUrl">Link da NFC-e</label>
-      <input id="nfceUrl" placeholder="https://www.nfce.fazenda.sp.gov.br/...ConsultaQRCode.aspx?p=..." />
-
-      <div class="row" style="margin-top:10px">
-        <button class="btn secondary" id="btnUsarLink" type="button">🔗 Usar link no lançamento</button>
-        <button class="btn secondary" id="btnAbrirLink" type="button">🌐 Abrir consulta</button>
-      </div>
-
-      <div class="statusLine" id="nfceStatus">—</div>
     </section>
 
-    <!-- ABASTECER -->
-    <section class="section view" id="view-abastecer" style="display:none">
-      <div class="sectionTitle">⛽ Novo abastecimento</div>
-      <p class="hint">Para calcular Km/L: informe sempre o odômetro. O app usa a diferença para o abastecimento anterior do mesmo combustível.</p>
+    <section class="card" style="margin-top:14px">
+      <div class="kpi">
+        <div class="h">Saldo Total</div>
+        <div class="v" id="saldoTotal">R$ 0,00</div>
 
-      <div class="row">
-        <div>
-          <label for="data">Data</label>
-          <input id="data" type="date" />
-        </div>
-        <div>
-          <label for="tipo">Combustível</label>
-          <select id="tipo">
-            <option value="Gasolina">Gasolina</option>
-            <option value="Etanol">Etanol</option>
-          </select>
-        </div>
+        <div class="l">Contas + Dinheiro</div>
+        <div class="l" style="text-align:right" id="saldoContas">R$ 0,00</div>
+
+        <div class="l">Cartões (fatura atual)</div>
+        <div class="l" style="text-align:right" id="saldoCartoes">R$ 0,00</div>
+
+        <div class="l">Benefícios (VR+VA+Comb.)</div>
+        <div class="l" style="text-align:right" id="saldoBenef">R$ 0,00</div>
       </div>
 
-      <div class="row">
-        <div>
-          <label for="odometro">Odômetro (km)</label>
-          <input id="odometro" inputmode="numeric" placeholder="Ex: 84092" />
-        </div>
-        <div>
-          <label for="litros">Litros</label>
-          <input id="litros" inputmode="decimal" placeholder="Ex: 8,818" />
-        </div>
+      <div class="sep"></div>
+
+      <div class="kpi" style="grid-template-columns:1fr auto">
+        <div class="h">Reserva <span class="small">(meta 10k)</span></div>
+        <div class="v" id="saldoReserva">R$ 0,00</div>
+        <div class="small">Progresso</div>
+        <div class="small" style="text-align:right" id="progReserva">0,0%</div>
       </div>
+      <div style="height:10px"></div>
+      <div style="height:10px;border-radius:999px;background:#eef2f7;overflow:hidden">
+        <div id="barReserva" style="height:10px;width:0%;background:#cfe8da"></div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="font-weight:900;font-size:22px;letter-spacing:-.02em">Lançamentos</div>
+        <span class="tag" id="tagCount">0</span>
+      </div>
+      <div class="sep"></div>
+      <div class="list" id="list"></div>
+      <div class="small" style="margin-top:10px">Obs: protótipo local (salva no aparelho). Benefícios <b>não entram</b> na projeção — mas aparecem no total.</div>
+    </section>
+  </section>
+
+  <!-- SALDOS VIEW -->
+  <section class="view" id="vSaldos">
+    <section class="card">
+      <div style="font-weight:900;font-size:22px;letter-spacing:-.02em">Saldos iniciais</div>
+      <div class="muted" style="margin-top:6px">Preencha 1 vez (ou ajuste quando quiser). Isso define seu “ponto de partida”.</div>
+      <div class="sep"></div>
 
       <div class="row">
-        <div>
-          <label for="valor">Valor (R$)</label>
-          <input id="valor" inputmode="decimal" placeholder="Ex: 50,00" />
-        </div>
-        <div>
-          <label for="nfceLink">Link NFC-e (opcional)</label>
-          <input id="nfceLink" placeholder="Fica salvo no histórico" />
-        </div>
-      </div>
-
-      <label for="kmAntes">Km que o painel mostrava ANTES (opcional)</label>
-      <input id="kmAntes" inputmode="numeric" placeholder="Ex: 18" />
-
-      <div class="row" style="margin-top:10px">
-        <button class="btn" id="btnSalvar" type="button">Salvar</button>
-        <button class="btn secondary" id="btnLimparForm" type="button">Limpar</button>
+        <div><div class="small">Conta Nubank</div><input id="iniContaNu" inputmode="decimal" placeholder="0,00" /></div>
+        <div><div class="small">Conta Mercado Pago</div><input id="iniContaMP" inputmode="decimal" placeholder="0,00" /></div>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <button class="btn danger" id="btnApagarTudo" type="button">🧹 Apagar tudo</button>
-        <button class="btn secondary" id="btnExportarJson" type="button">⬇️ Exportar backup (JSON)</button>
+        <div><div class="small">Dinheiro</div><input id="iniDin" inputmode="decimal" placeholder="0,00" /></div>
+        <div><div class="small">Reserva</div><input id="iniRes" inputmode="decimal" placeholder="0,00" /></div>
       </div>
 
-      <div class="statusLine" id="saveStatus">—</div>
-    </section>
-
-    <!-- HISTORICO -->
-    <section class="section view" id="view-historico" style="display:none">
-      <div class="sectionTitle">🧾 Histórico de consumo</div>
-      <p class="hint">Toque no link da NFC-e para abrir quando quiser.</p>
-
-      <div style="overflow:auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Km</th>
-              <th>Litros</th>
-              <th>R$</th>
-              <th>Tipo</th>
-              <th>Km/L</th>
-              <th>NFC-e</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-      <div class="statusLine" id="histStatus">—</div>
-    </section>
-
-    <!-- RELATORIOS -->
-    <section class="section view" id="view-relatorios" style="display:none">
-      <div class="sectionTitle">📊 Relatórios</div>
-      <p class="hint">Consumo (Km/L) por abastecimento e gasto mensal.</p>
-      <div class="divider"></div>
-
-      <div class="reportGrid">
-        <div class="reportCard">
-          <div class="reportHead">
-            <p class="reportTitle">Consumo (Km/L)</p>
-            <p class="reportSub">linha</p>
-          </div>
-          <div class="chartBox">
-            <canvas id="chartKml" height="220"></canvas>
-          </div>
-        </div>
-
-        <div class="reportCard">
-          <div class="reportHead">
-            <p class="reportTitle">Gasto mensal (R$)</p>
-            <p class="reportSub">barras</p>
-          </div>
-          <div class="chartBox">
-            <canvas id="chartMes" height="220"></canvas>
-          </div>
-        </div>
-      </div>
-<div class="statusLine" id="relStatus">—</div>
-    </section>
-
-    <!-- CONFIG -->
-    <section class="section view" id="view-config" style="display:none">
-      <div class="sectionTitle">⚙️ Configurações</div>
-      <p class="hint">Ajuste tanque e janela de média. A autonomia usa: (kmAntes informado) + (litros * média Km/L).</p>
+      <div class="sep"></div>
 
       <div class="row">
-        <div>
-          <label for="tank">Capacidade do tanque (L)</label>
-          <input id="tank" inputmode="decimal" placeholder="Ex: 52" />
-        </div>
-        <div>
-          <label for="kmlWindow">Média por quantos lançamentos</label>
-          <input id="kmlWindow" inputmode="numeric" placeholder="Ex: 6" />
-        </div>
+        <div><div class="small">Cartão Nubank (fatura atual)</div><input id="iniCartNu" inputmode="decimal" placeholder="0,00" /></div>
+        <div><div class="small">Cartão Mercado Pago (fatura atual)</div><input id="iniCartMP" inputmode="decimal" placeholder="0,00" /></div>
       </div>
 
-      <button class="btn" id="btnSalvarCfg" type="button" style="margin-top:10px">Salvar configurações</button>
-      <div class="statusLine" id="cfgStatus">—</div>
+      <div class="sep"></div>
 
-      <div class="divider"></div>
-      <div class="sectionTitle">ℹ️ Como a autonomia é calculada</div>
-      <p class="hint">
-        O painel do carro pode variar muito (trânsito, estilo de direção). Aqui usamos uma estimativa simples:
-        <br><br>
-        <b>Autonomia ≈ (km antes, se você informar) + (litros abastecidos × sua média Km/L)</b>.
-        <br><br>
-        Se você não informar “km antes”, mostramos apenas <b>litros × média</b> do combustível.
-      </p>
+      <div class="row">
+        <div><div class="small">VR</div><input id="iniVR" inputmode="decimal" placeholder="0,00" /></div>
+        <div><div class="small">VA</div><input id="iniVA" inputmode="decimal" placeholder="0,00" /></div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div><div class="small">Combustível</div><input id="iniComb" inputmode="decimal" placeholder="0,00" /></div>
+        <div><div class="small">Meta Reserva</div><input id="metaRes" inputmode="decimal" placeholder="10000" /></div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <button id="btnSaveIni" type="button">Salvar</button>
+        <button class="btn-secondary" id="btnLoadExample" type="button">Carregar seus saldos (exemplo)</button>
+        <button class="btn-danger" id="btnReset" type="button">Zerar tudo</button>
+      </div>
     </section>
-  </main>
+  </section>
+
+  <!-- BACKUPS VIEW -->
+  <section class="view" id="vBackups">
+    <section class="card">
+      <div style="font-weight:900;font-size:22px;letter-spacing:-.02em">Backup automático (15)</div>
+      <div class="muted" style="margin-top:6px">Salva um backup quando você sai/fecha/troca de app. Mantém os <b>15 últimos</b> e sobrepõe os antigos.</div>
+      <div class="sep"></div>
+
+      <div class="row">
+        <button id="btnRestoreLast2" type="button">Restaurar último backup</button>
+        <button class="btn-secondary" id="btnShowBackups" type="button">Ver backups</button>
+      </div>
+
+      <div id="backupList" class="list" style="margin-top:10px"></div>
+
+      <div class="sep"></div>
+
+      <div class="small" style="margin:6px 0 8px">🔐 PIN (4 números) para Restaurar/Apagar</div>
+      <div class="row">
+        <input id="pinNew" inputmode="numeric" placeholder="Definir novo PIN (4 dígitos)" />
+        <button class="btn-secondary" id="btnSetPin" type="button">Definir/Alterar PIN</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="small" style="margin:6px 0 8px">Importar arquivo JSON (manual):</div>
+      <input id="fileImport" type="file" accept="application/json" />
+      <div class="row" style="margin-top:10px">
+        <button class="btn-secondary" id="btnImportFile" type="button">Importar arquivo</button>
+        <button class="btn-danger" id="btnClearBackups" type="button">Apagar backups</button>
+      </div>
+      <div class="small" style="margin-top:10px">Dica: “Exportar” baixa um arquivo para você guardar fora do celular.</div>
+    </section>
+  </section>
+
+  <!-- FIXOS VIEW -->
+  <section class="view" id="vFixos">
+    <section class="card">
+      <div style="font-weight:900;font-size:22px;letter-spacing:-.02em">Contas fixas</div>
+      <div class="muted" style="margin-top:6px">
+        Próximo passo: cadastrar fixos (ex: TIM, água, energia) e “gerar” automaticamente no dia 05 (ou quando você quiser).
+        <br><br>Por enquanto, você pode lançar no chat normalmente: “Paguei TIM 45,99 Mercado Pago”.
+      </div>
+    </section>
+  </section>
+
 </div>
 
 <div id="toast"></div>
 
 <script>
-/* =========================
-   Storage
-========================= */
-const STORE_KEY = "cb_abastecimentos_v3";
-const CFG_KEY   = "cb_cfg_v3";
-
+/* ===== Helpers ===== */
 const $ = (id)=>document.getElementById(id);
-
 function toast(msg){
-  const t = $("toast");
-  t.textContent = msg;
-  t.style.display="block";
-  clearTimeout(toast._tm);
-  toast._tm = setTimeout(()=>{ t.style.display="none"; }, 2500);
-}
-function setPill(msg){ $("pillStatus").textContent = msg; }
-
-function parseBRNumber(s){
-  if(s === null || s === undefined) return null;
-  const v = String(s).trim();
-  if(!v) return null;
-  const norm = v.replace(/\./g,"").replace(",", ".");
-  const n = Number(norm);
-  return Number.isFinite(n) ? n : null;
-}
-function formatBRL(n){
-  const v = Number(n);
-  if(!Number.isFinite(v)) return "R$ 0,00";
-  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
-function formatNum(n, digits=2){
-  const v = Number(n);
-  if(!Number.isFinite(v)) return "—";
-  return v.toLocaleString("pt-BR",{minimumFractionDigits:digits, maximumFractionDigits:digits});
-}
-function formatInt(n){
-  const v = Number(n);
-  if(!Number.isFinite(v)) return "—";
-  return Math.round(v).toLocaleString("pt-BR");
-}
-function ymFromDateISO(iso){
-  const [y,m] = String(iso||"").split("-");
-  if(!y || !m) return null;
-  return `${y}-${m}`;
-}
-function ymLabel(ym){
-  const [y,m] = ym.split("-");
-  return `${m}/${y}`;
+  const t=$("toast"); t.textContent=msg; t.style.display="block";
+  clearTimeout(toast._tm); toast._tm=setTimeout(()=>t.style.display="none",2200);
 }
 
-function loadItems(){
-  try{ return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); }
-  catch(e){ return []; }
+/* ===== Tema claro/escuro ===== */
+const THEME_KEY="finance_theme_v1";
+function applyTheme(mode){
+  const m = mode==="dark"?"dark":"light";
+  document.body.classList.toggle("dark", m==="dark");
+  localStorage.setItem(THEME_KEY, m);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content", m==="dark" ? "#0b1220" : "#f4f6f8");
+  const btn = $("btnTheme");
+  if(btn) btn.textContent = (m==="dark") ? "☀️" : "🌙";
 }
-function saveItems(items){ localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
-
-function loadCfg(){
-  try{ return JSON.parse(localStorage.getItem(CFG_KEY) || "{}"); }
-  catch(e){ return {}; }
-}
-function saveCfg(cfg){ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
-
-let items = loadItems();
-let cfg = Object.assign({ tank: 52, kmlWindow: 6 }, loadCfg());
-
-/* =========================
-   Menu / Views
-========================= */
-const views = ["painel","abastecer","historico","relatorios","config"];
-function showView(name){
-  for(const v of views){
-    const el = document.getElementById("view-"+v);
-    if(!el) continue;
-    el.style.display = (v===name) ? "block" : "none";
-  }
-  // sidebar active
-  document.querySelectorAll(".nav button").forEach(b=>{
-    b.classList.toggle("active", b.dataset.view===name);
+function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || "light";
+  applyTheme(saved);
+  $("btnTheme")?.addEventListener("click", ()=>{
+    const cur = document.body.classList.contains("dark") ? "dark" : "light";
+    applyTheme(cur==="dark"?"light":"dark");
   });
-  // title
-  const titles = {
-    painel: ["Painel","Resumo rápido do consumo"],
-    abastecer: ["Abastecer","Novo abastecimento"],
-    historico: ["Histórico","Seus lançamentos"],
-    relatorios: ["Relatórios","Consumo e gasto mensal"],
-    config: ["Configurações","Ajustes do app"]
-  };
-  $("pageTitle").textContent = titles[name][0];
-  $("pageSub").textContent = titles[name][1];
-
-  // close mobile sidebar
-  closeSidebar();
-
-  // lazy render charts when open
-  if(name==="relatorios") renderCharts();
 }
-function openSidebar(){
-  $("sidebar").classList.add("open");
-  $("overlay").classList.add("show");
-}
-function closeSidebar(){
-  $("sidebar").classList.remove("open");
-  $("overlay").classList.remove("show");
-}
-$("menuBtn").addEventListener("click", openSidebar);
-$("overlay").addEventListener("click", closeSidebar);
-document.querySelectorAll(".nav button").forEach(b=>{
-  b.addEventListener("click", ()=>showView(b.dataset.view));
-});
-document.addEventListener("keydown", (e)=>{
-  if(e.key==="Escape") closeSidebar();
-});
 
-/* =========================
-   NFC-e (link)
-========================= */
-async function lerNfce(){
-  const url = ($("nfceUrl").value || "").trim();
-  if(!url){
-    $("nfceStatus").textContent = "Cole o link da NFC-e primeiro.";
-    toast("Cole o link da NFC-e.");
-    return;
-  }
-  $("nfceStatus").textContent = "Lendo NFC-e…";
-  setPill("Lendo NFC-e…");
+function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").trim(); }
+function brl(n){ return (Number(n)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function parseMoney(txt){
+  const raw = String(txt||"").replace(/\\./g,"").replace(",",".");
+  const m = raw.match(/-?\\d+(?:\\.\\d+)?/);
+  return m ? Number(m[0]) : 0;
+}
+function capFirst(s){ s=String(s||"").trim(); if(!s) return ""; return s.charAt(0).toUpperCase()+s.slice(1); }
+function nowYMD(){
+  const d=new Date(); const y=d.getFullYear(), m=d.getMonth()+1, day=d.getDate();
+  return `${y}-${String(m).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+}
+function ymdToBR(ymd){
+  if(!ymd) return "";
+  const [y,m,d]=ymd.split("-"); return `${d}/${m}/${y}`;
+}
 
+/* ===== Storage ===== */
+const KEY="finance_menu_v1_state";
+const BACKUP_KEY="finance_menu_v1_backups";
+const BACKUP_MAX=15;
+const PIN_HASH_KEY="finance_menu_v1_pin_hash";
+
+const DEFAULT_STATE = {
+  metaReserva: 10000,
+  saldos: {
+    conta_nubank:0,
+    conta_mp:0,
+    dinheiro:0,
+    cartao_nubank:0,
+    cartao_mp:0,
+    vr:0,
+    va:0,
+    combustivel:0,
+    reserva:0
+  },
+  lancamentos: [] // {id, ymd, desc, valor, grupo, conta, tipo}
+};
+
+function loadState(){
   try{
-    const r = await fetch(`/api/nfce?url=${encodeURIComponent(url)}`);
-    const data = await r.json();
+    const s = JSON.parse(localStorage.getItem(KEY)||"null");
+    if(!s) return structuredClone(DEFAULT_STATE);
+    return {
+      ...structuredClone(DEFAULT_STATE),
+      ...s,
+      saldos:{...structuredClone(DEFAULT_STATE.saldos), ...(s.saldos||{})},
+      lancamentos:Array.isArray(s.lancamentos)?s.lancamentos:[]
+    };
+  }catch(_){ return structuredClone(DEFAULT_STATE); }
+}
+let state = loadState();
+function saveState(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
-    if(!data.ok){
-      $("nfceStatus").textContent = `Erro: ${data.error || "não foi possível ler"}`;
-      setPill("Erro");
-      toast("Erro ao ler NFC-e");
-      return;
-    }
-
-    const n = data.normalized || {};
-    if(n.dataHora){
-      const d = n.dataHora.slice(0,10).split("/");
-      if(d.length === 3) $("data").value = `${d[2]}-${d[1]}-${d[0]}`;
-    }
-    if(n.tipo) $("tipo").value = n.tipo;
-    if(Number.isFinite(n.litros)) $("litros").value = String(n.litros).replace(".", ",");
-    if(Number.isFinite(n.valor)) $("valor").value = String(n.valor).replace(".", ",");
-
-    $("nfceLink").value = url;
-
-    $("nfceStatus").textContent = "OK ✅ Dados preenchidos. Agora informe o odômetro e salve.";
-    setPill("Pronto");
-    toast("Dados preenchidos ✅");
-    // abre tela de abastecer
-    showView("abastecer");
-  }catch(e){
-    $("nfceStatus").textContent = "Falha ao chamar /api/nfce. Confira se a API está no ar.";
-    setPill("Falha");
-    toast("Falha na API");
+/* ===== Backup (15) ===== */
+function loadBackups(){ try{ return JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]"); }catch(_){ return []; } }
+function saveBackups(list){ localStorage.setItem(BACKUP_KEY, JSON.stringify(list)); }
+function snapshot(reason){ return {ts:Date.now(), reason:reason||"auto", state:state}; }
+function autoBackup(reason){
+  try{
+    const list = loadBackups();
+    list.push(snapshot(reason));
+    while(list.length>BACKUP_MAX) list.shift();
+    saveBackups(list);
+  }catch(_){}
+}
+function formatDT(ts){
+  try{
+    const d=new Date(ts);
+    const dd=String(d.getDate()).padStart(2,"0");
+    const mm=String(d.getMonth()+1).padStart(2,"0");
+    const yy=d.getFullYear();
+    const hh=String(d.getHours()).padStart(2,"0");
+    const mi=String(d.getMinutes()).padStart(2,"0");
+    return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+  }catch(_){ return ""; }
+}
+function restoreSnapshot(snap){
+  if(!snap || !snap.state) return false;
+  state = snap.state;
+  saveState();
+  renderAll();
+  toast("Backup restaurado ✅");
+  return true;
+}
+function restoreLastBackup(){
+  const list=loadBackups();
+  if(!list.length){ toast("Sem backup ainda."); return; }
+  const last=list[list.length-1];
+  if(confirm("Restaurar o último backup? Isso substitui seus dados atuais no aparelho.")){
+    restoreSnapshot(last);
   }
 }
-function usarLinkNoLancamento(){
-  const url = ($("nfceUrl").value || "").trim();
-  if(!url){ toast("Cole o link da NFC-e primeiro."); return; }
-  $("nfceLink").value = url;
-  toast("Link colocado no lançamento.");
+
+/* ===== PIN (4 dígitos) ===== */
+async function sha256(txt){
+  const enc=new TextEncoder().encode(txt);
+  const buf=await crypto.subtle.digest("SHA-256", enc);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
 }
-function abrirLink(){
-  const url = ($("nfceUrl").value || "").trim();
-  if(!url){ toast("Cole o link da NFC-e."); return; }
-  window.open(url, "_blank", "noopener");
+function isValidPin(pin){ return /^\\d{4}$/.test(String(pin||"").trim()); }
+function hasPin(){ return !!localStorage.getItem(PIN_HASH_KEY); }
+async function setPinFlow(){
+  const pin=String($("pinNew").value||"").trim();
+  if(!isValidPin(pin)){ toast("PIN deve ter 4 números."); return; }
+  localStorage.setItem(PIN_HASH_KEY, await sha256(pin));
+  $("pinNew").value="";
+  toast("PIN definido ✅");
 }
-$("btnLerNfce").addEventListener("click", lerNfce);
-$("btnUsarLink").addEventListener("click", usarLinkNoLancamento);
-$("btnAbrirLink").addEventListener("click", abrirLink);
-$("btnQrInfo").addEventListener("click", ()=>{
-  toast("No Xiaomi pode falhar. Use a câmera/Lens para abrir o link e cole aqui.");
-});
-
-/* =========================
-   Save abastecimento
-========================= */
-function sortItems(){
-  // order by date then odometer
-  items.sort((a,b)=>{
-    const da = (a.data||"");
-    const db = (b.data||"");
-    if(da<db) return -1;
-    if(da>db) return 1;
-    return (Number(a.odometro)||0) - (Number(b.odometro)||0);
-  });
+async function requirePin(){
+  if(!hasPin()){
+    const p1 = prompt("Defina um PIN de 4 números:");
+    if(p1===null) return false;
+    if(!isValidPin(p1)){ toast("PIN inválido."); return false; }
+    const p2 = prompt("Confirme o PIN:");
+    if(p2===null) return false;
+    if(String(p2).trim() !== String(p1).trim()){ toast("PIN não confere."); return false; }
+    localStorage.setItem(PIN_HASH_KEY, await sha256(String(p1).trim()));
+    toast("PIN definido ✅");
+    return true;
+  }
+  const pin=prompt("Digite seu PIN (4 números):");
+  if(pin===null) return false;
+  if(!isValidPin(pin)){ toast("PIN inválido."); return false; }
+  const ok = (await sha256(String(pin).trim())) === localStorage.getItem(PIN_HASH_KEY);
+  if(!ok){ toast("PIN incorreto."); return false; }
+  return true;
 }
-
-function lastItemOfType(tipo, currentOdo){
-  const filtered = items
-    .filter(x => x.tipo===tipo && Number.isFinite(Number(x.odometro)) && Number(x.odometro) < currentOdo);
-  if(filtered.length===0) return null;
-  filtered.sort((a,b)=>Number(a.odometro)-Number(b.odometro));
-  return filtered[filtered.length-1];
-}
-
-function computeKmlForEntry(tipo, odometro, litros){
-  const odo = Number(odometro);
-  const l = Number(litros);
-  if(!Number.isFinite(odo) || !Number.isFinite(l) || l<=0) return null;
-
-  const prev = lastItemOfType(tipo, odo);
-  if(!prev) return null;
-
-  const delta = odo - Number(prev.odometro);
-  if(!Number.isFinite(delta) || delta<=0) return null;
-
-  return { kml: delta / l, deltaKm: delta };
+async function withPin(fn){
+  const ok=await requirePin();
+  if(!ok) return;
+  await fn();
 }
 
-function avgKml(tipo){
-  const w = Number(cfg.kmlWindow) || 6;
-  const list = items
-    .filter(x => x.tipo===tipo && Number.isFinite(Number(x.kml)))
-    .sort((a,b)=> (a.data||"").localeCompare(b.data||""));
-  const last = list.slice(-w);
-  if(last.length===0) return null;
-  const sum = last.reduce((acc,x)=>acc+Number(x.kml),0);
-  return sum / last.length;
+/* ===== Chat UI ===== */
+function addMessage(text, who){
+  const div=document.createElement("div");
+  div.className="msg "+(who==="user"?"user":"bot");
+  div.innerHTML=String(text||"").replace(/\\n/g,"<br>");
+  $("messages").appendChild(div);
+  $("messages").scrollTop=$("messages").scrollHeight;
+}
+function greeting(){
+  const h=new Date().getHours();
+  const g=h<12?"Bom dia":(h<18?"Boa tarde":"Boa noite");
+  addMessage(`${g} 😊<br>Seja bem-vindo(a) ao Finance.<br><br><b>Informe seus movimentos.</b>`, "bot");
+}
+if($("messages").children.length===0) greeting();
+
+/* ===== NLP simples ===== */
+function isQuestion(t){
+  const s=norm(t);
+  return (
+    s.includes("qual meu saldo") ||
+    s.includes("saldo atual") ||
+    s === "saldo" ||
+    s.includes("resumo") ||
+    s.includes("beneficios") ||
+    s.includes("benefícios")
+  );
+}
+function answerQuestion(t){
+  const s=norm(t);
+  if(s.includes("beneficios") || s.includes("benefícios")){
+    addMessage(`Benefícios (VR+VA+Comb.): <b>${brl(getBenefTotal())}</b>`, "bot");
+    return true;
+  }
+  if(s.includes("resumo")){
+    addMessage(
+      `Resumo agora:\n• Contas+Dinheiro: <b>${brl(getContasTotal())}</b>\n• Cartões (fatura): <b>${brl(getCartoesTotal())}</b>\n• Benefícios: <b>${brl(getBenefTotal())}</b>\n• Reserva: <b>${brl(state.saldos.reserva)}</b>\n\nSaldo Total: <b>${brl(getSaldoTotal())}</b>`,
+      "bot"
+    );
+    return true;
+  }
+  if(s.includes("saldo")){
+    addMessage(`Seu saldo total agora é: <b>${brl(getSaldoTotal())}</b><br><span class="small">Contas+Dinheiro: ${brl(getContasTotal())} • Cartões: ${brl(getCartoesTotal())} • Benefícios: ${brl(getBenefTotal())}</span>`, "bot");
+    return true;
+  }
+  return false;
 }
 
-function estimateAutonomy(tipo, litros, kmAntes){
-  const av = avgKml(tipo);
-  if(!Number.isFinite(Number(litros)) || !(Number(litros)>0) || !Number.isFinite(av)) return null;
-  const add = Number(litros) * av;
-  const before = Number(kmAntes);
-  if(Number.isFinite(before) && before>=0) return before + add;
-  return add;
+function inferConta(text){
+  const t=norm(text);
+
+  // reserva primeiro (evita VA dentro de reserVA)
+  if(t.includes("reserva") || t.includes("poupanca") || t.includes("poupança")) return {grupo:"reserva", conta:"reserva"};
+
+  if(/\\bvr\\b/.test(t)) return {grupo:"benef", conta:"vr"};
+  if(/\\bva\\b/.test(t)) return {grupo:"benef", conta:"va"};
+  if(t.includes("combustivel") || t.includes("combustível") || t.includes("gasolina") || t.includes("etanol")) return {grupo:"benef", conta:"combustivel"};
+
+  if(t.includes("dinheiro")) return {grupo:"contas", conta:"dinheiro"};
+  if(t.includes("cartao") || t.includes("cartão") || t.includes("fatura")){
+    if(t.includes("nubank") || /\\bnu\\b/.test(t)) return {grupo:"cartao", conta:"cartao_nubank"};
+    if(t.includes("mercado pago") || t.includes("mercadopago") || /\\bmp\\b/.test(t)) return {grupo:"cartao", conta:"cartao_mp"};
+    return {grupo:"cartao", conta:"cartao_nubank"};
+  }
+  if(t.includes("nubank") || /\\bnu\\b/.test(t)) return {grupo:"contas", conta:"conta_nubank"};
+  if(t.includes("mercado pago") || t.includes("mercadopago") || /\\bmp\\b/.test(t)) return {grupo:"contas", conta:"conta_mp"};
+
+  // default
+  return {grupo:"contas", conta:"conta_mp"};
 }
 
-function saveForm(){
-  const data = $("data").value;
-  const tipo = $("tipo").value;
-  const odometro = parseBRNumber($("odometro").value);
-  const litros = parseBRNumber($("litros").value);
-  const valor = parseBRNumber($("valor").value);
-  const nfceLink = ($("nfceLink").value || "").trim();
-  const kmAntes = parseBRNumber($("kmAntes").value);
+function inferTipo(text){
+  const t=norm(text);
+  if(t.startsWith("recebi") || t.includes("recebi ") || t.includes("entrou") || t.includes("deposito") || t.includes("depósito")) return "in";
+  if(t.startsWith("paguei") || t.includes("paguei ") || t.startsWith("gastei") || t.includes("gastei ") || t.includes("pague ") ) return "out";
+  if(t.includes("coloquei") || t.includes("guardei") || t.includes("transferi para reserva")) return "in";
+  if(t.includes("tirei") || t.includes("saquei")) return "out";
+  return "out";
+}
 
-  if(!data){ toast("Informe a data."); return; }
-  if(!Number.isFinite(odometro)){ toast("Informe o odômetro."); return; }
-  if(!Number.isFinite(litros) || litros<=0){ toast("Informe os litros."); return; }
-  if(!Number.isFinite(valor) || valor<0){ toast("Informe o valor."); return; }
+function buildMovement(text){
+  const amount = parseMoney(text);
+  if(!amount) return null;
 
-  const kmlObj = computeKmlForEntry(tipo, odometro, litros);
-  const kml = kmlObj ? kmlObj.kml : null;
-  const deltaKm = kmlObj ? kmlObj.deltaKm : null;
+  const {grupo, conta} = inferConta(text);
+  const tipo = inferTipo(text);
+  let desc = text.replace(/-?\\d+[\\d\\.,]*/g,"").trim();
+  desc = desc.replace(/\\b(recebi|paguei|gastei|pix|cartao|cartão|conta|nubank|mercado pago|mercadopago|dinheiro|vr|va|combustivel|combustível|fatura)\\b/gi,"").trim();
+  if(!desc) desc = "Movimento";
 
-  const autonomiaEst = estimateAutonomy(tipo, litros, kmAntes);
+  // normaliza: primeira palavra maiúscula
+  desc = capFirst(desc);
 
-  const item = {
-    id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
-    data, tipo,
-    odometro, litros, valor,
-    nfceLink: nfceLink || null,
-    kmAntes: Number.isFinite(kmAntes) ? kmAntes : null,
-    kml: (Number.isFinite(kml) ? kml : null),
-    deltaKm: (Number.isFinite(deltaKm) ? deltaKm : null),
-    autonomiaEst: (Number.isFinite(autonomiaEst) ? autonomiaEst : null)
+  let valor = amount;
+  if(tipo==="out") valor = -Math.abs(valor);
+  if(tipo==="in") valor = Math.abs(valor);
+
+  // regras especiais
+  if(grupo==="cartao"){
+    // compras aumentam a fatura (valor positivo no card); pagamentos zeram
+    const t=norm(text);
+    if(t.includes("paguei cartao") || t.includes("paguei cartão") || t.includes("paguei fatura")){
+      valor = -Math.abs(amount);
+      desc = capFirst(desc || "Pagamento cartão");
+    }else{
+      valor = Math.abs(amount);
+    }
+  }
+  if(grupo==="reserva"){
+    // reserva: "coloquei/guardei/transferi" = entrada, senão saída
+    const t=norm(text);
+    const isIn = (t.includes("coloquei") || t.includes("guardei") || t.includes("transferi") || t.includes("depositei") || t.includes("entrou") || t.startsWith("recebi"));
+    valor = isIn ? Math.abs(amount) : -Math.abs(amount);
+    desc = capFirst("Reserva");
+  }
+
+  return {
+    id: "l_"+Math.random().toString(16).slice(2),
+    ymd: nowYMD(),
+    desc,
+    valor,
+    grupo,
+    conta,
+    tipo
   };
-
-  items.push(item);
-  sortItems();
-  saveItems(items);
-
-  $("saveStatus").textContent = (item.kml ? `Salvo ✅ Km/L calculado: ${formatNum(item.kml,2)} (Δ ${formatInt(item.deltaKm)} km)` : "Salvo ✅ (Km/L será calculado a partir do 2º abastecimento do mesmo combustível)");
-  toast("Salvo ✅");
-  setPill("Pronto");
-
-  clearForm(false);
-  renderAll();
 }
 
-function clearForm(clearNf=false){
-  $("odometro").value = "";
-  $("litros").value = "";
-  $("valor").value = "";
-  $("kmAntes").value = "";
-  if(clearNf){
-    $("nfceLink").value = "";
-    $("nfceUrl").value = "";
+/* ===== Apply movement ===== */
+function applyMovement(m){
+  if(m.grupo==="contas"){
+    state.saldos[m.conta] = (Number(state.saldos[m.conta])||0) + m.valor;
+  }else if(m.grupo==="benef"){
+    state.saldos[m.conta] = (Number(state.saldos[m.conta])||0) + m.valor;
+  }else if(m.grupo==="cartao"){
+    // fatura: compras somam; pagamento diminui; se pagar mais que a fatura, trava em 0 (assume integral)
+    const cur = (Number(state.saldos[m.conta])||0) + m.valor;
+    state.saldos[m.conta] = Math.max(0, cur);
+  }else if(m.grupo==="reserva"){
+    state.saldos.reserva = (Number(state.saldos.reserva)||0) + m.valor;
+  }
+  state.lancamentos.unshift(m);
+}
+
+/* ===== Totais ===== */
+function getContasTotal(){
+  return (state.saldos.conta_nubank||0) + (state.saldos.conta_mp||0) + (state.saldos.dinheiro||0);
+}
+function getCartoesTotal(){
+  return (state.saldos.cartao_nubank||0) + (state.saldos.cartao_mp||0);
+}
+function getBenefTotal(){
+  return (state.saldos.vr||0) + (state.saldos.va||0) + (state.saldos.combustivel||0);
+}
+function getSaldoTotal(){
+  return getContasTotal() - getCartoesTotal() + getBenefTotal() + (state.saldos.reserva||0);
+}
+
+/* ===== Render ===== */
+function renderKPIs(){
+  $("saldoContas").textContent = brl(getContasTotal());
+  $("saldoCartoes").textContent = brl(getCartoesTotal());
+  $("saldoBenef").textContent = brl(getBenefTotal());
+  $("saldoReserva").textContent = brl(state.saldos.reserva||0);
+  $("saldoTotal").textContent = brl(getSaldoTotal());
+
+  const meta = Number(state.metaReserva)||10000;
+  const pct = meta>0 ? Math.max(0, Math.min(1, (Number(state.saldos.reserva)||0)/meta)) : 0;
+  $("progReserva").textContent = (pct*100).toFixed(1).replace(".",",") + "%";
+  $("barReserva").style.width = (pct*100).toFixed(1) + "%";
+}
+function renderList(){
+  $("tagCount").textContent = String(state.lancamentos.length||0);
+  const box = $("list");
+  box.innerHTML = "";
+  for(const it of (state.lancamentos||[]).slice(0,80)){
+    const div = document.createElement("div");
+    div.className="item";
+    const amtClass = it.valor>=0 ? "pos":"neg";
+    div.innerHTML = `
+      <div class="top">
+        <div class="desc">${capFirst(it.desc||"")}</div>
+        <div class="amt ${amtClass}">${brl(it.valor)}</div>
+      </div>
+      <div class="meta">${ymdToBR(it.ymd)} • ${labelConta(it.grupo,it.conta)}</div>
+    `;
+    box.appendChild(div);
   }
 }
-$("btnSalvar").addEventListener("click", saveForm);
-$("btnLimparForm").addEventListener("click", ()=>{ clearForm(false); toast("Campos limpos"); });
-
-$("btnApagarTudo").addEventListener("click", ()=>{
-  if(!confirm("Apagar TODO o histórico?")) return;
-  items = [];
-  saveItems(items);
-  renderAll();
-  toast("Histórico apagado");
-});
-
-$("btnExportarJson").addEventListener("click", ()=>{
-  const payload = { exportedAt: new Date().toISOString(), cfg, items };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `backup_combustivel_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1500);
-  toast("Backup baixado");
-});
-
-/* =========================
-   Config
-========================= */
-function loadCfgToUI(){
-  $("tank").value = (cfg.tank ?? 52);
-  $("kmlWindow").value = (cfg.kmlWindow ?? 6);
+function labelConta(grupo, conta){
+  const map = {
+    conta_nubank:"Conta Nubank",
+    conta_mp:"Conta Mercado Pago",
+    dinheiro:"Dinheiro",
+    cartao_nubank:"Cartão Nubank (fatura)",
+    cartao_mp:"Cartão Mercado Pago (fatura)",
+    vr:"VR",
+    va:"VA",
+    combustivel:"Combustível",
+    reserva:"Reserva"
+  };
+  return (map[conta]||conta) + (grupo==="benef" ? " • Benefício" : (grupo==="cartao" ? " • Cartão" : (grupo==="reserva" ? "" : " • Conta")));
 }
-function saveCfgFromUI(){
-  const tank = parseBRNumber($("tank").value);
-  const kmlWindow = parseBRNumber($("kmlWindow").value);
-  if(!Number.isFinite(tank) || tank<=0){ toast("Tanque inválido"); return; }
-  if(!Number.isFinite(kmlWindow) || kmlWindow<1){ toast("Janela inválida"); return; }
-  cfg.tank = tank;
-  cfg.kmlWindow = Math.round(kmlWindow);
-  saveCfg(cfg);
-  $("cfgStatus").textContent = "Configurações salvas ✅";
-  toast("Config salva ✅");
-  renderAll();
+function renderIniForm(){
+  const s=state.saldos;
+  $("iniContaNu").value = (s.conta_nubank||0).toString().replace(".",",");
+  $("iniContaMP").value = (s.conta_mp||0).toString().replace(".",",");
+  $("iniDin").value = (s.dinheiro||0).toString().replace(".",",");
+  $("iniRes").value = (s.reserva||0).toString().replace(".",",");
+  $("iniCartNu").value = (s.cartao_nubank||0).toString().replace(".",",");
+  $("iniCartMP").value = (s.cartao_mp||0).toString().replace(".",",");
+  $("iniVR").value = (s.vr||0).toString().replace(".",",");
+  $("iniVA").value = (s.va||0).toString().replace(".",",");
+  $("iniComb").value = (s.combustivel||0).toString().replace(".",",");
+  $("metaRes").value = (state.metaReserva||10000).toString().replace(".",",");
 }
-$("btnSalvarCfg").addEventListener("click", saveCfgFromUI);
-
-/* =========================
-   Render (cards, table, charts)
-========================= */
-function gastoMesAtual(){
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
-  const sum = items
-    .filter(x => ymFromDateISO(x.data)===ym && Number.isFinite(Number(x.valor)))
-    .reduce((acc,x)=>acc+Number(x.valor),0);
-  return sum;
+function renderAll(){
+  renderKPIs();
+  renderList();
+  renderIniForm();
 }
-function autonomiaAtual(){
-  // preferência: usar a última autonomiaEst calculada
-  const last = [...items].sort((a,b)=>(a.data||"").localeCompare(b.data||"")).slice(-1)[0];
-  if(!last) return null;
-  if(Number.isFinite(Number(last.autonomiaEst))) return Number(last.autonomiaEst);
+renderAll();
 
-  // fallback: tanque * média geral do tipo do último abastecimento
-  const av = avgKml(last.tipo);
-  if(!Number.isFinite(av)) return null;
-  const tank = Number(cfg.tank) || 52;
-  return tank * av;
+/* ===== Menu ===== */
+function openDrawer(){ $("drawer").classList.add("open"); $("ovl").classList.add("open"); }
+function closeDrawer(){ $("drawer").classList.remove("open"); $("ovl").classList.remove("open"); }
+$("btnMenu").addEventListener("click", openDrawer);
+$("btnClose").addEventListener("click", closeDrawer);
+$("ovl").addEventListener("click", closeDrawer);
+
+function setView(id){
+  for(const v of document.querySelectorAll(".view")) v.classList.remove("active");
+  $(id).classList.add("active");
+  for(const b of ["mChat","mSaldos","mBackups","mFixos"]) $(b).classList.remove("active");
+  if(id==="vChat") $("mChat").classList.add("active");
+  if(id==="vSaldos") $("mSaldos").classList.add("active");
+  if(id==="vBackups") $("mBackups").classList.add("active");
+  if(id==="vFixos") $("mFixos").classList.add("active");
+  closeDrawer();
 }
+$("mChat").addEventListener("click", ()=>setView("vChat"));
+$("mSaldos").addEventListener("click", ()=>setView("vSaldos"));
+$("mBackups").addEventListener("click", ()=>setView("vBackups"));
+$("mFixos").addEventListener("click", ()=>setView("vFixos"));
 
-function renderCards(){
-  const gas = avgKml("Gasolina");
-  const eta = avgKml("Etanol");
-  $("kmlGas").textContent = gas ? formatNum(gas,2) : "—";
-  $("kmlEta").textContent = eta ? formatNum(eta,2) : "—";
-  $("gastoMes").textContent = formatBRL(gastoMesAtual());
+/* ===== Events ===== */
+function send(){
+  const raw = ($("input").value||"").trim();
+  if(!raw) return;
+  $("input").value="";
+  addMessage(raw,"user");
 
-  const aut = autonomiaAtual();
-  $("autonomia").textContent = aut ? `${formatInt(aut)} km` : "—";
-}
+  if(isQuestion(raw)){
+    if(answerQuestion(raw)) return;
+  }
 
-function renderTable(){
-  const tb = $("tbody");
-  tb.innerHTML = "";
-  if(items.length===0){
-    $("histStatus").textContent = "Sem lançamentos ainda.";
+  const mv = buildMovement(raw);
+  if(!mv){
+    addMessage("Não entendi. Tenta assim: “Paguei energia 200 Mercado Pago” ou “Gastei 50 mercado Dinheiro”.", "bot");
     return;
   }
-  const rows = [...items].sort((a,b)=>(b.data||"").localeCompare(a.data||""));
-  for(const x of rows){
-    const tr = document.createElement("tr");
-    const nf = x.nfceLink ? `<a href="${x.nfceLink}" target="_blank" rel="noopener">abrir</a>` : "—";
-    tr.innerHTML = `
-      <td>${x.data || "—"}</td>
-      <td>${Number.isFinite(Number(x.odometro)) ? formatInt(x.odometro) : "—"}</td>
-      <td>${Number.isFinite(Number(x.litros)) ? formatNum(x.litros,3) : "—"}</td>
-      <td>${Number.isFinite(Number(x.valor)) ? formatBRL(x.valor) : "—"}</td>
-      <td>${x.tipo || "—"}</td>
-      <td>${Number.isFinite(Number(x.kml)) ? formatNum(x.kml,2) : "—"}</td>
-      <td>${nf}</td>
-    `;
-    tb.appendChild(tr);
-  }
-  $("histStatus").textContent = `${items.length} lançamento(s).`;
-}
 
-let chartKml = null;
-let chartMes = null;
-
-function buildKmlSeries(){
-  const rows = [...items].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
-  const labels = rows.map(x=>x.data);
-  const gas = rows.map(x=>(x.tipo==="Gasolina" && Number.isFinite(Number(x.kml))) ? Number(x.kml) : null);
-  const eta = rows.map(x=>(x.tipo==="Etanol" && Number.isFinite(Number(x.kml))) ? Number(x.kml) : null);
-  return { labels, gas, eta };
-}
-function buildMonthlySpend(){
-  const map = new Map();
-  for(const x of items){
-    const ym = ymFromDateISO(x.data);
-    if(!ym) continue;
-    const v = Number(x.valor);
-    if(!Number.isFinite(v)) continue;
-    map.set(ym, (map.get(ym)||0)+v);
-  }
-  const keys = [...map.keys()].sort();
-  return { labels: keys.map(ymLabel), values: keys.map(k=>map.get(k)) };
-}
-
-function renderCharts(){
-  const kml = buildKmlSeries();
-  const ms = buildMonthlySpend();
-
-  const ctx1 = document.getElementById("chartKml");
-  const ctx2 = document.getElementById("chartMes");
-
-  if(chartKml) chartKml.destroy();
-  if(chartMes) chartMes.destroy();
-
-  chartKml = new Chart(ctx1, {
-    type:"line",
-    data:{
-      labels: kml.labels,
-      datasets:[
-        { label:"Gasolina (Km/L)", data:kml.gas, spanGaps:true, tension:.25 },
-        { label:"Etanol (Km/L)", data:kml.eta, spanGaps:true, tension:.25 },
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:true,
-      plugins:{ legend:{ labels:{ color:"#eaf1ff" } } },
-      scales:{
-        x:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } },
-        y:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } }
-      }
-    }
-  });
-
-  chartMes = new Chart(ctx2, {
-    type:"bar",
-    data:{
-      labels: ms.labels,
-      datasets:[
-        { label:"Gasto (R$)", data: ms.values }
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:true,
-      plugins:{ legend:{ labels:{ color:"#eaf1ff" } } },
-      scales:{
-        x:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } },
-        y:{ ticks:{ color:"rgba(234,241,255,.75)" }, grid:{ color:"rgba(255,255,255,.06)" } }
-      }
-    }
-  });
-
-  $("relStatus").textContent = items.length ? "Atualizado." : "Sem dados para gráficos.";
-}
-
-function renderAll(){
-  loadCfgToUI();
-  renderCards();
-  renderTable();
-  // charts render only when tab open; but if already open, refresh
-  const isRelOpen = document.getElementById("view-relatorios").style.display !== "none";
-  if(isRelOpen) renderCharts();
-}
-
-/* =========================
-   Init
-========================= */
-(function init(){
-  // default date
-  const today = new Date();
-  $("data").value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
-
-  $("nfceStatus").textContent = "Cole o link da NFC-e e toque em “Ler NFC-e e preencher”.";
-  $("saveStatus").textContent = "—";
-  $("cfgStatus").textContent = "—";
-  $("histStatus").textContent = "—";
-  $("relStatus").textContent = "—";
-
+  applyMovement(mv);
+  saveState();
   renderAll();
-  showView("painel");
-})();
+  addMessage("✅ Registrado.", "bot");
+}
+$("btnSend").addEventListener("click", send);
+$("input").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); send(); }});
+
+/* Saldos iniciais */
+$("btnSaveIni").addEventListener("click", ()=>{
+  state.saldos.conta_nubank = parseMoney($("iniContaNu").value);
+  state.saldos.conta_mp = parseMoney($("iniContaMP").value);
+  state.saldos.dinheiro = parseMoney($("iniDin").value);
+  state.saldos.reserva = parseMoney($("iniRes").value);
+  state.saldos.cartao_nubank = parseMoney($("iniCartNu").value);
+  state.saldos.cartao_mp = parseMoney($("iniCartMP").value);
+  state.saldos.vr = parseMoney($("iniVR").value);
+  state.saldos.va = parseMoney($("iniVA").value);
+  state.saldos.combustivel = parseMoney($("iniComb").value);
+  state.metaReserva = Math.max(0, parseMoney($("metaRes").value) || 10000);
+  saveState();
+  renderAll();
+  toast("Salvo ✅");
+});
+$("btnLoadExample").addEventListener("click", ()=>{
+  // seus saldos (exemplo)
+  state.saldos.cartao_nubank = 683.31;
+  state.saldos.cartao_mp = 1249.49;
+  state.saldos.conta_nubank = 40;
+  state.saldos.conta_mp = 121.81;
+  state.saldos.dinheiro = 79.05;
+  state.saldos.vr = 0.31;
+  state.saldos.va = 0;
+  state.saldos.combustivel = 323.73;
+  state.saldos.reserva = 0;
+  state.metaReserva = 10000;
+  saveState();
+  renderAll();
+  toast("Carregado ✅");
+});
+$("btnReset").addEventListener("click", ()=>withPin(async ()=>{
+  if(!confirm("Zerar tudo?")) return;
+  state = structuredClone(DEFAULT_STATE);
+  saveState();
+  renderAll();
+  toast("Zerado.");
+}));
+
+/* Restore / Export */
+$("btnRestoreLast").addEventListener("click", ()=>withPin(async ()=>restoreLastBackup()));
+$("btnRestoreLast2").addEventListener("click", ()=>withPin(async ()=>restoreLastBackup()));
+
+$("btnExport").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify({exportedAt:new Date().toISOString(), state}, null, 2)], {type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="finance_export.json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+});
+
+/* backups list */
+$("btnShowBackups").addEventListener("click", ()=>{
+  const list = loadBackups();
+  const box = $("backupList");
+  box.innerHTML = "";
+  if(!list.length){
+    box.innerHTML = `<div class="small">Sem backups ainda. Eles aparecem depois que você sai/fecha/troca de app.</div>`;
+    return;
+  }
+  [...list].reverse().forEach((b, idx)=>{
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML = `
+      <div class="top">
+        <div class="desc">${formatDT(b.ts)}</div>
+        <div class="tag">${b.reason||"auto"}</div>
+      </div>
+      <div class="meta">Lançamentos: ${(b.state?.lancamentos?.length||0)} • Saldo Total: ${brl(((b.state?.saldos?.conta_nubank||0)+(b.state?.saldos?.conta_mp||0)+(b.state?.saldos?.dinheiro||0)) - ((b.state?.saldos?.cartao_nubank||0)+(b.state?.saldos?.cartao_mp||0)) + ((b.state?.saldos?.vr||0)+(b.state?.saldos?.va||0)+(b.state?.saldos?.combustivel||0)) + (b.state?.saldos?.reserva||0))}</div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn-secondary" type="button" data-restore="${list.length-1-idx}">Restaurar este</button>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+  box.querySelectorAll("[data-restore]").forEach(btn=>{
+    btn.addEventListener("click", ()=>withPin(async ()=>{
+      const i = Number(btn.getAttribute("data-restore"));
+      const l = loadBackups();
+      if(!l[i]) return;
+      if(confirm("Restaurar este backup?")) restoreSnapshot(l[i]);
+    }));
+  });
+});
+
+/* PIN */
+$("btnSetPin").addEventListener("click", ()=>setPinFlow());
+
+/* importar */
+$("btnImportFile").addEventListener("click", ()=>withPin(async ()=>{
+  const f = $("fileImport").files && $("fileImport").files[0];
+  if(!f){ toast("Selecione um JSON."); return; }
+  const txt = await f.text();
+  let obj;
+  try{ obj = JSON.parse(txt); }catch(_){ toast("JSON inválido."); return; }
+  const next = obj.state || obj;
+  if(!next || !next.saldos){ toast("Arquivo não parece export do Finance."); return; }
+  state = {
+    ...structuredClone(DEFAULT_STATE),
+    ...next,
+    saldos:{...structuredClone(DEFAULT_STATE.saldos), ...(next.saldos||{})},
+    lancamentos:Array.isArray(next.lancamentos)?next.lancamentos:[]
+  };
+  saveState();
+  renderAll();
+  toast("Importado ✅");
+}));
+
+$("btnClearBackups").addEventListener("click", ()=>withPin(async ()=>{
+  if(!confirm("Apagar todos os backups?")) return;
+  localStorage.removeItem(BACKUP_KEY);
+  $("backupList").innerHTML="";
+  toast("Backups apagados.");
+}));
+
+/* auto backup triggers */
+window.addEventListener("pagehide", ()=>autoBackup("pagehide"));
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") autoBackup("hidden"); });
+window.addEventListener("beforeunload", ()=>autoBackup("beforeunload"));
+
+// PWA: registra service worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  });
+}
+
 </script>
 </body>
 </html>
