@@ -1,5 +1,5 @@
-/* Finance Chat PWA - offline cache (v11) */
-const CACHE_VERSION = "v11-20260304-1";
+/* Finance Chat PWA - offline cache (v12) */
+const CACHE_VERSION = "v12-20260305-1";
 const CACHE_NAME = `finance-chat-${CACHE_VERSION}`;
 const ASSETS = [
   "./",
@@ -26,7 +26,6 @@ self.addEventListener("activate", (event) => {
   })());
 });
 
-// Network-first para HTML (atualiza rápido). Cache-first para assets.
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
