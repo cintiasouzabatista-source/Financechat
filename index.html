@@ -188,26 +188,99 @@
       .grid{grid-template-columns:1fr;}
       .row{grid-template-columns:1fr;}
     }
-  </style>
+  
+/* --- Layout v19 (sidebar like screenshot) overrides --- */
+:root{
+  --bg:#f4f6f8;
+}
+body{background:var(--bg);}
+.app{grid-template-columns: 280px 1fr; gap:18px; padding:18px;}
+.sidebar{
+  background: #ffffffcc;
+  backdrop-filter: blur(8px);
+  border:1px solid rgba(16,24,40,.08);
+  border-radius: 18px;
+  padding:14px;
+  box-shadow: 0 10px 30px rgba(16,24,40,.08);
+}
+.brand{display:flex; align-items:center; gap:12px; padding:8px 8px 12px;}
+.logoWrap{width:44px; height:44px; border-radius:14px; background: rgba(16,185,129,.10); display:flex; align-items:center; justify-content:center; border:1px solid rgba(16,185,129,.25);}
+.logo{width:18px; height:18px; border-radius:8px; background: rgba(16,185,129,.95); box-shadow: inset 0 0 0 6px rgba(255,255,255,.75);}
+.brandText h1{font-size:18px; margin:0; letter-spacing:.2px;}
+.brandText p{margin:2px 0 0; color:var(--muted); font-size:12.5px;}
+.nav{margin-top:6px; display:flex; flex-direction:column; gap:6px;}
+.nav button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 12px;
+  border-radius: 14px;
+  border:1px solid transparent;
+  background: transparent;
+  color: var(--text);
+}
+.nav .navItem{display:flex; align-items:center; gap:10px; font-weight:600;}
+.nav .navIcon{width:22px; display:inline-flex; align-items:center; justify-content:center;}
+.nav button[aria-current="page"]{
+  background: rgba(16,185,129,.12);
+  border-color: rgba(16,185,129,.22);
+}
+.nav button:hover{background: rgba(16,24,40,.04);}
+.main{
+  background: transparent;
+  padding:0;
+}
+.mainHeader{display:none;}
+/* main card wrapper similar to screenshot */
+.view .card, .chat-card{
+  border-radius: 18px;
+}
+#view-chat .chat-card{
+  border:1px solid rgba(16,24,40,.08);
+  box-shadow: 0 18px 45px rgba(16,24,40,.10);
+}
+#view-chat .chat-body{
+  background: linear-gradient(180deg, rgba(37,99,235,.07), rgba(37,99,235,0));
+  border-radius: 16px;
+  border:1px solid rgba(16,24,40,.06);
+}
+@media (max-width: 920px){
+  .app{grid-template-columns:1fr; padding:12px;}
+  .sidebar{border-radius:16px;}
+}
+
+.chat-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px 12px 0;}
+.btn.ghost{background: #fff; border:1px solid rgba(16,24,40,.10); border-radius:14px; padding:12px; font-weight:600;}
+.btn.ghost:hover{background: rgba(16,24,40,.03);}
+</style>
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
       <div style="display:flex; flex-direction:column; flex:1; min-width:0;">
         <div class="brand">
-          <div class="logo" aria-hidden="true"></div>
-          <div style="min-width:0;">
+          <div class="logoWrap" aria-hidden="true"><div class="logo"></div></div>
+          <div class="brandText" style="min-width:0;">
+            <h1>Finanças</h1>
+            <p>chat + painel</p>
+          </div>
+        </div>
+<div style="min-width:0;">
             <h1>Finanças • Chat</h1>
             <p>Parcelas por mês • editar/excluir: só esta ou todas</p>
           </div>
         </div>
 
         <nav class="nav" aria-label="Navegação">
-          <button data-view="chat" aria-current="page"><span>💬 Chat IA</span><span class="badge">Ativo</span></button>
-          <button data-view="tx"><span>🧾 Transações</span><span class="badge" id="badgeTx">0</span></button>
-          <button data-view="saldo"><span>💰 Saldo</span><span class="badge">Mês</span></button>
-          <button data-view="accounts"><span>🏦 Contas e Cartões</span><span class="badge">Resumo</span></button>
-          <button data-view="charts"><span>📊 Gráficos</span><span class="badge">%</span></button>
+          <button data-view="chat" aria-current="page"><span class="navItem"><span class="navIcon">💬</span>Chat</span></button>
+          <button data-view="saldo"><span class="navItem"><span class="navIcon">🏠</span>Painel</span></button>
+          <button data-view="tx"><span class="navItem"><span class="navIcon">🧾</span>Transações</span><span class="badge" id="badgeTx">0</span></button>
+          <button data-view="accounts"><span class="navItem"><span class="navIcon">💳</span>Contas e Cartões</span></button>
+          <button data-view="charts"><span class="navItem"><span class="navIcon">🎁</span>Benefícios</span></button>
+          <button data-view="charts"><span class="navItem"><span class="navIcon">📊</span>Relatórios</span></button>
+          <button data-view="settings"><span class="navItem"><span class="navIcon">⚙️</span>Configurações</span></button>
         </nav>
       </div>
 
@@ -433,7 +506,32 @@
           </div>
         </div>
       </section>
-    </main>
+    
+      <section class="view" id="view-settings" hidden>
+        <div class="card">
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <div>
+              <h3 style="margin:0 0 6px">Configurações</h3>
+              <p class="muted" style="margin:0">Tema, exportação e preferências.</p>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row" style="gap:10px; flex-wrap:wrap;">
+            <div class="field" style="min-width:220px">
+              <label for="themeSwitch">Tema</label>
+              <div class="seg">
+                <button class="seg-btn" id="themeSwitch" type="button">Alternar claro/escuro</button>
+                <span class="pill" id="themeLabel">Claro</span>
+              </div>
+            </div>
+            <div class="field" style="min-width:220px">
+              <label>Backup</label>
+              <button class="btn" id="btnExport" type="button">Exportar JSON</button>
+            </div>
+          </div>
+        </div>
+      </section>
+</main>
   </div>
 
   <!-- MODAL EDIT -->
@@ -569,6 +667,7 @@
       saldo: document.getElementById("view-saldo"),
       accounts: document.getElementById("view-accounts"),
       charts: document.getElementById("view-charts"),
+      settings: document.getElementById("view-settings"),
     };
 
     function setActiveView(key){
@@ -595,6 +694,9 @@
         pageSubtitle.textContent = "Saldo e fatura por mês";
         recomputeBalances();
         renderAccountsCards();
+      }else if(key === "settings"){
+        pageTitle.textContent = "Configurações";
+        pageSubtitle.textContent = "Preferências e exportação";
       }else if(key === "charts"){
         pageTitle.textContent = "Gráficos";
         pageSubtitle.textContent = "Categorias % e Receitas x Despesas %";
@@ -1614,6 +1716,34 @@
         navigator.serviceWorker.register("./sw.js").catch(() => {});
       });
     }
-  </script>
+  
+// --- UI helpers for layout buttons (non-breaking) ---
+(() => {
+  const speakAlt = document.getElementById('btnSpeakAlt');
+  const mic = document.getElementById('btnMic');
+  if (speakAlt && mic) speakAlt.addEventListener('click', () => mic.click());
+
+  const shortcutsBtn = document.getElementById('btnShortcuts');
+  const input = document.getElementById('msgInput');
+  if (shortcutsBtn && input){
+    const presets = [
+      "Gastei 100 mercado pix Mercado Pago",
+      "Gastei 200 roupa cartão Nubank 2x",
+      "Paguei energia 200 pix Mercado Pago",
+      "Recebi salário 4400 Mercado Pago",
+      "Reserva 100"
+    ];
+    shortcutsBtn.addEventListener('click', () => {
+      // ciclo simples
+      const cur = (shortcutsBtn.getAttribute('data-i')||"0")|0;
+      const next = (cur+1)%presets.length;
+      shortcutsBtn.setAttribute('data-i', String(next));
+      input.value = presets[cur];
+      input.focus();
+      input.dispatchEvent(new Event('input', {bubbles:true}));
+    });
+  }
+})();
+</script>
 </body>
 </html>
