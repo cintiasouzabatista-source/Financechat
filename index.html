@@ -2,8 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Finanças • Chat</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <title>Finance • Chat</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#2563eb">
   <style>
     :root{
       --bg:#f6f7fb; --panel:#fff; --text:#101828; --muted:#667085; --border:#e4e7ec;
@@ -58,7 +62,7 @@
     html[data-theme="dark"] .knob{left:23px;}
 
     /* Main */
-    .main{padding:18px; display:flex; flex-direction:column; gap:14px; min-height:100vh; min-height:100dvh; min-height:100dvh;}
+    .main{padding:18px; padding-bottom: calc(18px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:14px; min-height:100vh; min-height:100dvh; min-height:100dvh;}
     .topbar{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding:14px 16px; border:1px solid var(--border); border-radius:var(--radius2);
@@ -184,6 +188,64 @@
       .grid{grid-template-columns:1fr;}
       .row{grid-template-columns:1fr;}
     }
+  
+    /* Mobile polish */
+    body{font-size:16px;}
+    .btn.icon{width:44px; height:44px;}
+    textarea, input{font-size:16px;} /* evita zoom */
+
+    /* App-like bottom navigation (mobile) */
+    .bottomnav{
+      position:fixed; left:12px; right:12px; bottom:12px;
+      display:none;
+      gap:6px;
+      padding:10px;
+      border-radius:22px;
+      background:rgba(15,23,42,.82);
+      border:1px solid var(--border);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      z-index: 50;
+      justify-content:space-between;
+      align-items:stretch;
+    }
+    .bottomnav button{
+      position:relative;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      padding:10px 8px;
+      border-radius:16px;
+      min-height:54px;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .bottomnav button span:first-child{font-size:16px}
+    .bottomnav .badge{position:absolute; top:6px; right:10px;}
+
+    @media (max-width: 720px){
+      .sidebar{display:none !important;}
+      .bottomnav{display:flex;}
+      .main{
+        padding:12px;
+        padding-bottom: calc(12px + 92px + env(safe-area-inset-bottom));
+      }
+      .topbar{
+        position:sticky; top:0;
+        background: linear-gradient(to bottom, rgba(11,18,32,.92), rgba(11,18,32,.55));
+        backdrop-filter: blur(10px);
+        padding-top: calc(10px + env(safe-area-inset-top));
+        z-index: 20;
+        border-bottom: 1px solid rgba(255,255,255,.06);
+      }
+      .grid{grid-template-columns: 1fr !important;}
+      .nav{gap:6px;}
+      th, td{padding:10px 12px;}
+    }
+
   </style>
 </head>
 <body>
@@ -193,7 +255,7 @@
         <div class="brand">
           <div class="logo" aria-hidden="true"></div>
           <div style="min-width:0;">
-            <h1>Finanças • Chat</h1>
+            <h1>Finance • Chat</h1>
             <p>Parcelas por mês • editar/excluir: só esta ou todas</p>
           </div>
         </div>
@@ -232,8 +294,10 @@
         </div>
 
         <div class="actions">
+          <button class="btn" id="btnHardReset" style="display:none;">🧹 Limpeza</button>
+          <button class="btn primary" id="btnInstall" style="display:none;">📲 Instalar app</button>
           <button class="btn" id="btnSeed">+ Exemplo</button>
-          <button class="btn danger" id="btnReset">Limpar dados</button>
+          
         </div>
       </header>
 
@@ -415,7 +479,7 @@
             </div>
 
             <div style="height:10px;"></div>
-            <div class="pill">💡 Dica: para a projeção ficar perfeita, registre as contas fixas com “todo mês” (o app pergunta 12 meses).</div>
+            <div class="pill">💡 Dica: registre contas fixas com “todo mês” (o app pergunta 12 meses).</div>
           </div>
         </div>
 
@@ -688,7 +752,6 @@
         drawCharts();
       }
       updateBadges();
-      syncMonthUI();
     }
 
     // =========================
@@ -1093,15 +1156,12 @@
         const totalEl = document.getElementById("cardCardsTotal");
         if(totalEl) totalEl.textContent = "R$ " + formatBRL(cardsTotal);
 
-      // Projeção do mês (fim do mês) — baseada nas transações já registradas
+      // Projeção do mês (fim do mês)
       const projLabel = document.getElementById("saldoMonthProj");
       if(projLabel) projLabel.textContent = "Mês: " + m;
 
-      // Saldo atual em contas = soma dos saldos (todas as transações até agora)
       const saldoAtual = (state.accounts || []).reduce((s,a)=>s+(a.balance||0),0);
 
-      // Restante do mês (contas): entradas/saídas em CONTA com data >= hoje (se mês atual)
-      // Se não for mês atual, considera todo o mês como "restante"
       const todayIso = (() => {
         const now = new Date();
         const off = now.getTimezoneOffset();
@@ -1121,29 +1181,26 @@
           return s;
         }, 0);
 
-      const faturasMes = (state.cards || []).reduce((s,c)=>s + cardMonthTotal(c.id), 0);
-
+      const faturasMes = (state.cards || []).reduce((s,c)=> s + cardMonthTotal(c.id), 0);
       const saldoFim = saldoAtual + remainingAcc;
       const aposCartoes = saldoFim - faturasMes;
 
-      const setVal = (id, val, clsPosNeg=true) => {
+      const setVal = (id, val) => {
         const el = document.getElementById(id);
         if(!el) return;
         el.textContent = "R$ " + formatBRL(val);
-        if(clsPosNeg){
-          el.classList.remove("pos","neg");
-          el.classList.add(val >= 0 ? "pos" : "neg");
-        }
+        el.classList.remove("pos","neg");
+        el.classList.add(val >= 0 ? "pos" : "neg");
       };
 
-      setVal("projSaldoAtual", saldoAtual, true);
-      setVal("projRestanteContas", remainingAcc, true);
+      setVal("projSaldoAtual", saldoAtual);
+      setVal("projRestanteContas", remainingAcc);
 
       const fEl = document.getElementById("projFaturasMes");
       if(fEl) fEl.textContent = "R$ " + formatBRL(faturasMes);
 
-      setVal("projSaldoFim", saldoFim, true);
-      setVal("projAposCartoes", aposCartoes, true);
+      setVal("projSaldoFim", saldoFim);
+      setVal("projAposCartoes", aposCartoes);
 
     }
     }
@@ -1321,6 +1378,237 @@
     }
     function updateBadges(){ document.getElementById("badgeTx").textContent = String(state.tx.length); }
 
+    
+    // =========================
+    // Parser inteligente (pt-BR) — Finance Chat (V10)
+    // =========================
+    function stripAccents(s){
+      return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    }
+    function norm(s){
+      return stripAccents(String(s||"").toLowerCase()).replace(/\s+/g," ").trim();
+    }
+    function parseAmountBR(txt){
+      const m = txt.match(/(\d{1,3}(?:[.\s]\d{3})*(?:,\d{1,2})|\d+(?:,\d{1,2})?)/g);
+      if(!m || !m.length) return null;
+      const raw = m[m.length-1];
+      const val = raw.replace(/\s/g,"").replace(/\./g,"").replace(",",".");
+      const n = Number(val);
+      return Number.isFinite(n) ? n : null;
+    }
+    function extractInstallments(t){
+      const m = t.match(/(?:em\s*)?(\d{1,2})\s*x\b/);
+      if(!m) return null;
+      const n = Number(m[1]);
+      if(!Number.isFinite(n) || n < 2 || n > 36) return null;
+      return n;
+    }
+    function findByName(list, t){
+      const nt = norm(t);
+      let best = null, bestLen = 0;
+      (list||[]).forEach(it=>{
+        const name = norm(it.name || "");
+        if(!name) return;
+        if(nt.includes(name) && name.length > bestLen){
+          best = it; bestLen = name.length;
+        }
+      });
+      return best;
+    }
+    function ensureRules(){
+      state.rules = state.rules || {};
+      state.rules.merchantToCategory = state.rules.merchantToCategory || {};
+      const d = state.rules.merchantToCategory;
+      const defaults = {
+        "uber":"Transporte",
+        "99":"Transporte",
+        "ifood":"Alimentação",
+        "mercado":"Mercado",
+        "supermercado":"Mercado",
+        "farmacia":"Saúde",
+        "drogaria":"Saúde",
+        "netflix":"Assinaturas",
+        "spotify":"Assinaturas",
+        "amazon":"Compras",
+        "shopee":"Compras"
+      };
+      Object.keys(defaults).forEach(k=>{ if(!d[k]) d[k]=defaults[k]; });
+    }
+    function learnCategoryFromText(nt){
+      const m = nt.match(/\b(?:cat|categoria)\s+([a-z0-9\u00c0-\u017F]+(?:\s+[a-z0-9\u00c0-\u017F]+){0,3})\b/i);
+      if(!m) return null;
+      const cat = m[1].trim();
+      return cat.split(" ").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+    }
+    function detectCategory(nt){
+      ensureRules();
+      const explicit = learnCategoryFromText(nt);
+      if(explicit) return explicit;
+      const rules = state.rules.merchantToCategory;
+      let best=null, bestLen=0;
+      Object.keys(rules).forEach(k=>{
+        const kk = norm(k);
+        if(nt.includes(kk) && kk.length>bestLen){ best=rules[k]; bestLen=kk.length; }
+      });
+      return best || "Outros";
+    }
+    function detectType(nt){
+      if(/\b(recebi|recebido|salario|sal[áa]rio|entrada|ganhei|pix recebido)\b/.test(nt)) return "income";
+      if(/\b(transferi|transferencia|transferência|transf|enviei|pix)\b/.test(nt) && (nt.includes("->") || nt.includes(" para ") || nt.includes(" de "))) return "transfer";
+      return "expense";
+    }
+    function detectMethod(t){
+      const nt = norm(t);
+      const card = findByName(state.cards, nt);
+      if(card) return { kind:"card", id: card.id };
+      const acc = findByName(state.accounts, nt);
+      if(acc) return { kind:"account", id: acc.id };
+
+      if(/\b(credito|cr[eé]dito|cartao|cartão)\b/.test(nt)){
+        if(state.cards?.[0]) return { kind:"card", id: state.cards[0].id };
+      }
+      if(/\b(debito|d[eé]bito|pix|dinheiro|conta)\b/.test(nt)){
+        if(state.accounts?.[0]) return { kind:"account", id: state.accounts[0].id };
+      }
+      if(state.accounts?.[0]) return { kind:"account", id: state.accounts[0].id };
+      if(state.cards?.[0]) return { kind:"card", id: state.cards[0].id };
+      return { kind:"account", id: null };
+    }
+    function pickAccountByKeyword(kw){
+      const nt = norm(kw);
+      const acc = findByName(state.accounts, nt);
+      if(acc) return acc.id;
+      const alias = {
+        "vr":"Vale Refeição",
+        "vale refeicao":"Vale Refeição",
+        "va":"Vale Alimentação",
+        "vale alimentacao":"Vale Alimentação",
+        "combustivel":"Auxílio Combustível",
+        "auxilio combustivel":"Auxílio Combustível",
+        "dinheiro":"Dinheiro",
+        "mercado pago":"Mercado Pago",
+        "mercadopago":"Mercado Pago",
+        "nubank":"Nubank"
+      };
+      const name = alias[nt];
+      if(name){
+        const a = (state.accounts||[]).find(x => norm(x.name) === norm(name));
+        if(a) return a.id;
+      }
+      return state.accounts?.[0]?.id || null;
+    }
+    function parseSplitSimple(nt, amount){
+      const m = nt.match(/\bsendo\s+(\d+(?:,\d{1,2})?)\s+([a-z\u00c0-\u017F0-9 ]+?)\s+e\s+resto\s+([a-z\u00c0-\u017F0-9 ]+)/);
+      if(!m) return null;
+      const part1 = Number(m[1].replace(",","."));
+      if(!Number.isFinite(part1) || part1<=0) return null;
+      const a1 = m[2].trim(), a2 = m[3].trim();
+      const part2 = Math.max(0, (amount||0) - part1);
+      return [{amount:part1, kw:a1},{amount:part2, kw:a2}];
+    }
+
+    function parseFinanceMessageV2(text){
+      const raw = String(text||"").trim();
+      if(!raw) return { ok:false, error:"Mensagem vazia." };
+      const nt = norm(raw);
+
+      const explicitCat = learnCategoryFromText(nt);
+      const amount = parseAmountBR(nt);
+      const inst = extractInstallments(nt);
+      const type = detectType(nt);
+
+      // aprendizado: "uber 23,90 cat transporte" salva "uber" -> Transporte
+      if(explicitCat){
+        ensureRules();
+        const first = nt.split(" ")[0];
+        if(first && first.length>=3){
+          state.rules.merchantToCategory[first] = explicitCat;
+          save();
+        }
+      }
+
+      // Transferência
+      if(type === "transfer"){
+        let fromKw=null, toKw=null;
+        if(nt.includes("->")){
+          const parts = nt.split("->").map(s=>s.trim());
+          toKw = parts[1];
+          fromKw = parts[0].replace(/\b(transferi|transferencia|transferência|transf|pix|enviei)\b/g," ").trim();
+        }else{
+          const m = nt.match(/\bde\s+(.+?)\s+(?:para|pra)\s+(.+)$/);
+          if(m){ fromKw=m[1].trim(); toKw=m[2].trim(); }
+        }
+        if(!amount) return { ok:false, error:"Não encontrei o valor. Ex: transferi 300 mercado pago -> dinheiro" };
+        const fromId = pickAccountByKeyword(fromKw||"");
+        const toId = pickAccountByKeyword(toKw||"");
+        if(!fromId || !toId) return { ok:false, error:"Não consegui identificar as contas. Ex: mercado pago -> dinheiro" };
+        return { ok:true, kind:"transfer", items:[{
+          id: uid(),
+          type:"transfer",
+          amount,
+          date: state.ui.today || todayISO(),
+          note: raw,
+          fromAccountId: fromId,
+          toAccountId: toId
+        }]};
+      }
+
+      if(!amount) return { ok:false, error:"Não encontrei o valor. Ex: mercado 120 vr" };
+
+      let method = detectMethod(nt);
+      const category = detectCategory(nt);
+
+      // divisão simples
+      const split = parseSplitSimple(nt, amount);
+      if(split && split.length===2 && split[1].amount>0){
+        const gid = uid();
+        const items = split.map((p,i)=>({
+          id: uid(),
+          type: type==="income" ? "income" : "expense",
+          amount: p.amount,
+          date: state.ui.today || todayISO(),
+          note: raw,
+          category,
+          method: { kind:"account", id: pickAccountByKeyword(p.kw) },
+          meta: { splitGroup: gid, splitIndex: i+1 }
+        }));
+        return { ok:true, kind:"split", items };
+      }
+
+      // cartão parcelado
+      if(method.kind==="card" && inst){
+        const per = round2(amount/inst);
+        const start = state.ui.today || todayISO();
+        const groupId = uid();
+        const items = [];
+        for(let i=0;i<inst;i++){
+          items.push({
+            id: uid(),
+            type:"expense",
+            amount: per,
+            date: addMonthsISO(start, i),
+            note: raw,
+            category,
+            method: { kind:"card", id: method.id },
+            meta: { installmentGroup: groupId, installmentN: i+1, installmentTotal: inst }
+          });
+        }
+        return { ok:true, kind:"installments", items };
+      }
+
+      // único lançamento
+      return { ok:true, kind:"single", items:[{
+        id: uid(),
+        type: type==="income" ? "income" : "expense",
+        amount,
+        date: state.ui.today || todayISO(),
+        note: raw,
+        category,
+        method
+      }]};
+    }
+
+
     // =========================
     // Chat actions
     // =========================
@@ -1405,6 +1693,7 @@
       renderSaldo();
       drawCharts();
       updateBadges();
+      syncMonthUI();
     }
 
     btnSend.addEventListener("click", () => {
@@ -1709,6 +1998,7 @@
       renderSaldo();
       drawCharts();
       updateBadges();
+      syncMonthUI();
     }
 
     document.getElementById("btnCloseEdit").addEventListener("click", closeEditModal);
@@ -1728,6 +2018,7 @@
       renderSaldo();
       drawCharts();
       updateBadges();
+      syncMonthUI();
     }
 
     // Autosize init
@@ -1742,9 +2033,120 @@
     // =========================
     const btnPrevMonth = document.getElementById("btnPrevMonth");
     const btnNextMonth = document.getElementById("btnNextMonth");
-
     if(btnPrevMonth) btnPrevMonth.addEventListener("click", () => setMonth(addMonthYYYYMM(state.ui.filterMonth ?? currentMonth(), -1)));
     if(btnNextMonth) btnNextMonth.addEventListener("click", () => setMonth(addMonthYYYYMM(state.ui.filterMonth ?? currentMonth(), 1)));
+
+    // =========================
+    // PWA install prompt (botão "Instalar app")
+    // =========================
+    let deferredInstallPrompt = null;
+    const btnInstall = document.getElementById("btnInstall");
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (btnInstall) btnInstall.style.display = "inline-flex";
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      if (btnInstall) btnInstall.style.display = "none";
+      try { addChat("ai", "✅ App instalado! Agora abre em modo aplicativo na tela inicial."); } catch {}
+    });
+
+    if (btnInstall) {
+      btnInstall.addEventListener("click", async () => {
+        if (!deferredInstallPrompt) {
+          alert("Se o botão de instalar não aparecer, use: ⋮ > Adicionar à tela inicial.");
+          return;
+        }
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        if (btnInstall) btnInstall.style.display = "none";
+      });
+    }
+
+
+    
+    // =========================
+    // Settings modal bindings (V12)
+    // =========================
+    const settingsModal = document.getElementById("settingsModal");
+    const btnSettings = document.getElementById("btnSettings");
+    const btnCloseSettings = document.getElementById("btnCloseSettings");
+
+    function openSettings(){ if(settingsModal) settingsModal.setAttribute("aria-hidden","false"); }
+    function closeSettings(){ if(settingsModal) settingsModal.setAttribute("aria-hidden","true"); }
+
+    if(btnSettings) btnSettings.addEventListener("click", openSettings);
+    if(btnCloseSettings) btnCloseSettings.addEventListener("click", closeSettings);
+    if(settingsModal){
+      settingsModal.addEventListener("click", (e)=>{
+        const t = e.target;
+        if(t && t.dataset && t.dataset.close) closeSettings();
+      });
+    }
+
+    const toggleTheme2 = document.getElementById("toggleTheme2");
+    if(toggleTheme2){
+      toggleTheme2.checked = document.documentElement.classList.contains("dark");
+      toggleTheme2.addEventListener("change", ()=> setTheme(toggleTheme2.checked ? "dark" : "light"));
+    }
+
+    function isStandalone(){
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+    const appModePill = document.getElementById("appModePill");
+    const appBanner = document.getElementById("appBanner");
+    function refreshAppModeUI(){
+      const st = isStandalone();
+      if(appModePill) appModePill.textContent = st ? "App instalado ✅" : "Abrindo no navegador";
+      if(appBanner) appBanner.style.display = st ? "none" : "inline-flex";
+    }
+    refreshAppModeUI();
+
+    const btnInstall2 = document.getElementById("btnInstall2");
+    if(btnInstall2){
+      btnInstall2.addEventListener("click", ()=> {
+        const b = document.getElementById("btnInstall");
+        if(b && b.style.display !== "none") b.click();
+        else alert("Se não aparecer o instalador, use: ⋮ > Adicionar à tela inicial.");
+      });
+    }
+
+    const btnForceUpdate = document.getElementById("btnForceUpdate");
+    if(btnForceUpdate) btnForceUpdate.addEventListener("click", ()=> document.getElementById("btnUpdateNow")?.click());
+
+    const btnHardReset2 = document.getElementById("btnHardReset2");
+    if(btnHardReset2) btnHardReset2.addEventListener("click", ()=> document.getElementById("btnHardReset")?.click());
+
+    const btnExport2 = document.getElementById("btnExport2");
+    if(btnExport2) btnExport2.addEventListener("click", ()=> document.getElementById("btnExport")?.click());
+
+    const btnImport2 = document.getElementById("btnImport2");
+    const fileImport2 = document.getElementById("fileImport2");
+    if(btnImport2 && fileImport2){
+      btnImport2.addEventListener("click", ()=> fileImport2.click());
+      fileImport2.addEventListener("change", (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try{
+            const data = JSON.parse(reader.result);
+            state = data;
+            save();
+            renderAll();
+            closeSettings();
+            addChat("ai","✅ Restaurado! Seus dados foram carregados.");
+          }catch{
+            alert("Arquivo inválido.");
+          }
+        };
+        reader.readAsText(f);
+      });
+    }
 
 
     setTheme(getPreferredTheme());
@@ -1754,5 +2156,85 @@
     setupSpeech();
     setActiveView("chat");
   </script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+
+  
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Configurações</div>
+          <div class="muted" style="margin-top:4px;">Atualização, backup e aparência</div>
+        </div>
+        <button class="btn icon" id="btnCloseSettings" title="Fechar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="card" style="margin:0;">
+          <div class="card-head">
+            <h3>Modo app</h3>
+            <span class="muted" id="appModePill">—</span>
+          </div>
+          <div style="padding:14px 16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" id="btnInstall2">📲 Instalar app</button>
+            <button class="btn" id="btnForceUpdate">🔄 Forçar atualização</button>
+            <button class="btn danger" id="btnHardReset2">🧹 Limpeza total</button>
+            <div class="muted" style="font-size:12px; flex:1 1 100%;">
+              Dica: se abrir no Chrome, use ⋮ &gt; Instalar app (ou Adicionar à tela inicial). No app instalado, a atualização é automática.
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="card" style="margin:0;">
+          <div class="card-head">
+            <h3>Backup</h3>
+            <span class="muted">local (arquivo)</span>
+          </div>
+          <div style="padding:14px 16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn" id="btnExport2">⬇️ Exportar</button>
+            <button class="btn" id="btnImport2">⬆️ Restaurar</button>
+            <input type="file" id="fileImport2" accept="application/json" style="display:none;" />
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="card" style="margin:0;">
+          <div class="card-head">
+            <h3>Aparência</h3>
+            <span class="muted">tema</span>
+          </div>
+          <div style="padding:14px 16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div class="pill">Tema escuro</div>
+            <label class="switch">
+              <input type="checkbox" id="toggleTheme2">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="bottomnav nav" id="bottomnav">
+    <button data-view="chat" class="active"><span>💬</span><span>Chat</span></button>
+    <button data-view="tx"><span>🧾</span><span>Transações</span><span class="badge" id="badgeTxMobile">0</span></button>
+    <button data-view="saldo"><span>💰</span><span>Saldo</span></button>
+    <button data-view="accounts"><span>🏦</span><span>Contas</span></button>
+    <button data-view="charts"><span>📊</span><span>Gráficos</span></button>
+  </nav>
 </body>
 </html>
