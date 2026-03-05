@@ -248,6 +248,8 @@
       th, td{padding:10px 12px;}
     }
 
+  
+    body[data-active="chat"] #monthControls{display:none !important;}
   </style>
 </head>
 <body>
@@ -741,6 +743,7 @@
     };
 
     function setActiveView(key){
+      document.body.setAttribute("data-active", key);
       Object.entries(views).forEach(([k, el]) => el.classList.toggle("active", k === key));
       document.querySelectorAll(".nav button").forEach(btn => btn.setAttribute("aria-current", btn.dataset.view === key ? "page" : "false"));
 

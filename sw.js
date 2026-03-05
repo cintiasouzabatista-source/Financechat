@@ -1,5 +1,5 @@
 /* Finance Chat PWA - offline cache (v14) */
-const CACHE_VERSION = "v14-20260305-1";
+const CACHE_VERSION = "v15-20260305-1";
 const CACHE_NAME = `finance-chat-${CACHE_VERSION}`;
 const ASSETS = [
   "./",
