@@ -5,36 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Finanças • Chat</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
-/* ===== CONFIRMAÇÃO INLINE ESTILO CHAT ===== */
-function renderInlineConfirm(d){
-  const box = document.getElementById("chatBox");
-  const wrap = document.createElement("div");
-  wrap.className = "msg bot";
-  wrap.innerHTML = `
-    <div>🧾 Confirmar lançamento</div>
-    <div style="margin-top:6px;font-size:13px">
-      ${d.tipo} • ${d.categoria} • ${d.meio} • ${d.ref||"—"} • ${brl(d.valor)} • ${d.data}
-    </div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn" onclick="finalizeDraft()">Finalizar</button>
-      <button class="btn secondary" onclick="editDraft()">Editar</button>
-      <button class="btn danger" onclick="cancelDraft()">Excluir</button>
-    </div>
-  `;
-  box.appendChild(wrap);
-  box.scrollTop = box.scrollHeight;
-}
-
-const _originalOpenDraft = openDraftFromMessage;
-openDraftFromMessage = function(msg){
-  draft = parseMessage(msg);
-  const q = askMissing(draft);
-  if(q){ botSay(q); return; }
-  renderInlineConfirm(draft);
-};
-
-</script>
+  <!-- Chart.js (se Relatórios estiver ativo) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
@@ -243,13 +215,49 @@ openDraftFromMessage = function(msg){
       border-top-right-radius:10px;
     }
 
-    .chatComposer{
-      display:grid;
-      grid-template-columns: 1fr auto;
+    /* Composer mais interativo (estilo v19) */
+    .composerCard{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
       gap:10px;
-      align-items:center;
     }
-    input, select, button{
+    .composerRow{
+      display:grid;
+      grid-template-columns: auto 1fr auto;
+      gap:10px;
+      align-items:end;
+    }
+    .iconBtn{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background:var(--panel);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      font-size:18px;
+    }
+    .sendBtn{
+      width:54px;
+      height:46px;
+      border-radius:14px;
+      border:1px solid rgba(16,185,129,.22);
+      background:rgba(16,185,129,.14);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+    }
+    textarea{
       width:100%;
       border-radius:14px;
       border:1px solid var(--stroke);
@@ -259,8 +267,29 @@ openDraftFromMessage = function(msg){
       outline:none;
       font-size:14px;
       font-weight:400;
+      resize:none;
+      min-height:46px;
+      max-height:150px;
+      line-height:1.35;
     }
-    input::placeholder{color:rgba(15,23,42,.45)}
+    textarea::placeholder{color:rgba(15,23,42,.45)}
+    .actionsRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){ .actionsRow{grid-template-columns:1fr} }
+
+    input, select, button{
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background:var(--panel);
+      color:var(--text);
+      padding:12px 12px;
+      outline:none;
+      font-size:14px;
+      font-weight:400;
+    }
     .btn{
       width:auto;
       padding:12px 14px;
@@ -399,27 +428,31 @@ openDraftFromMessage = function(msg){
           <div class="chatWrap">
             <div class="chatBox" id="chatBox"></div>
 
-            <div class="chatComposer">
-              <input id="chatInput" placeholder='Ex: "Gastei 100 mercado pix" | "Gastei 200 roupa cartão nubank 2x"' />
-              <button class="btn" id="btnSend">Enviar</button>
-            </div>
+            <!-- Composer (mantém a estrutura do index e deixa o chat mais interativo) -->
+            <div class="composerCard" aria-label="Compor mensagem">
+              <div class="composerRow">
+                <button class="iconBtn" id="btnMic" title="Falar (beta)" aria-label="Falar (beta)">🎙️</button>
+                <textarea id="chatInput" placeholder='Ex: "Gastei 100 mercado pix" | "Gastei 200 roupa cartão nubank 2x"'></textarea>
+                <button class="sendBtn" id="btnSend" title="Enviar" aria-label="Enviar">➤</button>
+              </div>
 
-            <div class="row">
-              <button class="btn secondary" id="btnMic">🎙️ Falar (beta)</button>
-              <button class="btn secondary" id="btnQuick">➕ Atalhos</button>
-            </div>
+              <div class="actionsRow">
+                <button class="btn secondary" id="btnQuick" type="button">➕ Atalhos</button>
+                <button class="btn secondary" id="btnExample" type="button">✨ Exemplo</button>
+              </div>
 
-            <div class="divider"></div>
+              <div class="divider" style="margin:8px 0"></div>
 
-            <div class="alert" id="dueAlert" style="display:none">
-              <h3>Contas a vencer</h3>
-              <p>Pra você não pagar fora do prazo e evitar juros/multa.</p>
-              <div class="list" id="dueList"></div>
+              <div class="alert" id="dueAlert" style="display:none">
+                <h3>Contas a vencer</h3>
+                <p>Pra você não pagar fora do prazo e evitar juros/multa.</p>
+                <div class="list" id="dueList"></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="panelbox" id="draftBox" style="display:none !important" style="display:none">
+        <div class="panelbox" id="draftBox" style="display:none !important">
           <div class="title">Confirmar lançamento</div>
           <div id="draftSummary" class="tag">—</div>
           <div class="row" style="margin-top:10px">
@@ -777,7 +810,7 @@ function meSay(text){
   const box = $("chatBox");
   const div = document.createElement("div");
   div.className = "msg me";
-  div.innerHTML = escapeHtml(text);
+  div.innerHTML = escapeHtml(text).replace(/\n/g,"<br>");
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
@@ -1159,10 +1192,21 @@ $("btnFinalize").addEventListener("click", finalizeDraft);
 $("btnEdit").addEventListener("click", editDraft);
 $("btnCancel").addEventListener("click", cancelDraft);
 
+/* Autosize textarea */
+function autoSizeTA(){
+  const ta = $("chatInput");
+  if(!ta) return;
+  ta.style.height = "0px";
+  const h = Math.min(150, Math.max(46, ta.scrollHeight));
+  ta.style.height = h + "px";
+}
+$("chatInput").addEventListener("input", autoSizeTA);
+
 function sendChat(){
   const msg = ($("chatInput").value||"").trim();
   if(!msg) return;
   $("chatInput").value="";
+  autoSizeTA();
   meSay(msg);
   const t = normalize(msg);
 
@@ -1174,10 +1218,30 @@ function sendChat(){
   handleChatReply(msg);
 }
 $("btnSend").addEventListener("click", sendChat);
-$("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); sendChat(); } });
+
+/* Enter envia; Shift+Enter quebra linha */
+$("chatInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendChat();
+  }
+});
 
 $("btnQuick").addEventListener("click", ()=>{
   botSay('Atalhos:\n- "gastei 35 mercado pix nubank"\n- "gastei 200 roupa cartão nubank 2x"\n- "paguei energia 200 pix mercado pago"\n- "recebi salario 4400 nubank"');
+});
+$("btnExample").addEventListener("click", ()=>{
+  const examples = [
+    "Gastei 100 mercado pix nubank",
+    "Gastei 200 roupa cartão nubank 2x",
+    "Paguei energia 200 pix mercado pago",
+    "Recebi salário 4400 Nubank"
+  ];
+  const pick = examples[Math.floor(Math.random()*examples.length)];
+  $("chatInput").value = pick;
+  autoSizeTA();
+  toast("Exemplo preenchido");
+  $("chatInput").focus();
 });
 
 /* Voice (beta) */
@@ -1192,7 +1256,7 @@ $("btnMic").addEventListener("click", ()=>{
   rec.maxAlternatives = 1;
   rec.onresult = (ev)=>{
     const text = ev.results?.[0]?.[0]?.transcript || "";
-    if(text){ $("chatInput").value = text; toast("Reconhecido ✓"); }
+    if(text){ $("chatInput").value = text; autoSizeTA(); toast("Reconhecido ✓"); }
   };
   rec.onerror = ()=>toast("Erro no microfone");
   rec.onend = ()=>{ rec=null; };
@@ -1554,9 +1618,10 @@ function renderAll(){
   renderAll();
   setTab("chat");
   setPill("Pronto");
+  autoSizeTA();
 })();
 
-/* ===== CONFIRMAÇÃO INLINE ESTILO CHAT ===== */
+/* ===== CONFIRMAÇÃO INLINE ESTILO CHAT (mantém sua ideia, sem quebrar o fluxo) ===== */
 function renderInlineConfirm(d){
   const box = document.getElementById("chatBox");
   const wrap = document.createElement("div");
@@ -1576,6 +1641,7 @@ function renderInlineConfirm(d){
   box.scrollTop = box.scrollHeight;
 }
 
+/* Sobrescreve só para mostrar a confirmação inline no chat (em vez do box separado) */
 const _originalOpenDraft = openDraftFromMessage;
 openDraftFromMessage = function(msg){
   draft = parseMessage(msg);
@@ -1587,4 +1653,3 @@ openDraftFromMessage = function(msg){
 </script>
 </body>
 </html>
-
