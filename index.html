@@ -960,7 +960,7 @@ function computeBillCycle(cardName, purchaseDateISO){
 /* Draft flow */
 let draft = null;
 function botSummary(d){
-  // resumo em linhas, do jeito que você pediu
+  // Resumo em linhas (como você pediu)
   const linhas = [
     d.tipo || "—",
     d.categoria || "—",
@@ -971,11 +971,11 @@ function botSummary(d){
   botSay(linhas.join("\n"));
 }
 
-function autoFinalizeIfComplete(){
+function finalizeWhenComplete(){
   if(!draft) return false;
   const q = askMissing(draft);
   if(q) return false;
-  // salva e confirma no chat
+  // salva
   tx.push(...createTxFromDraft(draft));
   persist("lancamento_chat");
   botSummary(draft);
@@ -987,7 +987,7 @@ function autoFinalizeIfComplete(){
   renderAll();
   return true;
 }
-function showDraft(on){ $("draftBox").style.display = on ? "block" : "none"; }
+function showDraft(on){ /* confirmação por bot - não usa painel */ }
 function draftText(d){
   const base = `${d.tipo} • ${d.categoria} • ${d.meio} • ${d.ref||"—"} • ${brl(d.valor)} • ${d.data}`;
   const extra = (d.meio==="Cartão" && d.parcelas>1) ? ` • ${d.parcelas}x • fatura ${d.cicloFatura}` : (d.meio==="Cartão" ? ` • fatura ${d.cicloFatura}` : "");
@@ -1052,9 +1052,14 @@ function createTxFromDraft(d){
 function openDraftFromMessage(msg){
   draft = parseMessage(msg);
   const q = askMissing(draft);
-  if(q){ botSay(q); setPill("Pronto"); showDraft(false); return; }
-  // completo -> salva automático (sem botões)
-  autoFinalizeIfComplete();
+  if(q){
+    botSay(q);
+    setPill("Pronto");
+    showDraft(false);
+    return;
+  }
+  // Se está tudo completo, salva.
+  finalizeWhenComplete();
 }
 
 function handleChatReply(msg){
@@ -1131,7 +1136,7 @@ function handleChatReply(msg){
   const q = askMissing(draft);
   if(q){ botSay(q); showDraft(false); return; }
 
-  if(autoFinalizeIfComplete()) return;
+  if(finalizeWhenComplete()) return;
 $("draftSummary").textContent = draftText(draft);
   $("draftHint").textContent="Agora: finalizar, editar ou excluir.";
   showDraft(true);
@@ -1203,9 +1208,6 @@ function cancelDraft(){
   setPill("Pronto");
 }
 
-$("btnFinalize").addEventListener("click", finalizeDraft);
-$("btnEdit").addEventListener("click", editDraft);
-$("btnCancel").addEventListener("click", cancelDraft);
 
 /* Autosize textarea */
 function autoSizeTA(){
