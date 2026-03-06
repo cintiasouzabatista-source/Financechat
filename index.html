@@ -472,6 +472,39 @@ body.dark .msg.me{
 #tab-config .panelbox .title{margin-bottom:8px}
 #tab-config .panelbox .k{margin-bottom:4px}
 
+
+/* Ações compactas em Transações */
+.txSimpleActions{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  justify-content:center;
+}
+.iconBtn{
+  width:36px !important;
+  min-width:36px;
+  height:36px;
+  padding:0 !important;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  font-size:16px;
+}
+@media (max-width:760px){
+  .txSimpleActions{
+    flex-direction:row;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+  }
+  .iconBtn{
+    width:34px !important;
+    min-width:34px;
+    height:34px;
+    font-size:15px;
+  }
+}
+
 </style>
 </head>
 
@@ -1374,7 +1407,7 @@ function renderTxTable(){
       const valClass = (t.tipo==="Receita") ? "pos" : "neg";
       const ref = t.ref || "—";
       const extra = (t.meio==="Cartão" && t.totalParcelas) ? ` (${t.parcela}/${t.totalParcelas})` : "";
-      tr.innerHTML = `<td>${t.data}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="txSimpleActions"><button class="btn secondary" data-edit-tx="${t.id}">Editar</button><button class="btn danger" data-del="${t.id}">Excluir</button></div></td>`;
+      tr.innerHTML = `<td>${t.data}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="txSimpleActions"><button class="btn secondary iconBtn" title="Editar" aria-label="Editar" data-edit-tx="${t.id}">✏️</button><button class="btn danger iconBtn" title="Excluir" aria-label="Excluir" data-del="${t.id}">🗑️</button></div></td>`;
       tbody.appendChild(tr);
     }
   }
@@ -1763,7 +1796,9 @@ document.addEventListener("click", (e)=>{
 /* Boot */
 function bootChat(){
   $("chatBox").innerHTML = "";
-  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo(a)?`);
+  botSay(`${greeting()} 😊
+Seja bem-vindo(a).
+Como posso ajudá-lo:`);
   renderDueAlerts();
 }
 function renderAll(){
