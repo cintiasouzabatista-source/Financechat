@@ -468,6 +468,10 @@ body.dark .msg.me{
   padding:0 12px;
 }
 
+
+#tab-config .panelbox .title{margin-bottom:8px}
+#tab-config .panelbox .k{margin-bottom:4px}
+
 </style>
 </head>
 
@@ -720,7 +724,16 @@ body.dark .msg.me{
       <!-- CONFIG -->
       <section id="tab-config" class="hidden">
         <div class="panelbox">
-          <div class="title">Tema</div><div class="row"><button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button></div><div class="divider"></div><div class="title">Categorias (receitas e despesas)</div>
+          <div class="title">Tema</div>
+          <div class="k">Escolha como o Finance AI deve aparecer.</div>
+          <div class="divider"></div>
+          <div class="row">
+            <button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button>
+          </div>
+        </div>
+
+        <div class="panelbox">
+          <div class="title">Categorias</div>
           <div class="row">
             <div><label for="catTipo">Tipo</label><select id="catTipo"><option value="Despesa">Despesa</option><option value="Receita">Receita</option></select></div>
             <div><label for="catNome">Nova categoria</label><input id="catNome" placeholder="Ex: Farmácia, Academia, Reembolso..." /></div>
@@ -736,8 +749,8 @@ body.dark .msg.me{
         </div>
 
         <div class="panelbox">
-          <div class="title">Backup automático</div>
-          <div class="k">Sempre salva por cima do último backup.</div>
+          <div class="title">Backup e importação</div>
+          <div class="k">Exporte seu backup ou importe um arquivo salvo.</div>
           <div class="divider"></div>
 
           <div class="row">
@@ -747,7 +760,11 @@ body.dark .msg.me{
 
           <div class="divider"></div>
           <div class="tag" id="backupInfo">—</div>
+        </div>
 
+        <div class="panelbox">
+          <div class="title">Reset financeiro</div>
+          <div class="k">Use apenas se quiser limpar todos os dados do app.</div>
           <div class="divider"></div>
           <button class="btn danger" id="btnResetAll" type="button">🧹 Zerar tudo</button>
         </div>
@@ -1826,23 +1843,26 @@ function renderAll(){
 
 <script>
 (function(){
-  const btn = document.getElementById("toggleTheme");
+  const ids = ["toggleTheme","toggleThemeMobile","toggleThemeConfig"];
+  const buttons = ids.map(id => document.getElementById(id)).filter(Boolean);
   const saved = localStorage.getItem("theme") || "dark";
   if(saved==="dark"){ document.body.classList.add("dark"); }
-  update();
 
   function update(){
     const dark = document.body.classList.contains("dark");
-    if(btn) btn.textContent = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
+    const label = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
+    buttons.forEach(btn => btn.textContent = label);
   }
 
-  if(btn){
-    btn.onclick = function(){
+  buttons.forEach(btn => {
+    btn.addEventListener("click", function(){
       document.body.classList.toggle("dark");
       localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light");
       update();
-    };
-  }
+    });
+  });
+
+  update();
 })();
 </script>
 
