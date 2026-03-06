@@ -1795,11 +1795,24 @@ document.addEventListener("click", (e)=>{
 
 /* Boot */
 function bootChat(){
-  $("chatBox").innerHTML = "";
-  botSay(`${greeting()} 😊
-Seja bem-vindo(a).
-Como posso ajudá-lo:`);
-  renderDueAlerts();
+  const box = document.getElementById("chatBox");
+  box.innerHTML = "";
+
+  const hora = new Date().getHours();
+  let saudacao = "Boa noite";
+
+  if(hora < 12) saudacao = "Bom dia";
+  else if(hora < 18) saudacao = "Boa tarde";
+
+  const msg = document.createElement("div");
+  msg.className = "msg bot";
+  msg.innerHTML = `
+    ${saudacao} 😊<br>
+    Seja bem-vindo(a).<br>
+    Como posso ajudá-lo:
+  `;
+
+  box.appendChild(msg);
 }
 function renderAll(){
   $("mesRef").value = monthNow();
@@ -1899,3 +1912,4 @@ localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"li
 
 </body>
 </html>
+
