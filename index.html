@@ -441,6 +441,33 @@ body.dark .msg.me{
   #tab-transacoes .txSimpleActions .btn{width:100%}
 }
 
+
+.monthNav{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:8px;
+  align-items:center;
+}
+.monthDisplay{
+  border:1px solid var(--stroke);
+  background:var(--panel);
+  color:var(--text);
+  border-radius:14px;
+  padding:12px;
+  min-height:46px;
+  display:flex;
+  align-items:center;
+}
+.monthBtn{
+  width:auto;
+  min-width:46px;
+  height:46px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 12px;
+}
+
 </style>
 </head>
 
@@ -570,7 +597,15 @@ body.dark .msg.me{
       <section id="tab-transacoes" class="hidden">
         <div class="panelbox">
           <div class="row">
-            <div><label for="mesRef">Mês</label><input id="mesRef" type="month" /></div>
+            <div>
+  <label for="mesRef">Mês</label>
+  <div class="monthNav">
+    <button class="btn secondary monthBtn" id="btnPrevMes" type="button">◀</button>
+    <div class="monthDisplay" id="mesDisplay">—</div>
+    <button class="btn secondary monthBtn" id="btnNextMes" type="button">▶</button>
+  </div>
+  <input id="mesRef" type="month" style="display:none" />
+</div>
             <div><label for="filtroMeio">Filtro (meio)</label>
               <select id="filtroMeio">
                 <option value="">Todos</option>
@@ -820,6 +855,24 @@ function monthFromIso(iso){
   if(!y||!m) return null;
   return `${y}-${m}`;
 }
+
+function ymToLongLabel(ym){
+  if(!ym) return "—";
+  const [y,m] = ym.split("-").map(Number);
+  const dt = new Date(y, (m||1)-1, 1);
+  return dt.toLocaleDateString("pt-BR", { month:"long", year:"numeric" });
+}
+function shiftMonth(ym, offset){
+  const [y,m] = ym.split("-").map(Number);
+  const dt = new Date(y, (m||1)-1 + offset, 1);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
+}
+function syncMesDisplay(){
+  if($("mesDisplay") && $("mesRef")){
+    $("mesDisplay").textContent = ymToLongLabel($("mesRef").value || monthNow());
+  }
+}
+
 function labelMonth(ym){
   const [y,m] = ym.split("-");
   return `${m}/${y}`;
@@ -1304,6 +1357,7 @@ function renderPainel(){
 /* Transações */
 function renderTxTable(){
   const ym = $("mesRef").value || monthNow();
+  syncMesDisplay();
   const meio = $("filtroMeio").value || "";
   const tipo = $("filtroTipo").value || "";
   const busca = normalize($("buscaCat").value || "");
@@ -1371,6 +1425,18 @@ function loadTxToDraft(item){
   toast("Excluído");
   renderAll();
 });
+
+if($("btnPrevMes")) $("btnPrevMes").addEventListener("click", ()=>{
+  $("mesRef").value = shiftMonth($("mesRef").value || monthNow(), -1);
+  syncMesDisplay();
+  renderTxTable();
+});
+if($("btnNextMes")) $("btnNextMes").addEventListener("click", ()=>{
+  $("mesRef").value = shiftMonth($("mesRef").value || monthNow(), 1);
+  syncMesDisplay();
+  renderTxTable();
+});
+
 ["mesRef","filtroMeio","filtroTipo","buscaCat"].forEach(id=>{
   $(id).addEventListener("input", ()=>{ renderTxTable(); renderPainel(); });
 });
@@ -1708,6 +1774,7 @@ function bootChat(){
 }
 function renderAll(){
   $("mesRef").value = monthNow();
+  syncMesDisplay();
   $("filtroMeio").value = "";
   $("filtroTipo").value = "";
   $("buscaCat").value = "";
