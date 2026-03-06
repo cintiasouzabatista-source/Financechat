@@ -502,7 +502,7 @@ body.dark .msg.me{
             <div class="chatBox" id="chatBox"></div>
 
             <div class="chatComposer">
-              <input id="chatInput" placeholder='Ex: "Gastei 100 mercado pix" | "Gastei 200 roupa cartão nubank 2x"' />
+              <input id="chatInput" placeholder='Ex: "100 mercado pix" | "1000 salário nubank" | "300 roupa cartão nubank 3x"' />
               <button class="btn" id="btnSend">Enviar</button>
             </div>
 <div class="divider"></div>
@@ -764,10 +764,32 @@ function brl(n){
 }
 function parseBR(s){
   if(s === null || s === undefined) return null;
-  const v = String(s).trim();
-  if(!v) return null;
-  const norm = v.replace(/\./g,"").replace(",", ".");
-  const n = Number(norm);
+  const raw = String(s).trim();
+  if(!raw) return null;
+
+  let v = raw.replace(/\s+/g, "");
+
+  if(v.includes(",")){
+    v = v.replace(/\./g, "").replace(",", ".");
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  const dots = (v.match(/\./g) || []).length;
+  if(dots > 1){
+    v = v.replace(/\./g, "");
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  if(dots === 1){
+    const parts = v.split(".");
+    if(parts[1] && parts[1].length === 3){
+      v = parts.join("");
+    }
+  }
+
+  const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
 function uid(){
@@ -996,7 +1018,7 @@ function extractParcels(text){
   return 1;
 }
 function extractValue(text){
-  const m = text.match(/(\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+(?:,\d{2})?)/);
+  const m = String(text).match(/(\d{1,3}(?:\.\d{3})+(?:,\d{2})?|\d+(?:,\d{2})?|\d+(?:\.\d{1,2})?)/);
   if(!m) return null;
   return parseBR(m[1]);
 }
@@ -1195,7 +1217,10 @@ $("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.prevent
 /* Painel */
 
 function sumsForMonth(ym){
-  const list = tx.filter(t => monthFromIso(t.data) === ym);
+  const list = tx.filter(t => {
+    if(t.meio === "Cartão") return (t.cicloFatura || monthFromIso(t.data)) === ym;
+    return monthFromIso(t.data) === ym;
+  });
   let receitas=0, banco=0, dinheiro=0, cartao=0, ben=0;
   for(const t of list){
     const val = Number(t.valor)||0;
@@ -1241,7 +1266,7 @@ function renderTxTable(){
   const tipo = $("filtroTipo").value || "";
   const busca = normalize($("buscaCat").value || "");
 
-  const list = tx.filter(t => monthFromIso(t.data)===ym)
+  const list = tx.filter(t => (t.meio==="Cartão" ? ((t.cicloFatura || monthFromIso(t.data))===ym) : (monthFromIso(t.data)===ym)))
                 .filter(t => !meio || t.meio===meio)
                 .filter(t => !tipo || t.tipo===tipo)
                 .filter(t => !busca || normalize(t.categoria||"").includes(busca))
