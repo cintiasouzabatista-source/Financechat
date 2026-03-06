@@ -412,6 +412,25 @@ body.dark .msg.me{
   border:1px solid rgba(16,185,129,.25);
 }
 
+
+/* ações pós-salvar */
+.msg .actionRow{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.msg .miniBtn{
+  width:auto;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid var(--stroke);
+  background:var(--panel);
+  color:var(--text);
+  cursor:pointer;
+  font-size:12px;
+}
+
 </style>
 </head>
 
@@ -1085,8 +1104,9 @@ function createTxFromDraft(d){
   }
   return items;
 }
-function botSummary(d){
-  botSay(draftSummaryLines(d) + "\n\nSalvo ✅");
+function botSummary(d, ids){
+  const summary = draftSummaryLines(d);
+  renderSavedSummary(summary, ids || []);
 }
 function saveDraft(){
   const q = askMissing(draft);
@@ -1097,13 +1117,13 @@ function saveDraft(){
     list.push(draft.categoria);
     data.categorias[bucket] = list;
   }
-  tx.push(...createTxFromDraft(draft));
+  const created = createTxFromDraft(draft);
+  tx.push(...created);
   persist("lancamento_chat");
-  botSummary(draft);
+  botSummary(draft, created.map(x => x.id));
   toast("Salvo ✅");
-  setPill("Salvo");
-  draft = null;
   renderAll();
+  resetComposerAndDraft();
 }
 function openDraftFromMessage(msg){
   draft = parseMessage(msg);
@@ -1494,6 +1514,97 @@ function renderCharts(){
   if(line) line.destroy();
   line = new Chart(ctxL, { type:"line", data:{ labels: dayLabels, datasets }, options:{ responsive:true, plugins:{ legend:{ position:"bottom" } }, scales:{ y:{ beginAtZero:true } } } });
 }
+
+
+/* ===== pós-salvar / reset ===== */
+let lastSavedIds = [];
+let lastSavedSummary = null;
+
+function resetComposerAndDraft(){
+  if($("chatInput")) $("chatInput").value = "";
+  draft = null;
+  showDraft(false);
+  if($("draftSummary")) $("draftSummary").textContent = "—";
+  if($("draftHint")) $("draftHint").textContent = "—";
+  setPill("Pronto");
+}
+
+function renderSavedSummary(summaryText, ids){
+  const box = $("chatBox");
+  const wrap = document.createElement("div");
+  wrap.className = "msg bot";
+  wrap.innerHTML = `
+    <div>${escapeHtml(summaryText).replace(/\n/g,"<br>")}</div>
+    <div style="margin-top:8px"><strong>Salvo ✅</strong></div>
+    <div class="actionRow">
+      <button class="miniBtn" data-edit-last="1">Editar</button>
+      <button class="miniBtn" data-delete-last="1">Excluir</button>
+    </div>
+  `;
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
+  lastSavedIds = [...ids];
+  lastSavedSummary = summaryText;
+}
+
+function removeTxByIds(ids){
+  const before = tx.length;
+  tx = tx.filter(item => !ids.includes(item.id));
+  if(tx.length !== before){
+    persist("excluir_ultimo_lancamento");
+    renderAll();
+  }
+}
+
+function startEditLastSaved(){
+  if(!lastSavedIds || !lastSavedIds.length) return;
+  const items = tx.filter(item => lastSavedIds.includes(item.id));
+  if(!items.length){
+    botSay("Não encontrei o último lançamento para editar.");
+    return;
+  }
+
+  const first = items[0];
+  draft = {
+    tipo: first.tipo,
+    categoria: first.categoria,
+    valor: items.reduce((a,t)=>a+(Number(t.valor)||0),0),
+    ref: first.ref || null,
+    data: first.data || nowISO(),
+    meio: first.meio || null,
+    parcelas: first.totalParcelas || 1,
+    cicloFatura: first.cicloFatura || null,
+    nf: first.nf || null
+  };
+
+  removeTxByIds(lastSavedIds);
+  botSay("Último lançamento carregado para edição. Me envie a frase corrigida ou ajuste os campos no chat.");
+  if($("chatInput")) $("chatInput").value = "";
+  setPill("Editar");
+}
+
+document.addEventListener("click", (e)=>{
+  const editBtn = e.target.closest("[data-edit-last]");
+  if(editBtn){
+    startEditLastSaved();
+    return;
+  }
+  const delBtn = e.target.closest("[data-delete-last]");
+  if(delBtn){
+    if(!lastSavedIds || !lastSavedIds.length){
+      botSay("Não há lançamento recente para excluir.");
+      return;
+    }
+    removeTxByIds(lastSavedIds);
+    botSay("Último lançamento excluído.");
+    lastSavedIds = [];
+    lastSavedSummary = null;
+    resetComposerAndDraft();
+    toast("Excluído");
+    return;
+  }
+});
+
 
 /* Boot */
 function bootChat(){
