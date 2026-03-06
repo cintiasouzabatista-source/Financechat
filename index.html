@@ -305,35 +305,66 @@
       max-width:92vw;
       text-align:center;
     }
-  
-/* ===== DARK MODE ===== */
+  /* ===== THEME ===== */
 body.dark{
-  --bg:#0f172a;
-  --panel:#1e293b;
-  --text:#e2e8f0;
-  --muted:rgba(226,232,240,.70);
-  --stroke:rgba(226,232,240,.12);
-  --divider:rgba(226,232,240,.10);
+  --bg:#06122b;
+  --panel:#1c2a44;
+  --text:#e5edf9;
+  --muted:rgba(229,237,249,.72);
+  --stroke:rgba(229,237,249,.12);
+  --divider:rgba(229,237,249,.08);
   --green:#22c55e;
   --red:#f87171;
-  --accent:#22c55e;
-  --shadow:0 10px 24px rgba(0,0,0,.25);
+  --accent:#34d399;
+  --shadow:0 16px 36px rgba(0,0,0,.30);
 }
+body.dark .topbar,
+body.dark .drawer .panel,
+body.dark .sidebar,
+body.dark .panelbox,
+body.dark .card,
+body.dark .line,
+body.dark table,
+body.dark input,
+body.dark select,
+body.dark button,
+body.dark .pill,
+body.dark .tag{
+  background:var(--panel);
+  color:var(--text);
+  border-color:var(--stroke);
+}
+body.dark .topbar{
+  background:rgba(28,42,68,.96);
+}
+body.dark .drawer .backdrop{ background:rgba(0,0,0,.45); }
+body.dark .nav button{ color:var(--text); }
+body.dark .nav button:hover{ background:rgba(255,255,255,.04); border-color:var(--stroke); }
+body.dark .nav button.active{ background:rgba(52,211,153,.16); border-color:rgba(52,211,153,.24); }
 body.dark .chatBox{
-  background:linear-gradient(180deg, rgba(15,23,42,.96), rgba(30,41,59,.92));
-  border:1px solid rgba(226,232,240,.08);
+  background:linear-gradient(180deg, rgba(8,20,48,.98), rgba(26,38,67,.92));
+  border-color:var(--stroke);
 }
 body.dark .msg.bot{
-  background:#0f172a;
-  border:1px solid rgba(226,232,240,.08);
-  color:rgba(226,232,240,.92);
+  background:#091632;
+  color:var(--text);
+  border-color:var(--stroke);
 }
 body.dark .msg.me{
-  background:rgba(34,197,94,.16);
-  border:1px solid rgba(34,197,94,.25);
-  color:rgba(226,232,240,.92);
+  background:rgba(16,185,129,.18);
+  color:var(--text);
+  border-color:rgba(16,185,129,.25);
 }
-
+body.dark input::placeholder{ color:rgba(229,237,249,.38); }
+body.dark th, body.dark td, body.dark label, body.dark .k, body.dark .title, body.dark .top-title { color:var(--muted); }
+body.dark a{ color:#93c5fd; }
+body.dark option{ background:#1c2a44; color:#e5edf9; }
+.theme-box{ margin-top:14px; }
+.theme-toggle{
+  width:100%;
+  border-radius:14px;
+  padding:12px 14px;
+}
 </style>
 </head>
 
@@ -357,12 +388,7 @@ body.dark .msg.me{
       <button data-tab="relatorios"><span class="ico">📊</span>Relatórios</button>
       <button data-tab="config"><span class="ico">⚙️</span>Configurações</button>
     </nav>
-<div style="margin-top:20px;padding:0 10px 10px">
-  <button id="toggleThemeMobile" class="btn secondary" type="button">☀️/🌙 Tema</button>
-</div>
-<div style="margin-top:20px;padding:0 10px 10px">
-  <button id="toggleTheme" class="btn secondary" type="button">☀️/🌙 Tema</button>
-</div>
+    <div class="theme-box"><button id="toggleTheme" class="btn secondary theme-toggle" type="button">🌙 Tema escuro</button></div>
   </aside>
 
   <main class="main">
@@ -395,6 +421,7 @@ body.dark .msg.me{
           <button data-tab="relatorios"><span class="ico">📊</span>Relatórios</button>
           <button data-tab="config"><span class="ico">⚙️</span>Configurações</button>
         </nav>
+        <div class="theme-box"><button id="toggleThemeMobile" class="btn secondary theme-toggle" type="button">🌙 Tema escuro</button></div>
       </div>
     </div>
 
@@ -580,7 +607,7 @@ body.dark .msg.me{
       <!-- CONFIG -->
       <section id="tab-config" class="hidden">
         <div class="panelbox">
-          <div class="title">Categorias (receitas e despesas)</div>
+          <div class="title">Tema</div><div class="row"><button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button></div><div class="divider"></div><div class="title">Categorias (receitas e despesas)</div>
           <div class="row">
             <div><label for="catTipo">Tipo</label><select id="catTipo"><option value="Despesa">Despesa</option><option value="Receita">Receita</option></select></div>
             <div><label for="catNome">Nova categoria</label><input id="catNome" placeholder="Ex: Farmácia, Academia, Reembolso..." /></div>
@@ -884,11 +911,11 @@ function isWordIn(text, words){
 }
 function detectPaymentMethod(text){
   const t = normalize(text);
+  if(data.beneficiosAtivo && findByAlias(data.beneficios||[], t)) return "Benefício";
   if(t.includes("cartao") || t.includes("cartão") || t.includes("credito") || t.includes("crédito")) return "Cartão";
   if(t.includes("pix")) return "PIX";
   if(t.includes("debito") || t.includes("débito")) return "Débito";
   if(t.includes("dinheiro") || t.includes("especie") || t.includes("espécie")) return "Dinheiro";
-  if(data.beneficiosAtivo && findByAlias(data.beneficios||[], t)) return "Benefício";
   return null;
 }
 function extractParcels(text){
@@ -940,7 +967,7 @@ function draftSummaryLines(d){
     d.categoria || "—",
     brl(d.valor),
     d.ref || "—",
-    d.data || nowISO()
+    d.data ? new Date(d.data+"T12:00:00").toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR")
   ];
   if(d.meio==="Cartão" && d.parcelas>1) lines.push(`${d.parcelas} parcelas`);
   return lines.join("\n");
@@ -1109,8 +1136,8 @@ function sumsForMonth(ym){
     else banco += val;
   }
   const saidas = banco + dinheiro + cartao + ben;
-  const saldoAtual = receitas - (banco + dinheiro);
-  const saldoFinal = saldoAtual - (cartao + ben);
+  const saldoAtual = receitas - (banco + dinheiro + ben);
+  const saldoFinal = saldoAtual - cartao;
   return {receitas,banco,dinheiro,cartao,ben,saidas,saldoAtual,saldoFinal};
 }
 function renderPainel(){
@@ -1455,29 +1482,24 @@ function renderAll(){
 
 
 </script>
-
 <script>
 (function(){
-  const btn = document.getElementById("toggleTheme");
-  const btnM = document.getElementById("toggleThemeMobile");
-  function syncLabel(){
+  const ids = ["toggleTheme","toggleThemeMobile","toggleThemeConfig"];
+  const buttons = ids.map(id => document.getElementById(id)).filter(Boolean);
+  function syncThemeLabel(){
     const dark = document.body.classList.contains("dark");
     const label = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
-    if(btn) btn.textContent = label;
-    if(btnM) btnM.textContent = label;
+    buttons.forEach(btn => btn.textContent = label);
   }
   const saved = localStorage.getItem("theme") || "dark";
-  if(saved === "dark") document.body.classList.add("dark");
-  syncLabel();
-  function toggle(){
+  if(saved === "dark"){ document.body.classList.add("dark"); }
+  syncThemeLabel();
+  buttons.forEach(btn => btn.addEventListener("click", function(){
     document.body.classList.toggle("dark");
     localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-    syncLabel();
-  }
-  if(btn) btn.addEventListener("click", toggle);
-  if(btnM) btnM.addEventListener("click", toggle);
+    syncThemeLabel();
+  }));
 })();
 </script>
-
 </body>
 </html>
