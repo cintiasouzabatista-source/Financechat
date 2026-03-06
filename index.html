@@ -578,7 +578,7 @@ body.dark .msg.me{
           </div>
 
           <div class="line">
-            <div><div class="k">Saldo atual</div><div class="k">saldos iniciais + receitas − (banco + dinheiro)</div></div>
+            <div><div class="k">Saldo atual</div><div class="k">receitas − (banco + dinheiro)</div></div>
             <div class="v" id="saldoAtual">R$ 0,00</div>
           </div>
 
@@ -637,17 +637,14 @@ body.dark .msg.me{
       <!-- CONTAS E CARTÕES -->
       <section id="tab-contas" class="hidden">
         <div class="panelbox">
-          <div class="title">Contas (pix/débito)</div><div class="k">Você pode definir um saldo inicial para cada conta.</div>
+          <div class="title">Contas (pix/débito)</div>
           <div class="row">
             <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Mercado Pago, Nubank..." /></div>
             <div><label for="apelidoConta">Apelidos (vírgula)</label><input id="apelidoConta" placeholder="Ex: mp, mercadopago, roxinho" /></div>
           </div>
-          <div class="row">
-            <div><label for="saldoInicialConta">Saldo inicial</label><input id="saldoInicialConta" inputmode="decimal" placeholder="Ex: 1500 ou 1500,00" /></div>
-            <div><label>&nbsp;</label><button class="btn" id="btnAddConta" type="button" style="margin-top:0">Adicionar conta</button></div>
-          </div>
+          <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
           <div class="divider"></div>
-          <div style="overflow:auto"><table><thead><tr><th>Conta</th><th>Saldo inicial</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyContas"></tbody></table></div>
+          <div style="overflow:auto"><table><thead><tr><th>Conta</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyContas"></tbody></table></div>
         </div>
 
         <div class="panelbox">
@@ -705,7 +702,7 @@ body.dark .msg.me{
       <section id="tab-config" class="hidden">
         <div class="panelbox">
           <div class="title">Tema</div>
-          <div class="k">Escolha como o Finance AI deve aparecer.</div>
+          <div class="k">Escolha como o Finance AI deve aparecer. O botão abaixo alterna entre claro e escuro.</div>
           <div class="divider"></div>
           <div class="row">
             <button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button>
@@ -764,9 +761,9 @@ const STORE = { TX:"fin_tx_chat_v1", DATA:"fin_data_chat_v1", BACKUP:"fin_backup
 const DEFAULTS = {
   data: {
     contas: [
-      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"], initialBalance:0 },
-      { name:"Nubank", aliases:["nu","nubank","roxinho"], initialBalance:0 },
-      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"], initialBalance:0 }
+      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"] },
+      { name:"Nubank", aliases:["nu","nubank","roxinho"] },
+      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"] }
     ],
     cartoes: [
       { name:"Nubank", aliases:["nu","nubank","roxinho"], fechamento:10, pagamento:17 },
@@ -1318,16 +1315,15 @@ function sumsForMonth(ym){
     if(t.meio==="Cartão") cartao += val;
     else if(t.meio==="Dinheiro") dinheiro += val;
     else if(t.meio==="Benefício"){
-      // benefício fora do painel principal
+      // benefício fica no menu Benefícios, fora do painel principal
     } else banco += val;
   }
 
-  const initialBalances = (data.contas||[]).reduce((acc, c)=>acc + (Number(c.initialBalance)||0), 0);
   const saidas = banco + dinheiro + cartao;
-  const saldoAtual = initialBalances + receitas - (banco + dinheiro);
+  const saldoAtual = receitas - (banco + dinheiro);
   const saldoFinal = saldoAtual - cartao;
 
-  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal,initialBalances};
+  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal};
 }
 function renderPainel(){
   const ym = monthNow();
@@ -1446,7 +1442,7 @@ function renderContas(){
   for(let i=0;i<data.contas.length;i++){
     const c = data.contas[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${brl(c.initialBalance||0)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
     tb.appendChild(tr);
   }
   const tb2 = $("tbodyCartoes"); tb2.innerHTML="";
@@ -1501,13 +1497,12 @@ document.addEventListener("click", (e)=>{
 $("btnAddConta").addEventListener("click", ()=>{
   const name = ($("novaConta").value||"").trim();
   const aliases = ($("apelidoConta").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
-  const initialBalance = parseBR($("saldoInicialConta").value) || 0;
   if(!name){ toast("Digite o nome"); return; }
   data.contas = data.contas || [];
   if(data.contas.some(x=>normalize(x.name)===normalize(name))){ toast("Conta já existe"); return; }
-  data.contas.unshift({ name, aliases, initialBalance });
-  $("novaConta").value=""; $("apelidoConta").value=""; $("saldoInicialConta").value="";
-  persist("add_conta"); renderContas(); renderPainel(); toast("Conta adicionada");
+  data.contas.unshift({ name, aliases });
+  $("novaConta").value=""; $("apelidoConta").value="";
+  persist("add_conta"); renderContas(); toast("Conta adicionada");
 });
 $("btnAddCartao").addEventListener("click", ()=>{
   const name = ($("novoCartao").value||"").trim();
@@ -1767,7 +1762,40 @@ document.addEventListener("click", (e)=>{
 
 /* Boot */
 function bootChat(){
-bootChat()
+  const box = $("chatBox");
+  if(!box) return;
+  box.innerHTML = "";
+
+  const hora = new Date().getHours();
+  let saudacao = "Boa noite";
+  if(hora < 12) saudacao = "Bom dia";
+  else if(hora < 18) saudacao = "Boa tarde";
+
+  const msg = document.createElement("div");
+  msg.className = "msg bot";
+  msg.innerHTML = `
+    ${saudacao} 😊<br>
+    Seja bem-vindo(a).<br>
+    Como posso ajudá-lo:
+  `;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+  renderDueAlerts();
+}
+function renderAll(){
+  $("mesRef").value = monthNow();
+  syncMesDisplay();
+  $("filtroMeio").value = "";
+  $("filtroTipo").value = "";
+  $("buscaCat").value = "";
+  renderPainel();
+  renderTxTable();
+  renderContas();
+  renderBeneficios();
+  renderCats();
+  renderDueAlerts();
+  getBackupInfo();
+}
 
 (function init(){
   if(!localStorage.getItem(STORE.DATA) && !localStorage.getItem(STORE.TX)){
@@ -1777,20 +1805,25 @@ bootChat()
   } else {
     makeBackup("init");
   }
-  bootChat();
   renderAll();
   setTab("chat");
   setPill("Pronto");
+  bootChat();
 })();
 
 
 
 </script>
-<script>
+
+<script id="themeToggleScript">
 (function(){
   const btn = document.getElementById("toggleThemeConfig");
   const saved = localStorage.getItem("theme") || "dark";
-  if(saved === "dark") document.body.classList.add("dark");
+  if(saved === "dark"){
+    document.body.classList.add("dark");
+  }else{
+    document.body.classList.remove("dark");
+  }
 
   function syncLabel(){
     if(!btn) return;
@@ -1810,47 +1843,5 @@ bootChat()
 })();
 </script>
 
-<script>
-(function(){
-  const ids = ["toggleTheme","toggleThemeMobile","toggleThemeConfig"];
-  const buttons = ids.map(id => document.getElementById(id)).filter(Boolean);
-  const saved = localStorage.getItem("theme") || "dark";
-  if(saved==="dark"){ document.body.classList.add("dark"); }
-
-  function update(){
-    const dark = document.body.classList.contains("dark");
-    const label = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
-    buttons.forEach(btn => btn.textContent = label);
-  }
-
-  buttons.forEach(btn => {
-    btn.addEventListener("click", function(){
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light");
-      update();
-    });
-  });
-
-  update();
-})();
-</script>
-
-
-<script id="themeToggleScript">
-(function(){
-const btn=document.getElementById("toggleThemeConfig");
-const saved=localStorage.getItem("theme")||"dark";
-if(saved==="dark"){document.body.classList.add("dark");}
-if(btn){
-btn.addEventListener("click",()=>{
-document.body.classList.toggle("dark");
-localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
-});
-}
-})();
-</script>
-
 </body>
 </html>
-
-
