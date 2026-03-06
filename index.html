@@ -374,10 +374,7 @@
               <input id="chatInput" placeholder='Ex: "Gastei 100 mercado pix" | "Gastei 200 roupa cartão nubank 2x"' />
               <button class="btn" id="btnSend">Enviar</button>
             </div>
-
-            <div class="row"></div>
-
-            <div class="divider"></div>
+<div class="divider"></div>
 
             <div class="alert" id="dueAlert" style="display:none">
               <h3>Contas a vencer</h3>
@@ -879,7 +876,7 @@ function guessCategory(text, bucket){
   if(isWordIn(text, ["mercado","supermercado","padaria","feira"])) return "Mercado";
   if(isWordIn(text, ["energia","luz","agua","água","internet","telefone"])) return "Contas";
   if(isWordIn(text, ["uber","99","onibus","ônibus","metro","metrô","gasolina","etanol","combustivel","combustível"])) return "Transporte";
-  if(bucket==="Receita" && isWordIn(text, ["salario","salário"])) return "Salário";
+  if(bucket==="Receita" && isWordIn(text, ["salario","salário","pagamento"])) return "Salário";
   return "Outros";
 }
 function shouldAskFixedBill(text){
@@ -898,26 +895,36 @@ function computeBillCycle(cardName, purchaseDateISO){
   return `${y}-${String(m+1).padStart(2,"0")}`;
 }
 
+
 /* Draft flow */
 let draft = null;
-function showDraft(on){ $("draftBox").style.display = on ? "block" : "none"; }
-function draftText(d){
-  const base = `${d.tipo} • ${d.categoria} • ${d.meio} • ${d.ref||"—"} • ${brl(d.valor)} • ${d.data}`;
-  const extra = (d.meio==="Cartão" && d.parcelas>1) ? ` • ${d.parcelas}x • fatura ${d.cicloFatura}` : (d.meio==="Cartão" ? ` • fatura ${d.cicloFatura}` : "");
-  const nf = d.nf ? ` • NF` : "";
-  return base + extra + nf;
+function showDraft(on){ $("draftBox").style.display = "none"; }
+function draftSummaryLines(d){
+  const lines = [
+    d.tipo || "—",
+    d.categoria || "—",
+    brl(d.valor),
+    d.ref || "—",
+    d.data || nowISO()
+  ];
+  if(d.meio==="Cartão" && d.parcelas>1) lines.push(`${d.parcelas} parcelas`);
+  return lines.join("\n");
 }
 function askMissing(d){
-  if(!Number.isFinite(d.valor) || d.valor<=0) return "Qual é o valor? (ex: 100 ou 100,50)";
-  if(!d.meio) return "Qual forma de pagamento? (pix, débito, dinheiro, cartão)";
-  if(d.meio==="Cartão"){ if(!d.ref) return "Qual cartão? (cadastre em Contas e Cartões)"; }
-  else if(d.meio==="Benefício"){ if(!d.ref) return "Qual benefício? (VR, VA, Combustível...)"; }
-  else if(d.meio==="Dinheiro"){ d.ref = "Dinheiro"; }
-  else { if(!d.ref) return "Qual conta? (ex: Nubank, Mercado Pago)"; }
-  if(!d.categoria) return "Qual categoria? (ex: Mercado, Contas, Transporte...)";
+  if(!Number.isFinite(d.valor) || d.valor<=0) return "Qual é o valor?";
+  if(!d.categoria) return "Qual categoria?";
+  if(!d.ref){
+    if(d.meio==="Dinheiro"){ d.ref = "Dinheiro"; }
+    else if(d.meio==="Benefício") return "Qual benefício?";
+    else return "Qual conta? (ex: Nubank, Mercado Pago)";
+  }
+  if(!d.meio){
+    if(d.ref && d.ref!=="Dinheiro") d.meio = "Débito";
+    else return "Qual forma de pagamento? (pix, débito, dinheiro, cartão)";
+  }
+  if(d.meio==="Cartão" && d.parcelas < 1) d.parcelas = 1;
   return null;
 }
-
 function parseMessage(msg){
   const t = normalize(msg);
   let tipo = null;
@@ -925,26 +932,31 @@ function parseMessage(msg){
   if(isWordIn(t, ["gastei","gastar","paguei","pagar","comprei","compra"])) tipo = tipo || "Despesa";
 
   const valor = extractValue(msg);
-  const meio = detectPaymentMethod(msg);
+  let meio = detectPaymentMethod(msg);
   const dataISO = nowISO();
 
   let ref = null;
   if(meio==="Cartão") ref = findByAlias(data.cartoes||[], msg);
   else if(meio==="Benefício") ref = data.beneficiosAtivo ? findByAlias(data.beneficios||[], msg) : null;
-  else if(meio==="Dinheiro") ref = "Dinheiro";
-  else ref = findByAlias(data.contas||[], msg);
+  else {
+    ref = findByAlias(data.contas||[], msg);
+    const c = findByAlias(data.cartoes||[], msg);
+    if(!ref && c){
+      ref = c;
+      meio = meio || "Cartão";
+    }
+  }
+  if(meio==="Dinheiro") ref = "Dinheiro";
 
   const bucket = (tipo==="Receita") ? "Receita" : "Despesa";
   const categoria = guessCategory(msg, bucket);
-
   const nf = (msg.match(/https?:\/\/\S+/) || [null])[0];
-  const parcelas = (meio==="Cartão" && (tipo||"Despesa")==="Despesa") ? extractParcels(msg) : 1;
+  const parcelas = ((meio==="Cartão") && (tipo||"Despesa")==="Despesa") ? extractParcels(msg) : 1;
   let cicloFatura = null;
   if(meio==="Cartão" && ref) cicloFatura = computeBillCycle(ref, dataISO);
 
-  return { tipo: tipo||"Despesa", meio, ref, categoria, valor, data: dataISO, nf, parcelas, cicloFatura, fixoSuggestion: (tipo!=="Receita" && shouldAskFixedBill(msg)) };
+  return { tipo: tipo||"Despesa", meio, ref, categoria, valor, data: dataISO, nf, parcelas, cicloFatura };
 }
-
 function createTxFromDraft(d){
   const items = [];
   if(d.meio==="Cartão" && d.tipo==="Despesa" && d.parcelas>1){
@@ -961,167 +973,78 @@ function createTxFromDraft(d){
   }
   return items;
 }
-
-function openDraftFromMessage(msg){
-  draft = parseMessage(msg);
-  const q = askMissing(draft);
-  if(q){ botSay(q); $("draftHint").textContent="Responda no chat para completar."; showDraft(false); return; }
-
-  if(draft.fixoSuggestion && draft.tipo==="Despesa"){
-    botSay("Isso parece uma conta recorrente. Quer cadastrar como conta fixa? Responda: sim ou não.");
-    $("draftHint").textContent="Se quiser, responda sim/não para conta fixa (antes de finalizar).";
-  } else {
-    $("draftHint").textContent="Confira e escolha: finalizar, editar ou excluir.";
-  }
-
-  $("draftSummary").textContent = draftText(draft);
-  showDraft(true);
+function botSummary(d){
+  botSay(draftSummaryLines(d) + "\n\nSalvo ✅");
 }
-
-function handleChatReply(msg){
-  if(!draft){ openDraftFromMessage(msg); return; }
-
-  if(draft.fixoSuggestion && isWordIn(msg, ["sim","não","nao"])){
-    if(normalize(msg).includes("sim")){
-      botSay("Qual dia do vencimento? (1 a 31)");
-      draft._awaitDueDay = true;
-      return;
-    } else {
-      draft.fixoSuggestion = false;
-      $("draftHint").textContent="Ok. Agora: finalizar, editar ou excluir.";
-      showDraft(true);
-      return;
-    }
-  }
-
-  if(draft._awaitDueDay){
-    const day = parseBR(msg);
-    if(!Number.isFinite(day) || day<1 || day>31){ botSay("Dia inválido. Me diga 1 a 31."); return; }
-    data.contasFixas = data.contasFixas || [];
-    data.contasFixas.push({ name: draft.categoria, valor: draft.valor, diaVenc: Math.round(day), categoria: draft.categoria, meio: draft.meio, conta: draft.ref||null });
-    draft._awaitDueDay = false;
-    draft.fixoSuggestion = false;
-    persist("conta_fixa");
-    botSay("Conta fixa cadastrada ✅");
-    $("draftHint").textContent="Agora: finalizar, editar ou excluir.";
-    showDraft(true);
-    renderDueAlerts();
-    return;
-  }
-
-  if(!draft.meio){
-    const m = detectPaymentMethod(msg);
-    if(!m){ botSay("Responda: pix, débito, dinheiro ou cartão."); return; }
-    draft.meio = m;
-  }
-  if(!draft.ref){
-    if(draft.meio==="Cartão"){
-      const c = findByAlias(data.cartoes||[], msg);
-      if(!c){ botSay("Não encontrei esse cartão. Cadastre em Contas e Cartões."); return; }
-      draft.ref = c;
-      draft.cicloFatura = computeBillCycle(draft.ref, draft.data);
-    } else if(draft.meio==="Benefício"){
-      const b = findByAlias(data.beneficios||[], msg);
-      if(!b){ botSay("Não encontrei esse benefício. Cadastre em Benefícios."); return; }
-      draft.ref = b;
-    } else if(draft.meio==="Dinheiro"){
-      draft.ref = "Dinheiro";
-    } else {
-      const a = findByAlias(data.contas||[], msg);
-      if(!a){ botSay("Não encontrei essa conta. Cadastre em Contas e Cartões."); return; }
-      draft.ref = a;
-    }
-  }
-  if(!Number.isFinite(draft.valor) || draft.valor<=0){
-    const v = parseBR(msg);
-    if(!Number.isFinite(v) || v<=0){ botSay("Me diga um valor válido."); return; }
-    draft.valor = v;
-  }
-  if(!draft.categoria){
-    const cat = msg.trim();
-    const bucket = (draft.tipo==="Receita") ? "Receita" : "Despesa";
-    const list = data.categorias?.[bucket] || [];
-    if(!list.includes(cat)){
-      list.push(cat);
-      data.categorias[bucket] = list;
-      persist("nova_categoria_chat");
-    }
-    draft.categoria = cat;
-  }
-
+function saveDraft(){
   const q = askMissing(draft);
-  if(q){ botSay(q); showDraft(false); return; }
-
-  $("draftSummary").textContent = draftText(draft);
-  $("draftHint").textContent="Agora: finalizar, editar ou excluir.";
-  showDraft(true);
-}
-
-function finalizeDraft(){
-  if(!draft) return;
-  const q = askMissing(draft);
-  if(q){ botSay(q); showDraft(false); return; }
+  if(q){ botSay(q); return; }
   const bucket = (draft.tipo==="Receita") ? "Receita" : "Despesa";
   const list = data.categorias?.[bucket] || [];
   if(draft.categoria && !list.includes(draft.categoria)){
     list.push(draft.categoria);
     data.categorias[bucket] = list;
   }
-
   tx.push(...createTxFromDraft(draft));
   persist("lancamento_chat");
-  botSay("Salvo ✅");
+  botSummary(draft);
   toast("Salvo ✅");
   setPill("Salvo");
-  showDraft(false);
   draft = null;
   renderAll();
 }
-
-function editDraft(){
-  if(!draft) return;
-  botSay("Me diga o que mudar. Exemplos:\n- valor 120\n- categoria farmácia\n- meio pix\n- conta nubank\n- cartão nubank\n- parcelas 3x");
-  setPill("Editar");
-  draft._editing = true;
-  showDraft(false);
+function openDraftFromMessage(msg){
+  draft = parseMessage(msg);
+  const q = askMissing(draft);
+  if(q){ botSay(q); return; }
+  saveDraft();
 }
-function applyEdit(msg){
-  const t = normalize(msg);
-  if(t.includes("valor")){
-    const v = extractValue(msg);
-    if(Number.isFinite(v)) draft.valor = v;
+function handleChatReply(msg){
+  if(!draft){ openDraftFromMessage(msg); return; }
+
+  if((!Number.isFinite(draft.valor) || draft.valor<=0)){
+    const v = parseBR(msg);
+    if(Number.isFinite(v) && v>0) draft.valor = v;
   }
-  if(t.includes("categoria")){
-    const cat = msg.split(/categoria/i)[1]?.trim();
-    if(cat) draft.categoria = cat;
-  }
-  if(t.includes("meio") || isWordIn(t, ["pix","debito","débito","dinheiro","cartao","cartão","credito","crédito"])){
+
+  if(!draft.meio){
     const m = detectPaymentMethod(msg);
     if(m) draft.meio = m;
   }
-  if(t.includes("conta")){
-    const a = findByAlias(data.contas||[], msg);
-    if(a) draft.ref = a;
+
+  if(!draft.ref){
+    if(draft.meio==="Cartão"){
+      const c = findByAlias(data.cartoes||[], msg) || findByAlias(data.contas||[], msg);
+      if(c){ draft.ref = c; draft.cicloFatura = computeBillCycle(draft.ref, draft.data); }
+    } else if(draft.meio==="Benefício"){
+      const b = findByAlias(data.beneficios||[], msg);
+      if(b) draft.ref = b;
+    } else if(draft.meio==="Dinheiro"){
+      draft.ref = "Dinheiro";
+    } else {
+      const a = findByAlias(data.contas||[], msg) || findByAlias(data.cartoes||[], msg);
+      if(a) draft.ref = a;
+    }
   }
-  if(t.includes("cartao") || t.includes("cartão")){
-    const c = findByAlias(data.cartoes||[], msg);
-    if(c){ draft.ref=c; draft.meio="Cartão"; draft.cicloFatura = computeBillCycle(draft.ref, draft.data); }
+
+  const p = extractParcels(msg);
+  if(draft.meio==="Cartão" && p && p>1){
+    draft.parcelas = p;
+    if(draft.ref) draft.cicloFatura = computeBillCycle(draft.ref, draft.data);
   }
-  if(t.includes("parcel") || t.match(/\d+\s*x/)){
-    draft.parcelas = extractParcels(msg);
-    if(draft.meio==="Cartão" && draft.ref) draft.cicloFatura = computeBillCycle(draft.ref, draft.data);
+
+  if(!draft.categoria){
+    const cat = msg.trim();
+    if(cat) draft.categoria = cat;
   }
-  draft._editing = false;
-  $("draftSummary").textContent = draftText(draft);
-  $("draftHint").textContent="Atualizei. Agora: finalizar, editar ou excluir.";
-  showDraft(true);
+
+  const q = askMissing(draft);
+  if(q){ botSay(q); return; }
+  saveDraft();
 }
-function cancelDraft(){
-  draft = null;
-  showDraft(false);
-  botSay("Ok. Cancelado.");
-  setPill("Pronto");
-}
+function finalizeDraft(){ saveDraft(); }
+function editDraft(){ botSay("Pode me dizer o ajuste por mensagem."); }
+function cancelDraft(){ draft = null; botSay("Ok. Cancelado."); setPill("Pronto"); }
 
 $("btnFinalize").addEventListener("click", finalizeDraft);
 $("btnEdit").addEventListener("click", editDraft);
@@ -1132,43 +1055,13 @@ function sendChat(){
   if(!msg) return;
   $("chatInput").value="";
   meSay(msg);
-  const t = normalize(msg);
-
-  if(draft && draft._editing){ applyEdit(msg); return; }
-  if(draft && isWordIn(t, ["finalizar","salvar","ok","confirmar"])){ finalizeDraft(); return; }
-  if(draft && isWordIn(t, ["excluir","cancelar","apagar"])){ cancelDraft(); return; }
-  if(draft && isWordIn(t, ["editar","mudar"])){ editDraft(); return; }
-
   handleChatReply(msg);
 }
 $("btnSend").addEventListener("click", sendChat);
 $("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); sendChat(); } });
 
-$("btnQuick").addEventListener("click", ()=>{
-  botSay('Atalhos:\n- "gastei 35 mercado pix nubank"\n- "gastei 200 roupa cartão nubank 2x"\n- "paguei energia 200 pix mercado pago"\n- "recebi salario 4400 nubank"');
-});
-
-/* Voice (beta) */
-let rec = null;
-$("btnMic").addEventListener("click", ()=>{
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ toast("Seu navegador não suporta voz aqui."); return; }
-  if(rec){ rec.stop(); rec=null; toast("Parado"); return; }
-  rec = new SR();
-  rec.lang = "pt-BR";
-  rec.interimResults = false;
-  rec.maxAlternatives = 1;
-  rec.onresult = (ev)=>{
-    const text = ev.results?.[0]?.[0]?.transcript || "";
-    if(text){ $("chatInput").value = text; toast("Reconhecido ✓"); }
-  };
-  rec.onerror = ()=>toast("Erro no microfone");
-  rec.onend = ()=>{ rec=null; };
-  rec.start();
-  toast("Falando…");
-});
-
 /* Painel */
+
 function sumsForMonth(ym){
   const list = tx.filter(t => monthFromIso(t.data) === ym);
   let receitas=0, banco=0, dinheiro=0, cartao=0, ben=0;
@@ -1524,33 +1417,7 @@ function renderAll(){
   setPill("Pronto");
 })();
 
-/* ===== CONFIRMAÇÃO INLINE ESTILO CHAT ===== */
-function renderInlineConfirm(d){
-  const box = document.getElementById("chatBox");
-  const wrap = document.createElement("div");
-  wrap.className = "msg bot";
-  wrap.innerHTML = `
-    <div>🧾 Confirmar lançamento</div>
-    <div style="margin-top:6px;font-size:13px">
-      ${d.tipo} • ${d.categoria} • ${d.meio} • ${d.ref||"—"} • ${brl(d.valor)} • ${d.data}
-    </div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn" onclick="finalizeDraft()">Finalizar</button>
-      <button class="btn secondary" onclick="editDraft()">Editar</button>
-      <button class="btn danger" onclick="cancelDraft()">Excluir</button>
-    </div>
-  `;
-  box.appendChild(wrap);
-  box.scrollTop = box.scrollHeight;
-}
 
-const _originalOpenDraft = openDraftFromMessage;
-openDraftFromMessage = function(msg){
-  draft = parseMessage(msg);
-  const q = askMissing(draft);
-  if(q){ botSay(q); return; }
-  renderInlineConfirm(draft);
-};
 
 </script>
 </body>
