@@ -1767,24 +1767,7 @@ document.addEventListener("click", (e)=>{
 
 /* Boot */
 function bootChat(){
-  $("chatBox").innerHTML = "";
-  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo(a)?);
-  renderDueAlerts();
-}
-function renderAll(){
-  $("mesRef").value = monthNow();
-  syncMesDisplay();
-  $("filtroMeio").value = "";
-  $("filtroTipo").value = "";
-  $("buscaCat").value = "";
-  renderPainel();
-  renderTxTable();
-  renderContas();
-  renderBeneficios();
-  renderCats();
-  renderDueAlerts();
-  getBackupInfo();
-}
+bootChat()
 
 (function init(){
   if(!localStorage.getItem(STORE.DATA) && !localStorage.getItem(STORE.TX)){
@@ -1869,4 +1852,5 @@ localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"li
 
 </body>
 </html>
+
 
