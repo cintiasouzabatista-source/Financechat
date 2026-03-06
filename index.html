@@ -502,7 +502,7 @@ body.dark .msg.me{
             <div class="chatBox" id="chatBox"></div>
 
             <div class="chatComposer">
-              <input id="chatInput" placeholder='Ex: "100 mercado pix" | "1000 salário nubank" | "300 roupa cartão nubank 3x"' />
+              <input id="chatInput" placeholder='Ex: "300 roupa nubank 3x" | "300 roupa parcelado 3" | "300 roupa em 3 parcelas"' />
               <button class="btn" id="btnSend">Enviar</button>
             </div>
 <div class="divider"></div>
@@ -536,8 +536,7 @@ body.dark .msg.me{
             <div class="card"><div class="k">Despesas (banco)</div><div class="v neg" id="cBanco">R$ 0,00</div><div class="k">pix + débito</div></div>
             <div class="card"><div class="k">Dinheiro</div><div class="v neg" id="cDin">R$ 0,00</div><div class="k">espécie</div></div>
             <div class="card"><div class="k">Cartões</div><div class="v neg" id="cCartao">R$ 0,00</div><div class="k">compras no crédito</div></div>
-            <div class="card"><div class="k">Benefícios</div><div class="v neg" id="cBen">R$ 0,00</div><div class="k">VR/VA/Combustível</div></div>
-            <div class="card"><div class="k">Saídas totais</div><div class="v neg" id="cSaidas">R$ 0,00</div><div class="k">tudo somado</div></div>
+<div class="card"><div class="k">Saídas totais</div><div class="v neg" id="cSaidas">R$ 0,00</div><div class="k">tudo somado</div></div>
           </div>
 
           <div class="line">
@@ -546,7 +545,7 @@ body.dark .msg.me{
           </div>
 
           <div class="line">
-            <div><div class="k">Saldo final (projetado)</div><div class="k">saldo atual − (cartões + benefícios a pagar)</div></div>
+            <div><div class="k">Saldo final (projetado)</div><div class="k">saldo atual − cartões do mês</div></div>
             <div class="v" id="saldoFinal">R$ 0,00</div>
           </div>
         </div>
@@ -621,7 +620,7 @@ body.dark .msg.me{
       <!-- BENEFÍCIOS -->
       <section id="tab-beneficios" class="hidden">
         <div class="panelbox">
-          <div class="title">Benefícios (opcional)</div>
+          <div class="title">Benefícios (menu separado)</div>
           <div class="row">
             <div><label>Ativar Benefícios</label>
               <select id="benAtivo"><option value="sim">Sim</option><option value="nao">Não</option></select>
@@ -1011,10 +1010,30 @@ function detectPaymentMethod(text){
 }
 function extractParcels(text){
   const t = normalize(text);
-  const m = t.match(/(\d+)\s*x/);
+
+  // 3x / 10x / 12 x
+  let m = t.match(/(?:^|\s)(\d{1,2})\s*x(?:\s|$)/);
   if(m) return Math.max(1, Math.min(60, Number(m[1])));
-  const m2 = t.match(/parcelad[oa]\s*(\d+)/);
-  if(m2) return Math.max(1, Math.min(60, Number(m2[1])));
+
+  // x3
+  m = t.match(/(?:^|\s)x\s*(\d{1,2})(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // 3 parcelas / 3 parcela
+  m = t.match(/(?:^|\s)(\d{1,2})\s*parcelas?(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // parcelado 3 / parcelada 3
+  m = t.match(/parcelad[oa]\s*(?:em\s*)?(\d{1,2})(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // em 3x / em 3 parcelas
+  m = t.match(/em\s*(\d{1,2})\s*x(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  m = t.match(/em\s*(\d{1,2})\s*parcelas?(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
   return 1;
 }
 function extractValue(text){
@@ -1088,6 +1107,8 @@ function parseMessage(msg){
   let meio = detectPaymentMethod(msg);
   const dataISO = nowISO();
 
+  const parcelasDetectadas = extractParcels(msg);
+
   let ref = null;
   if(meio==="Cartão") ref = findByAlias(data.cartoes||[], msg);
   else if(meio==="Benefício") ref = data.beneficiosAtivo ? findByAlias(data.beneficios||[], msg) : null;
@@ -1101,10 +1122,17 @@ function parseMessage(msg){
   }
   if(meio==="Dinheiro") ref = "Dinheiro";
 
+  // Se detectou parcelamento, assume cartão
+  if(parcelasDetectadas > 1 && !meio) meio = "Cartão";
+  if(parcelasDetectadas > 1 && ref){
+    const c = findByAlias(data.cartoes||[], ref) || (data.cartoes||[]).find(x => x.name===ref);
+    if(c) meio = "Cartão";
+  }
+
   const bucket = (tipo==="Receita") ? "Receita" : "Despesa";
   const categoria = guessCategory(msg, bucket);
   const nf = (msg.match(/https?:\/\/\S+/) || [null])[0];
-  const parcelas = ((meio==="Cartão") && (tipo||"Despesa")==="Despesa") ? extractParcels(msg) : 1;
+  const parcelas = ((meio==="Cartão") && (tipo||"Despesa")==="Despesa") ? parcelasDetectadas : 1;
   let cicloFatura = null;
   if(meio==="Cartão" && ref) cicloFatura = computeBillCycle(ref, dataISO);
 
@@ -1221,19 +1249,24 @@ function sumsForMonth(ym){
     if(t.meio === "Cartão") return (t.cicloFatura || monthFromIso(t.data)) === ym;
     return monthFromIso(t.data) === ym;
   });
-  let receitas=0, banco=0, dinheiro=0, cartao=0, ben=0;
+
+  let receitas=0, banco=0, dinheiro=0, cartao=0;
   for(const t of list){
     const val = Number(t.valor)||0;
     if(t.tipo==="Receita"){ receitas += val; continue; }
+
     if(t.meio==="Cartão") cartao += val;
     else if(t.meio==="Dinheiro") dinheiro += val;
-    else if(t.meio==="Benefício") ben += val;
-    else banco += val;
+    else if(t.meio==="Benefício"){
+      // benefício fica no menu Benefícios, fora do painel principal
+    } else banco += val;
   }
-  const saidas = banco + dinheiro + cartao + ben;
-  const saldoAtual = receitas - (banco + dinheiro + ben);
+
+  const saidas = banco + dinheiro + cartao;
+  const saldoAtual = receitas - (banco + dinheiro);
   const saldoFinal = saldoAtual - cartao;
-  return {receitas,banco,dinheiro,cartao,ben,saidas,saldoAtual,saldoFinal};
+
+  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal};
 }
 function renderPainel(){
   const ym = monthNow();
@@ -1243,7 +1276,6 @@ function renderPainel(){
   $("cBanco").textContent = brl(s.banco);
   $("cDin").textContent = brl(s.dinheiro);
   $("cCartao").textContent = brl(s.cartao);
-  $("cBen").textContent = brl(s.ben);
   $("cSaidas").textContent = brl(s.saidas);
 
   const sa = $("saldoAtual");
