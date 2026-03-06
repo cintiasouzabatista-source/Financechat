@@ -1762,9 +1762,11 @@ document.addEventListener("click", (e)=>{
 
 /* Boot */
 function bootChat(){
-  const box = $("chatBox");
+  const box = document.getElementById("chatBox");
   if(!box) return;
-  box.innerHTML = "";
+
+  // só cria a mensagem se o chat estiver vazio
+  if(box.innerHTML.trim() !== "") return;
 
   const hora = new Date().getHours();
   let saudacao = "Boa noite";
@@ -1778,8 +1780,10 @@ function bootChat(){
     Seja bem-vindo(a).<br>
     Como posso ajudá-lo:
   `;
+
   box.appendChild(msg);
   box.scrollTop = box.scrollHeight;
+
   renderDueAlerts();
 }
 function renderAll(){
@@ -1805,10 +1809,14 @@ function renderAll(){
   } else {
     makeBackup("init");
   }
+
   renderAll();
   setTab("chat");
   setPill("Pronto");
-  bootChat();
+
+  setTimeout(() => {
+    bootChat();
+  }, 50);
 })();
 
 
@@ -1845,3 +1853,4 @@ function renderAll(){
 
 </body>
 </html>
+
