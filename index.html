@@ -5,36 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Finanças • Chat</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
-/* ===== CONFIRMAÇÃO INLINE ESTILO CHAT ===== */
-function renderInlineConfirm(d){
-  const box = document.getElementById("chatBox");
-  const wrap = document.createElement("div");
-  wrap.className = "msg bot";
-  wrap.innerHTML = `
-    <div>🧾 Confirmar lançamento</div>
-    <div style="margin-top:6px;font-size:13px">
-      ${d.tipo} • ${d.categoria} • ${d.meio} • ${d.ref||"—"} • ${brl(d.valor)} • ${d.data}
-    </div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn" onclick="finalizeDraft()">Finalizar</button>
-      <button class="btn secondary" onclick="editDraft()">Editar</button>
-      <button class="btn danger" onclick="cancelDraft()">Excluir</button>
-    </div>
-  `;
-  box.appendChild(wrap);
-  box.scrollTop = box.scrollHeight;
-}
-
-const _originalOpenDraft = openDraftFromMessage;
-openDraftFromMessage = function(msg){
-  draft = parseMessage(msg);
-  const q = askMissing(draft);
-  if(q){ botSay(q); return; }
-  renderInlineConfirm(draft);
-};
-
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
@@ -404,10 +375,7 @@ openDraftFromMessage = function(msg){
               <button class="btn" id="btnSend">Enviar</button>
             </div>
 
-            <div class="row">
-              <button class="btn secondary" id="btnMic">🎙️ Falar (beta)</button>
-              <button class="btn secondary" id="btnQuick">➕ Atalhos</button>
-            </div>
+            <div class="row"></div>
 
             <div class="divider"></div>
 
@@ -419,7 +387,7 @@ openDraftFromMessage = function(msg){
           </div>
         </div>
 
-        <div class="panelbox" id="draftBox" style="display:none !important" style="display:none">
+        <div class="panelbox" id="draftBox" style="display:none !important">
           <div class="title">Confirmar lançamento</div>
           <div id="draftSummary" class="tag">—</div>
           <div class="row" style="margin-top:10px">
