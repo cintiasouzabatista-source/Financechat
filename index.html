@@ -432,66 +432,13 @@ body.dark .msg.me{
 }
 
 
-/* ===== Transações mobile ===== */
-@media (max-width: 760px){
-  #tab-transacoes .panelbox{ padding:12px; }
-  #tab-transacoes table{ font-size:11px; }
-  #tab-transacoes th, #tab-transacoes td{ padding:8px 6px; }
-  #tab-transacoes th:nth-child(2), #tab-transacoes td:nth-child(2){ display:none; } /* esconde Tipo */
-  #tab-transacoes th:nth-child(3), #tab-transacoes td:nth-child(3){ display:none; } /* esconde Meio */
-  #tab-transacoes th:nth-child(1){ min-width:72px; }
-  #tab-transacoes th:nth-child(4){ min-width:98px; }
-  #tab-transacoes th:nth-child(5){ min-width:84px; }
-  #tab-transacoes th:nth-child(6){ min-width:82px; }
-  #tab-transacoes th:nth-child(7){ min-width:116px; }
-  #tab-transacoes .actionBtns{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    align-items:stretch;
-  }
-  #tab-transacoes .actionBtns .btn{
-    width:100%;
-    padding:8px 10px;
-    font-size:12px;
-  }
-}
-
-
-/* ===== Transações em cards no mobile ===== */
-.txCards{ display:none; }
-.txCard{
-  border:1px solid var(--stroke);
-  background:var(--panel);
-  border-radius:16px;
-  padding:12px;
-  box-shadow:var(--shadow);
-}
-.txCard + .txCard{ margin-top:10px; }
-.txCard .txTop{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:8px;
-}
-.txCard .txValue{ font-size:16px; }
-.txMeta{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px 12px;
-}
-.txMeta .k{ font-size:11px; }
-.txMeta .v2{ font-size:13px; }
-.txActions{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-}
-.txActions .btn{ width:100%; }
-
-@media (max-width: 760px){
-  #tab-transacoes .tableWrap{ display:none; }
-  #tab-transacoes .txCards{ display:block; }
+/* Transações simples */
+#tab-transacoes .txSimpleActions{display:flex;gap:8px;flex-wrap:wrap}
+#tab-transacoes .txSimpleActions .btn{width:auto}
+@media (max-width:760px){
+  #tab-transacoes th,#tab-transacoes td{padding:8px 6px;font-size:12px}
+  #tab-transacoes .txSimpleActions{flex-direction:column}
+  #tab-transacoes .txSimpleActions .btn{width:100%}
 }
 
 </style>
@@ -587,7 +534,6 @@ body.dark .msg.me{
             <button class="btn danger" id="btnCancel">Excluir</button>
           </div>
           <div class="k" style="margin-top:10px" id="draftHint">—</div>
-          <div id="txCards" class="txCards"></div>
         </div>
       </section>
 
@@ -640,5 +586,1198 @@ body.dark .msg.me{
           </div>
 
           <div class="divider"></div>
-          <div 
+          <div class="row"><div class="tag" id="txResumo">—</div><div class="tag" id="txResumo2">—</div></div>
+          <div class="divider"></div>
 
+          <div style="overflow:auto">
+            <table>
+              <thead><tr><th>Data</th><th>Conta</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead>
+              <tbody id="tbodyTx"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTAS E CARTÕES -->
+      <section id="tab-contas" class="hidden">
+        <div class="panelbox">
+          <div class="title">Contas (pix/débito)</div>
+          <div class="row">
+            <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Mercado Pago, Nubank..." /></div>
+            <div><label for="apelidoConta">Apelidos (vírgula)</label><input id="apelidoConta" placeholder="Ex: mp, mercadopago, roxinho" /></div>
+          </div>
+          <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
+          <div class="divider"></div>
+          <div style="overflow:auto"><table><thead><tr><th>Conta</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyContas"></tbody></table></div>
+        </div>
+
+        <div class="panelbox">
+          <div class="title">Cartões (crédito)</div>
+          <div class="row">
+            <div><label for="novoCartao">Nome</label><input id="novoCartao" placeholder="Ex: Nubank, Mercado Pago..." /></div>
+            <div><label for="apelidoCartao">Apelidos (vírgula)</label><input id="apelidoCartao" placeholder="Ex: nu, roxinho, mp" /></div>
+          </div>
+          <div class="row">
+            <div><label for="fechaDia">Fechamento (dia)</label><input id="fechaDia" inputmode="numeric" placeholder="Ex: 10" /></div>
+            <div><label for="pagaDia">Pagamento (dia)</label><input id="pagaDia" inputmode="numeric" placeholder="Ex: 17" /></div>
+          </div>
+          <button class="btn" id="btnAddCartao" type="button" style="margin-top:10px">Adicionar cartão</button>
+          <div class="divider"></div>
+          <div style="overflow:auto"><table><thead><tr><th>Cartão</th><th>Fech.</th><th>Pgto</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyCartoes"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- BENEFÍCIOS -->
+      <section id="tab-beneficios" class="hidden">
+        <div class="panelbox">
+          <div class="title">Benefícios (menu separado)</div>
+          <div class="row">
+            <div><label>Ativar Benefícios</label>
+              <select id="benAtivo"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </div>
+            <div><label>&nbsp;</label><button class="btn" id="btnSalvarBen" type="button">Salvar</button></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div><label for="novoBen">Nome do benefício</label><input id="novoBen" placeholder="Ex: VR, VA, Combustível" /></div>
+            <div><label for="apelidoBen">Apelidos (vírgula)</label><input id="apelidoBen" placeholder="Ex: vale refeição, vale alimentação" /></div>
+          </div>
+          <button class="btn" id="btnAddBen" type="button" style="margin-top:10px">Adicionar benefício</button>
+          <div class="divider"></div>
+          <div style="overflow:auto"><table><thead><tr><th>Benefício</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyBen"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- RELATÓRIOS -->
+      <section id="tab-relatorios" class="hidden">
+        <div class="panelbox">
+          <div class="title">Relatórios</div>
+          <div class="k">Ordem do maior para o menor.</div>
+          <div class="divider"></div>
+
+          <div class="title">Despesas por categoria (%)</div>
+          <div id="rankCats"></div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
+              <div class="title">Contas (pizza %)</div>
+              <canvas id="pieContas" height="220"></canvas>
+            </div>
+            <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
+              <div class="title">Cartões (barras %)</div>
+              <canvas id="barCartoes" height="220"></canvas>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
+            <div class="title">Benefícios (linhas)</div>
+            <canvas id="lineBen" height="220"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIG -->
+      <section id="tab-config" class="hidden">
+        <div class="panelbox">
+          <div class="title">Tema</div><div class="row"><button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button></div><div class="divider"></div><div class="title">Categorias (receitas e despesas)</div>
+          <div class="row">
+            <div><label for="catTipo">Tipo</label><select id="catTipo"><option value="Despesa">Despesa</option><option value="Receita">Receita</option></select></div>
+            <div><label for="catNome">Nova categoria</label><input id="catNome" placeholder="Ex: Farmácia, Academia, Reembolso..." /></div>
+          </div>
+          <button class="btn" id="btnAddCat" type="button" style="margin-top:10px">Adicionar categoria</button>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div><div class="title">Categorias de Despesa</div><div id="listCatDesp"></div></div>
+            <div><div class="title">Categorias de Receita</div><div id="listCatRec"></div></div>
+          </div>
+        </div>
+
+        <div class="panelbox">
+          <div class="title">Backup automático</div>
+          <div class="k">Sempre salva por cima do último backup.</div>
+          <div class="divider"></div>
+
+          <div class="row">
+            <button class="btn secondary" id="btnExport" type="button">⬇️ Exportar backup (JSON)</button>
+            <label style="margin:0"><input id="importFile" type="file" accept="application/json" style="padding:10px" /></label>
+          </div>
+
+          <div class="divider"></div>
+          <div class="tag" id="backupInfo">—</div>
+
+          <div class="divider"></div>
+          <button class="btn danger" id="btnResetAll" type="button">🧹 Zerar tudo</button>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================
+   Storage
+========================= */
+const STORE = { TX:"fin_tx_chat_v1", DATA:"fin_data_chat_v1", BACKUP:"fin_backup_last_v1" };
+
+const DEFAULTS = {
+  data: {
+    contas: [
+      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"] },
+      { name:"Nubank", aliases:["nu","nubank","roxinho"] },
+      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"] }
+    ],
+    cartoes: [
+      { name:"Nubank", aliases:["nu","nubank","roxinho"], fechamento:10, pagamento:17 },
+      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"], fechamento:10, pagamento:17 }
+    ],
+    beneficios: [
+      { name:"VR", aliases:["vr","vale refeicao","vale refeição","refeicao","refeição"] },
+      { name:"VA", aliases:["va","vale alimentacao","vale alimentação","alimentacao","alimentação"] },
+      { name:"Combustível", aliases:["combustivel","combustível","cartao combustivel","cartão combustível"] }
+    ],
+    beneficiosAtivo: true,
+    categorias: {
+      Despesa: ["Mercado","Transporte","Moradia","Contas","Saúde","Educação","Lazer","Assinaturas","Pets","Presentes","Outros"],
+      Receita: ["Salário","Benefícios","Freelance","Reembolso","Vendas","Outros"]
+    },
+    contasFixas: [],
+    alertDays: 7
+  },
+  tx: []
+};
+
+const $ = (id)=>document.getElementById(id);
+
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.style.display="block";
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=>{ t.style.display="none"; }, 2200);
+}
+function setPill(msg){ $("pill").textContent = msg; }
+function brl(n){
+  const v = Number(n);
+  if(!Number.isFinite(v)) return "R$ 0,00";
+  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+function parseBR(s){
+  if(s === null || s === undefined) return null;
+  const raw = String(s).trim();
+  if(!raw) return null;
+
+  let v = raw.replace(/\s+/g, "");
+
+  if(v.includes(",")){
+    v = v.replace(/\./g, "").replace(",", ".");
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  const dots = (v.match(/\./g) || []).length;
+  if(dots > 1){
+    v = v.replace(/\./g, "");
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  if(dots === 1){
+    const parts = v.split(".");
+    if(parts[1] && parts[1].length === 3){
+      v = parts.join("");
+    }
+  }
+
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function uid(){
+  return (crypto?.randomUUID ? crypto.randomUUID() : String(Date.now())+"_"+Math.random().toString(16).slice(2));
+}
+function nowISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function monthNow(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function monthFromIso(iso){
+  const [y,m] = String(iso||"").split("-");
+  if(!y||!m) return null;
+  return `${y}-${m}`;
+}
+function labelMonth(ym){
+  const [y,m] = ym.split("-");
+  return `${m}/${y}`;
+}
+function escapeHtml(s){
+  return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function loadJSON(key, fallback){
+  try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+function normalize(s){
+  return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+}
+
+let data = loadJSON(STORE.DATA, DEFAULTS.data);
+let tx = loadJSON(STORE.TX, DEFAULTS.tx);
+
+function makeBackup(reason="auto"){
+  const payload = { backedUpAt: new Date().toISOString(), reason, data, tx };
+  saveJSON(STORE.BACKUP, payload);
+  $("backupInfo").textContent = `Último backup: ${new Date(payload.backedUpAt).toLocaleString("pt-BR")} • ${reason}`;
+}
+function persist(reason="auto"){
+  saveJSON(STORE.DATA, data);
+  saveJSON(STORE.TX, tx);
+  makeBackup(reason);
+}
+function getBackupInfo(){
+  const b = loadJSON(STORE.BACKUP, null);
+  $("backupInfo").textContent = b ? `Último backup: ${new Date(b.backedUpAt).toLocaleString("pt-BR")} • ${b.reason||"auto"}` : "Sem backup ainda.";
+}
+
+/* Menu */
+const drawer = $("drawer");
+$("btnOpen").addEventListener("click", ()=>{ drawer.classList.add("open"); drawer.setAttribute("aria-hidden","false"); });
+function closeDrawer(){ drawer.classList.remove("open"); drawer.setAttribute("aria-hidden","true"); }
+$("btnClose").addEventListener("click", closeDrawer);
+$("backdrop").addEventListener("click", closeDrawer);
+
+const tabs = ["chat","painel","transacoes","contas","beneficios","relatorios","config"];
+function setTab(t){
+  tabs.forEach(x=>{
+    const el = document.getElementById("tab-"+x);
+    if(el) el.classList.toggle("hidden", x!==t);
+  });
+  document.querySelectorAll(".nav button").forEach(b=> b.classList.toggle("active", b.dataset.tab===t));
+  $("topTitle").textContent =
+    t==="chat" ? "Chat" :
+    t==="painel" ? "Painel" :
+    t==="transacoes" ? "Transações" :
+    t==="contas" ? "Contas e Cartões" :
+    t==="beneficios" ? "Benefícios" :
+    t==="relatorios" ? "Relatórios" : "Configurações";
+  closeDrawer();
+  if(t==="relatorios") renderCharts();
+  if(t==="painel") renderPainel();
+  if(t==="transacoes") renderTxTable();
+  if(t==="contas") renderContas();
+  if(t==="beneficios") renderBeneficios();
+  if(t==="config") renderCats();
+}
+document.querySelectorAll(".nav button").forEach(b=> b.addEventListener("click", ()=>setTab(b.dataset.tab)));
+
+/* Chat */
+function greeting(){
+  const h = new Date().getHours();
+  if(h < 12) return "Bom dia";
+  if(h < 18) return "Boa tarde";
+  return "Boa noite";
+}
+function botSay(text){
+  const box = $("chatBox");
+  const div = document.createElement("div");
+  div.className = "msg bot";
+  div.innerHTML = escapeHtml(text).replace(/\n/g,"<br>");
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function meSay(text){
+  const box = $("chatBox");
+  const div = document.createElement("div");
+  div.className = "msg me";
+  div.innerHTML = escapeHtml(text);
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+/* Alerts */
+function daysBetween(a,b){
+  const ms = (b.getTime() - a.getTime());
+  return Math.ceil(ms / (1000*60*60*24));
+}
+function nextDueDate(day, fromDate=new Date()){
+  const y = fromDate.getFullYear();
+  const m = fromDate.getMonth();
+  const d = fromDate.getDate();
+  let dt = new Date(y, m, Math.min(day, new Date(y, m+1, 0).getDate()));
+  if(dt.getDate() < d){
+    const ny = (m===11) ? y+1 : y;
+    const nm = (m===11) ? 0 : m+1;
+    dt = new Date(ny, nm, Math.min(day, new Date(ny, nm+1, 0).getDate()));
+  }
+  dt.setHours(12,0,0,0);
+  return dt;
+}
+function dueItems(){
+  const now = new Date(); now.setHours(12,0,0,0);
+  const maxDays = Number(data.alertDays||7);
+  const res = [];
+
+  for(const f of (data.contasFixas||[])){
+    const due = nextDueDate(Number(f.diaVenc||1), now);
+    const dd = daysBetween(now, due);
+    if(dd <= maxDays){
+      res.push({ kind:"Fixa", name: f.name || "Conta fixa", due, amount: Number(f.valor)||0 });
+    }
+  }
+
+  for(const c of (data.cartoes||[])){
+    const due = nextDueDate(Number(c.pagamento||1), now);
+    const dd = daysBetween(now, due);
+    if(dd <= maxDays){
+      const dueYM = `${due.getFullYear()}-${String(due.getMonth()+1).padStart(2,"0")}`;
+      const sum = tx.filter(t => t.meio==="Cartão" && t.ref===c.name && t.tipo==="Despesa" && t.cicloFatura===dueYM)
+                    .reduce((a,t)=>a+(Number(t.valor)||0),0);
+      res.push({ kind:"Cartão", name:`Pagamento cartão ${c.name}`, due, amount: sum });
+    }
+  }
+
+  res.sort((a,b)=>a.due-b.due);
+  return res;
+}
+function renderDueAlerts(){
+  const list = dueItems();
+  const alert = $("dueAlert");
+  const host = $("dueList");
+  const panel = $("duePanel");
+  host.innerHTML = "";
+  panel.innerHTML = "";
+
+  if(list.length===0){
+    alert.style.display = "none";
+    panel.innerHTML = `<div class="tag">Nada vencendo nos próximos ${Number(data.alertDays||7)} dias.</div>`;
+    return;
+  }
+
+  alert.style.display = "block";
+
+  for(const it of list){
+    const dd = daysBetween(new Date(new Date().setHours(12,0,0,0)), it.due);
+    const dateStr = it.due.toLocaleDateString("pt-BR");
+    const line = document.createElement("div");
+    line.className = "item";
+    line.innerHTML = `<div><span class="tag">${escapeHtml(it.kind)}</span> ${escapeHtml(it.name)}<br><small class="warn">vence em ${dd} dia(s) • ${dateStr}</small></div><div>${brl(it.amount)}</div>`;
+    host.appendChild(line);
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "alert";
+  wrap.innerHTML = `<h3>Contas a vencer</h3><p>Próximos ${Number(data.alertDays||7)} dias.</p><div class="list" id="duePanelList"></div>`;
+  panel.appendChild(wrap);
+  const panelList = wrap.querySelector("#duePanelList");
+  for(const it of list){
+    const dd = daysBetween(new Date(new Date().setHours(12,0,0,0)), it.due);
+    const dateStr = it.due.toLocaleDateString("pt-BR");
+    const line = document.createElement("div");
+    line.className = "item";
+    line.innerHTML = `<div><span class="tag">${escapeHtml(it.kind)}</span> ${escapeHtml(it.name)}<br><small class="warn">vence em ${dd} dia(s) • ${dateStr}</small></div><div>${brl(it.amount)}</div>`;
+    panelList.appendChild(line);
+  }
+}
+
+/* Recognition */
+function findByAlias(list, text){
+  const t = normalize(text);
+  for(const item of list){
+    const names = [item.name, ...(item.aliases||[])].map(normalize);
+    for(const n of names){
+      if(n && t.includes(n)) return item.name;
+    }
+  }
+  return null;
+}
+function isWordIn(text, words){
+  const t = " " + normalize(text) + " ";
+  return words.some(w => t.includes(" " + normalize(w) + " "));
+}
+function detectPaymentMethod(text){
+  const t = normalize(text);
+  if(data.beneficiosAtivo && findByAlias(data.beneficios||[], t)) return "Benefício";
+  if(t.includes("cartao") || t.includes("cartão") || t.includes("credito") || t.includes("crédito")) return "Cartão";
+  if(t.includes("pix")) return "PIX";
+  if(t.includes("debito") || t.includes("débito")) return "Débito";
+  if(t.includes("dinheiro") || t.includes("especie") || t.includes("espécie")) return "Dinheiro";
+  return null;
+}
+function extractParcels(text){
+  const t = normalize(text);
+
+  // 3x / 10x / 12 x
+  let m = t.match(/(?:^|\s)(\d{1,2})\s*x(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // x3
+  m = t.match(/(?:^|\s)x\s*(\d{1,2})(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // 3 parcelas / 3 parcela
+  m = t.match(/(?:^|\s)(\d{1,2})\s*parcelas?(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // parcelado 3 / parcelada 3
+  m = t.match(/parcelad[oa]\s*(?:em\s*)?(\d{1,2})(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  // em 3x / em 3 parcelas
+  m = t.match(/em\s*(\d{1,2})\s*x(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  m = t.match(/em\s*(\d{1,2})\s*parcelas?(?:\s|$)/);
+  if(m) return Math.max(1, Math.min(60, Number(m[1])));
+
+  return 1;
+}
+function extractValue(text){
+  const m = String(text).match(/(\d{1,3}(?:\.\d{3})+(?:,\d{2})?|\d+(?:,\d{2})?|\d+(?:\.\d{1,2})?)/);
+  if(!m) return null;
+  return parseBR(m[1]);
+}
+function guessCategory(text, bucket){
+  const list = (data.categorias?.[bucket] || []);
+  const t = normalize(text);
+  for(const c of list){ if(t.includes(normalize(c))) return c; }
+  if(isWordIn(text, ["mercado","supermercado","padaria","feira"])) return "Mercado";
+  if(isWordIn(text, ["energia","luz","agua","água","internet","telefone"])) return "Contas";
+  if(isWordIn(text, ["uber","99","onibus","ônibus","metro","metrô","gasolina","etanol","combustivel","combustível"])) return "Transporte";
+  if(bucket==="Receita" && isWordIn(text, ["salario","salário","pagamento"])) return "Salário";
+  return "Outros";
+}
+function shouldAskFixedBill(text){
+  return isWordIn(text, ["energia","luz","agua","água","internet","aluguel","condominio","condomínio","ipva","seguro","escola","mensalidade"]);
+}
+function computeBillCycle(cardName, purchaseDateISO){
+  const c = (data.cartoes||[]).find(x=>x.name===cardName);
+  if(!c) return monthFromIso(purchaseDateISO) || monthNow();
+  const d = new Date(purchaseDateISO+"T12:00:00");
+  const fecha = Number(c.fechamento||10);
+  let y = d.getFullYear();
+  let m = d.getMonth();
+  if(d.getDate() > fecha){
+    if(m===11){ y+=1; m=0; } else m+=1;
+  }
+  return `${y}-${String(m+1).padStart(2,"0")}`;
+}
+
+
+/* Draft flow */
+let draft = null;
+function showDraft(on){ $("draftBox").style.display = "none"; }
+function draftSummaryLines(d){
+  const lines = [
+    d.tipo || "—",
+    d.categoria || "—",
+    brl(d.valor),
+    d.ref || "—",
+    d.data ? new Date(d.data+"T12:00:00").toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR")
+  ];
+  if(d.meio==="Cartão" && d.parcelas>1) lines.push(`${d.parcelas} parcelas`);
+  return lines.join("\n");
+}
+function askMissing(d){
+  if(!Number.isFinite(d.valor) || d.valor<=0) return "Qual é o valor?";
+  if(!d.categoria) return "Qual categoria?";
+  if(!d.ref){
+    if(d.meio==="Dinheiro"){ d.ref = "Dinheiro"; }
+    else if(d.meio==="Benefício") return "Qual benefício?";
+    else return "Qual conta? (ex: Nubank, Mercado Pago)";
+  }
+  if(!d.meio){
+    if(d.ref && d.ref!=="Dinheiro") d.meio = "Débito";
+    else return "Qual forma de pagamento? (pix, débito, dinheiro, cartão)";
+  }
+  if(d.meio==="Cartão" && d.parcelas < 1) d.parcelas = 1;
+  return null;
+}
+function parseMessage(msg){
+  const t = normalize(msg);
+  let tipo = null;
+  if(isWordIn(t, ["recebi","receber","ganhei","entrou"])) tipo = "Receita";
+  if(isWordIn(t, ["gastei","gastar","paguei","pagar","comprei","compra"])) tipo = tipo || "Despesa";
+
+  const valor = extractValue(msg);
+  let meio = detectPaymentMethod(msg);
+  const dataISO = nowISO();
+
+  const parcelasDetectadas = extractParcels(msg);
+
+  let ref = null;
+  if(meio==="Cartão") ref = findByAlias(data.cartoes||[], msg);
+  else if(meio==="Benefício") ref = data.beneficiosAtivo ? findByAlias(data.beneficios||[], msg) : null;
+  else {
+    ref = findByAlias(data.contas||[], msg);
+    const c = findByAlias(data.cartoes||[], msg);
+    if(!ref && c){
+      ref = c;
+      meio = meio || "Cartão";
+    }
+  }
+  if(meio==="Dinheiro") ref = "Dinheiro";
+
+  // Se detectou parcelamento, assume cartão
+  if(parcelasDetectadas > 1 && !meio) meio = "Cartão";
+  if(parcelasDetectadas > 1 && ref){
+    const c = findByAlias(data.cartoes||[], ref) || (data.cartoes||[]).find(x => x.name===ref);
+    if(c) meio = "Cartão";
+  }
+
+  const bucket = (tipo==="Receita") ? "Receita" : "Despesa";
+  const categoria = guessCategory(msg, bucket);
+  const nf = (msg.match(/https?:\/\/\S+/) || [null])[0];
+  const parcelas = ((meio==="Cartão") && (tipo||"Despesa")==="Despesa") ? parcelasDetectadas : 1;
+  let cicloFatura = null;
+  if(meio==="Cartão" && ref) cicloFatura = computeBillCycle(ref, dataISO);
+
+  return { tipo: tipo||"Despesa", meio, ref, categoria, valor, data: dataISO, nf, parcelas, cicloFatura };
+}
+function createTxFromDraft(d){
+  const items = [];
+  if(d.meio==="Cartão" && d.tipo==="Despesa" && d.parcelas>1){
+    const per = d.valor / d.parcelas;
+    const startYM = d.cicloFatura || monthFromIso(d.data) || monthNow();
+    let [y,m] = startYM.split("-").map(Number);
+    for(let i=1;i<=d.parcelas;i++){
+      const ym = `${y}-${String(m).padStart(2,"0")}`;
+      items.push({ id:uid(), data:d.data, tipo:"Despesa", meio:"Cartão", ref:d.ref, categoria:d.categoria, valor:Number(per.toFixed(2)), nf:d.nf||null, parcela:i, totalParcelas:d.parcelas, cicloFatura:ym });
+      m+=1; if(m===13){m=1;y+=1;}
+    }
+  } else {
+    items.push({ id:uid(), data:d.data, tipo:d.tipo, meio:d.meio, ref:d.ref||null, categoria:d.categoria, valor:d.valor, nf:d.nf||null, parcela:null, totalParcelas:null, cicloFatura:(d.meio==="Cartão" ? (d.cicloFatura||monthFromIso(d.data)||monthNow()) : null) });
+  }
+  return items;
+}
+function botSummary(d, ids){
+  const summary = draftSummaryLines(d);
+  renderSavedSummary(summary, ids || []);
+}
+function saveDraft(){
+  const q = askMissing(draft);
+  if(q){ botSay(q); return; }
+  const bucket = (draft.tipo==="Receita") ? "Receita" : "Despesa";
+  const list = data.categorias?.[bucket] || [];
+  if(draft.categoria && !list.includes(draft.categoria)){
+    list.push(draft.categoria);
+    data.categorias[bucket] = list;
+  }
+  const created = createTxFromDraft(draft);
+  tx.push(...created);
+  persist("lancamento_chat");
+  botSummary(draft, created.map(x => x.id));
+  toast("Salvo ✅");
+  renderAll();
+  resetComposerAndDraft();
+}
+function openDraftFromMessage(msg){
+  draft = parseMessage(msg);
+  const q = askMissing(draft);
+  if(q){ botSay(q); return; }
+  saveDraft();
+}
+function handleChatReply(msg){
+  if(!draft){ openDraftFromMessage(msg); return; }
+
+  if((!Number.isFinite(draft.valor) || draft.valor<=0)){
+    const v = parseBR(msg);
+    if(Number.isFinite(v) && v>0) draft.valor = v;
+  }
+
+  if(!draft.meio){
+    const m = detectPaymentMethod(msg);
+    if(m) draft.meio = m;
+  }
+
+  if(!draft.ref){
+    if(draft.meio==="Cartão"){
+      const c = findByAlias(data.cartoes||[], msg) || findByAlias(data.contas||[], msg);
+      if(c){ draft.ref = c; draft.cicloFatura = computeBillCycle(draft.ref, draft.data); }
+    } else if(draft.meio==="Benefício"){
+      const b = findByAlias(data.beneficios||[], msg);
+      if(b) draft.ref = b;
+    } else if(draft.meio==="Dinheiro"){
+      draft.ref = "Dinheiro";
+    } else {
+      const a = findByAlias(data.contas||[], msg) || findByAlias(data.cartoes||[], msg);
+      if(a) draft.ref = a;
+    }
+  }
+
+  const p = extractParcels(msg);
+  if(draft.meio==="Cartão" && p && p>1){
+    draft.parcelas = p;
+    if(draft.ref) draft.cicloFatura = computeBillCycle(draft.ref, draft.data);
+  }
+
+  if(!draft.categoria){
+    const cat = msg.trim();
+    if(cat) draft.categoria = cat;
+  }
+
+  const q = askMissing(draft);
+  if(q){ botSay(q); return; }
+  saveDraft();
+}
+function finalizeDraft(){ saveDraft(); }
+function editDraft(){ botSay("Pode me dizer o ajuste por mensagem."); }
+function cancelDraft(){ draft = null; botSay("Ok. Cancelado."); setPill("Pronto"); }
+
+$("btnFinalize").addEventListener("click", finalizeDraft);
+$("btnEdit").addEventListener("click", editDraft);
+$("btnCancel").addEventListener("click", cancelDraft);
+
+function sendChat(){
+  const msg = ($("chatInput").value||"").trim();
+  if(!msg) return;
+  $("chatInput").value="";
+  meSay(msg);
+  handleChatReply(msg);
+}
+$("btnSend").addEventListener("click", sendChat);
+$("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); sendChat(); } });
+
+/* Painel */
+
+function sumsForMonth(ym){
+  const list = tx.filter(t => {
+    if(t.meio === "Cartão") return (t.cicloFatura || monthFromIso(t.data)) === ym;
+    return monthFromIso(t.data) === ym;
+  });
+
+  let receitas=0, banco=0, dinheiro=0, cartao=0;
+  for(const t of list){
+    const val = Number(t.valor)||0;
+    if(t.tipo==="Receita"){ receitas += val; continue; }
+
+    if(t.meio==="Cartão") cartao += val;
+    else if(t.meio==="Dinheiro") dinheiro += val;
+    else if(t.meio==="Benefício"){
+      // benefício fica no menu Benefícios, fora do painel principal
+    } else banco += val;
+  }
+
+  const saidas = banco + dinheiro + cartao;
+  const saldoAtual = receitas - (banco + dinheiro);
+  const saldoFinal = saldoAtual - cartao;
+
+  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal};
+}
+function renderPainel(){
+  const ym = monthNow();
+  $("lblMes").textContent = labelMonth(ym);
+  const s = sumsForMonth(ym);
+  $("cReceitas").textContent = brl(s.receitas);
+  $("cBanco").textContent = brl(s.banco);
+  $("cDin").textContent = brl(s.dinheiro);
+  $("cCartao").textContent = brl(s.cartao);
+  $("cSaidas").textContent = brl(s.saidas);
+
+  const sa = $("saldoAtual");
+  sa.textContent = brl(s.saldoAtual);
+  sa.classList.toggle("pos", s.saldoAtual>=0);
+  sa.classList.toggle("neg", s.saldoAtual<0);
+
+  const sf = $("saldoFinal");
+  sf.textContent = brl(s.saldoFinal);
+  sf.classList.toggle("pos", s.saldoFinal>=0);
+  sf.classList.toggle("neg", s.saldoFinal<0);
+
+  renderDueAlerts();
+}
+
+/* Transações */
+function renderTxTable(){
+  const ym = $("mesRef").value || monthNow();
+  const meio = $("filtroMeio").value || "";
+  const tipo = $("filtroTipo").value || "";
+  const busca = normalize($("buscaCat").value || "");
+
+  const list = tx.filter(t => (t.meio==="Cartão" ? ((t.cicloFatura || monthFromIso(t.data))===ym) : (monthFromIso(t.data)===ym)))
+                .filter(t => !meio || t.meio===meio)
+                .filter(t => !tipo || t.tipo===tipo)
+                .filter(t => !busca || normalize(t.categoria||"").includes(busca))
+                .sort((a,b)=> (a.data < b.data ? 1 : -1));
+
+  const tbody = $("tbodyTx");
+  tbody.innerHTML = "";
+  if(list.length===0){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="5" style="color:var(--muted)">Sem lançamentos.</td>`;
+    tbody.appendChild(tr);
+  } else {
+    for(const t of list){
+      const tr = document.createElement("tr");
+      const valClass = (t.tipo==="Receita") ? "pos" : "neg";
+      const ref = t.ref || "—";
+      const extra = (t.meio==="Cartão" && t.totalParcelas) ? ` (${t.parcela}/${t.totalParcelas})` : "";
+      tr.innerHTML = `<td>${t.data}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="txSimpleActions"><button class="btn secondary" data-edit-tx="${t.id}">Editar</button><button class="btn danger" data-del="${t.id}">Excluir</button></div></td>`;
+      tbody.appendChild(tr);
+    }
+  }
+  const s = sumsForMonth(ym);
+  $("txResumo").textContent = `${labelMonth(ym)} • ${list.length} itens`;
+  $("txResumo2").textContent = `Receitas ${brl(s.receitas)} • Saídas ${brl(s.saidas)}`;
+}
+
+function loadTxToDraft(item){
+  draft = {
+    id: item.id,
+    tipo: item.tipo,
+    meio: item.meio,
+    ref: item.ref || null,
+    categoria: item.categoria || "Outros",
+    valor: Number(item.valor)||0,
+    data: item.data || nowISO(),
+    nf: item.nf || null,
+    parcelas: item.totalParcelas || 1,
+    cicloFatura: item.cicloFatura || null
+  };
+  tx = tx.filter(x => x.id !== item.id);
+  persist("editar_transacao");
+  setTab("chat");
+  botSay("Lançamento carregado para edição. Envie a frase corrigida.");
+  renderAll();
+}
+
+ document.addEventListener("click", (e)=>{
+  const editBtn = e.target.closest("[data-edit-tx]");
+  if(editBtn){
+    const id = editBtn.getAttribute("data-edit-tx");
+    const item = tx.find(x => x.id === id);
+    if(item) loadTxToDraft(item);
+    return;
+  }
+  const btn = e.target.closest("[data-del]");
+  if(!btn) return;
+  const id = btn.getAttribute("data-del");
+  tx = tx.filter(x => x.id !== id);
+  persist("excluir");
+  toast("Excluído");
+  renderAll();
+});
+["mesRef","filtroMeio","filtroTipo","buscaCat"].forEach(id=>{
+  $(id).addEventListener("input", ()=>{ renderTxTable(); renderPainel(); });
+});
+
+/* Contas/cartões/benefícios */
+function renderContas(){
+  const tb = $("tbodyContas"); tb.innerHTML="";
+  data.contas = data.contas || [];
+  for(let i=0;i<data.contas.length;i++){
+    const c = data.contas[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
+    tb.appendChild(tr);
+  }
+  const tb2 = $("tbodyCartoes"); tb2.innerHTML="";
+  data.cartoes = data.cartoes || [];
+  for(let i=0;i<data.cartoes.length;i++){
+    const c = data.cartoes[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.fechamento)}</td><td>${escapeHtml(c.pagamento)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
+    tb2.appendChild(tr);
+  }
+}
+function renderBeneficios(){
+  $("benAtivo").value = data.beneficiosAtivo ? "sim" : "nao";
+  const tb = $("tbodyBen"); tb.innerHTML="";
+  data.beneficios = data.beneficios || [];
+  for(let i=0;i<data.beneficios.length;i++){
+    const b = data.beneficios[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(b.name)}</td><td>${escapeHtml((b.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-ben="${i}">Remover</button></td>`;
+    tb.appendChild(tr);
+  }
+}
+document.addEventListener("click", (e)=>{
+  const dc = e.target.closest("[data-del-conta]");
+  if(dc){
+    const i = Number(dc.getAttribute("data-del-conta"));
+    const name = data.contas[i]?.name || "";
+    if(!confirm(`Remover conta "${name}"?`)) return;
+    data.contas.splice(i,1);
+    persist("remover_conta");
+    renderContas(); toast("Conta removida"); return;
+  }
+  const dk = e.target.closest("[data-del-cartao]");
+  if(dk){
+    const i = Number(dk.getAttribute("data-del-cartao"));
+    const name = data.cartoes[i]?.name || "";
+    if(!confirm(`Remover cartão "${name}"?`)) return;
+    data.cartoes.splice(i,1);
+    persist("remover_cartao");
+    renderContas(); toast("Cartão removido"); renderDueAlerts(); return;
+  }
+  const db = e.target.closest("[data-del-ben]");
+  if(db){
+    const i = Number(db.getAttribute("data-del-ben"));
+    const name = data.beneficios[i]?.name || "";
+    if(!confirm(`Remover benefício "${name}"?`)) return;
+    data.beneficios.splice(i,1);
+    persist("remover_beneficio");
+    renderBeneficios(); toast("Benefício removido"); return;
+  }
+});
+$("btnAddConta").addEventListener("click", ()=>{
+  const name = ($("novaConta").value||"").trim();
+  const aliases = ($("apelidoConta").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
+  if(!name){ toast("Digite o nome"); return; }
+  data.contas = data.contas || [];
+  if(data.contas.some(x=>normalize(x.name)===normalize(name))){ toast("Conta já existe"); return; }
+  data.contas.unshift({ name, aliases });
+  $("novaConta").value=""; $("apelidoConta").value="";
+  persist("add_conta"); renderContas(); toast("Conta adicionada");
+});
+$("btnAddCartao").addEventListener("click", ()=>{
+  const name = ($("novoCartao").value||"").trim();
+  const aliases = ($("apelidoCartao").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
+  const fechamento = parseBR($("fechaDia").value);
+  const pagamento = parseBR($("pagaDia").value);
+  if(!name){ toast("Digite o nome"); return; }
+  if(!Number.isFinite(fechamento) || fechamento<1 || fechamento>31){ toast("Fechamento inválido"); return; }
+  if(!Number.isFinite(pagamento) || pagamento<1 || pagamento>31){ toast("Pagamento inválido"); return; }
+  data.cartoes = data.cartoes || [];
+  if(data.cartoes.some(x=>normalize(x.name)===normalize(name))){ toast("Cartão já existe"); return; }
+  data.cartoes.unshift({ name, aliases, fechamento: Math.round(fechamento), pagamento: Math.round(pagamento) });
+  $("novoCartao").value=""; $("apelidoCartao").value=""; $("fechaDia").value=""; $("pagaDia").value="";
+  persist("add_cartao"); renderContas(); toast("Cartão adicionado"); renderDueAlerts();
+});
+$("btnSalvarBen").addEventListener("click", ()=>{
+  data.beneficiosAtivo = ($("benAtivo").value==="sim");
+  persist("beneficios_toggle"); toast("Salvo"); renderBeneficios(); renderPainel();
+});
+$("btnAddBen").addEventListener("click", ()=>{
+  const name = ($("novoBen").value||"").trim();
+  const aliases = ($("apelidoBen").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
+  if(!name){ toast("Digite o nome"); return; }
+  data.beneficios = data.beneficios || [];
+  if(data.beneficios.some(x=>normalize(x.name)===normalize(name))){ toast("Já existe"); return; }
+  data.beneficios.unshift({ name, aliases });
+  $("novoBen").value=""; $("apelidoBen").value="";
+  persist("add_beneficio"); renderBeneficios(); toast("Benefício adicionado");
+});
+
+/* Categories */
+function renderCats(){
+  const desp = data.categorias?.Despesa || [];
+  const rec = data.categorias?.Receita || [];
+  $("listCatDesp").innerHTML = desp.map((c,i)=>`<div class="tag" style="margin:4px 6px 0 0">${escapeHtml(c)} <a href="#" data-del-cat="Despesa:${i}">x</a></div>`).join("");
+  $("listCatRec").innerHTML = rec.map((c,i)=>`<div class="tag" style="margin:4px 6px 0 0">${escapeHtml(c)} <a href="#" data-del-cat="Receita:${i}">x</a></div>`).join("");
+  getBackupInfo();
+}
+document.addEventListener("click", (e)=>{
+  const a = e.target.closest("[data-del-cat]");
+  if(!a) return;
+  e.preventDefault();
+  const [tipo, idxStr] = a.getAttribute("data-del-cat").split(":");
+  const idx = Number(idxStr);
+  if(!confirm("Remover categoria?")) return;
+  data.categorias[tipo].splice(idx,1);
+  persist("remover_categoria"); renderCats();
+});
+$("btnAddCat").addEventListener("click", ()=>{
+  const tipo = $("catTipo").value;
+  const nome = ($("catNome").value||"").trim();
+  if(!nome){ toast("Digite uma categoria"); return; }
+  data.categorias = data.categorias || {Despesa:[], Receita:[]};
+  const list = data.categorias[tipo] || [];
+  if(list.some(x=>normalize(x)===normalize(nome))){ toast("Já existe"); return; }
+  list.unshift(nome);
+  data.categorias[tipo] = list;
+  $("catNome").value="";
+  persist("add_categoria"); renderCats(); toast("Categoria adicionada");
+});
+
+/* Backup */
+$("btnExport").addEventListener("click", ()=>{
+  const payload = loadJSON(STORE.BACKUP, { data, tx, backedUpAt: new Date().toISOString(), reason:"manual_export" });
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `backup_financas_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1200);
+  toast("Backup exportado");
+});
+$("importFile").addEventListener("change", async (e)=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  try{
+    const txt = await file.text();
+    const payload = JSON.parse(txt);
+    if(!payload || !payload.data || !payload.tx) throw new Error("Formato inválido");
+    data = payload.data; tx = payload.tx;
+    persist("import");
+    toast("Backup restaurado ✅");
+    renderAll();
+  }catch(err){ toast("Falha ao importar"); }
+  finally{ e.target.value=""; }
+});
+$("btnResetAll").addEventListener("click", ()=>{
+  if(!confirm("Zerar tudo?")) return;
+  data = JSON.parse(JSON.stringify(DEFAULTS.data));
+  tx = [];
+  persist("reset");
+  toast("Zerado");
+  renderAll();
+});
+
+function autoBackupOnExit(){ makeBackup("auto_exit"); }
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") autoBackupOnExit(); });
+window.addEventListener("pagehide", ()=> autoBackupOnExit());
+
+/* Charts */
+let pie=null, bar=null, line=null;
+function sumBy(list, keyFn){
+  const m = new Map();
+  for(const t of list){
+    const k = keyFn(t);
+    m.set(k, (m.get(k)||0) + (Number(t.valor)||0));
+  }
+  return Array.from(m.entries()).sort((a,b)=>b[1]-a[1]);
+}
+function renderRankCats(ym){
+  const list = tx.filter(t => monthFromIso(t.data)===ym && t.tipo==="Despesa");
+  const sums = sumBy(list, t => t.categoria || "Outros");
+  const total = sums.reduce((a,[,v])=>a+v,0) || 0;
+  const host = $("rankCats");
+  if(total<=0){ host.innerHTML = `<div class="tag">Sem despesas.</div>`; return; }
+  host.innerHTML = sums.map(([k,v])=>{
+    const pct = Math.round((v/total)*100);
+    return `<div class="tag" style="display:flex; justify-content:space-between; gap:10px; margin:6px 0"><span>${escapeHtml(k)}</span><span>${pct}% • ${brl(v)}</span></div>`;
+  }).join("");
+}
+function renderCharts(){
+  const ym = monthNow();
+  renderRankCats(ym);
+
+  const list = tx.filter(t => monthFromIso(t.data)===ym && t.tipo==="Despesa");
+  const contas = list.filter(t => (t.meio==="PIX" || t.meio==="Débito" || t.meio==="Dinheiro")).map(t=>({k: t.ref || t.meio, v:Number(t.valor)||0}));
+  const cartoes = list.filter(t => t.meio==="Cartão");
+  const bens = list.filter(t => t.meio==="Benefício");
+
+  const sumContas = new Map();
+  for(const x of contas){ sumContas.set(x.k, (sumContas.get(x.k)||0) + x.v); }
+  const labelsC = Array.from(sumContas.keys());
+  const valuesC = Array.from(sumContas.values());
+
+  const sumCart = sumBy(cartoes, t => t.ref || "Cartão");
+  const totalCart = sumCart.reduce((a,[,v])=>a+v,0) || 1;
+  const labelsK = sumCart.map(([k])=>k);
+  const valuesK = sumCart.map(([,v])=> Math.round((v/totalCart)*100));
+
+  const daysInMonth = new Date(Number(ym.split("-")[0]), Number(ym.split("-")[1]), 0).getDate();
+  const dayLabels = Array.from({length: daysInMonth}, (_,i)=>String(i+1));
+  const benNames = (data.beneficiosAtivo ? (data.beneficios||[]).map(b=>b.name) : []);
+  const datasets = benNames.map(name=>{
+    const arr = Array.from({length: daysInMonth}, ()=>0);
+    for(const t of bens){
+      if(t.ref!==name) continue;
+      const d = Number(String(t.data).split("-")[2]);
+      if(d>=1 && d<=daysInMonth) arr[d-1] += Number(t.valor)||0;
+    }
+    return { label:name, data: arr, tension:.25, spanGaps:true };
+  });
+
+  const ctxP = $("pieContas");
+  if(pie) pie.destroy();
+  pie = new Chart(ctxP, { type:"pie", data:{ labels: labelsC, datasets:[{ data: valuesC }] }, options:{ responsive:true, plugins:{ legend:{ position:"bottom" } } } });
+
+  const ctxB = $("barCartoes");
+  if(bar) bar.destroy();
+  bar = new Chart(ctxB, { type:"bar", data:{ labels: labelsK, datasets:[{ label:"% do total", data: valuesK }] }, options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ suggestedMax:100 } } } });
+
+  const ctxL = $("lineBen");
+  if(line) line.destroy();
+  line = new Chart(ctxL, { type:"line", data:{ labels: dayLabels, datasets }, options:{ responsive:true, plugins:{ legend:{ position:"bottom" } }, scales:{ y:{ beginAtZero:true } } } });
+}
+
+
+/* ===== pós-salvar / reset ===== */
+let lastSavedIds = [];
+let lastSavedSummary = null;
+
+function resetComposerAndDraft(){
+  if($("chatInput")) $("chatInput").value = "";
+  draft = null;
+  showDraft(false);
+  if($("draftSummary")) $("draftSummary").textContent = "—";
+  if($("draftHint")) $("draftHint").textContent = "—";
+  setPill("Pronto");
+}
+
+function renderSavedSummary(summaryText, ids){
+  const box = $("chatBox");
+  const wrap = document.createElement("div");
+  wrap.className = "msg bot";
+  wrap.innerHTML = `
+    <div>${escapeHtml(summaryText).replace(/\n/g,"<br>")}</div>
+    <div style="margin-top:8px"><strong>Salvo ✅</strong></div>
+    <div class="actionRow">
+      <button class="miniBtn" data-edit-last="1">Editar</button>
+      <button class="miniBtn" data-delete-last="1">Excluir</button>
+    </div>
+  `;
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
+  lastSavedIds = [...ids];
+  lastSavedSummary = summaryText;
+}
+
+function removeTxByIds(ids){
+  const before = tx.length;
+  tx = tx.filter(item => !ids.includes(item.id));
+  if(tx.length !== before){
+    persist("excluir_ultimo_lancamento");
+    renderAll();
+  }
+}
+
+function startEditLastSaved(){
+  if(!lastSavedIds || !lastSavedIds.length) return;
+  const items = tx.filter(item => lastSavedIds.includes(item.id));
+  if(!items.length){
+    botSay("Não encontrei o último lançamento para editar.");
+    return;
+  }
+
+  const first = items[0];
+  draft = {
+    tipo: first.tipo,
+    categoria: first.categoria,
+    valor: items.reduce((a,t)=>a+(Number(t.valor)||0),0),
+    ref: first.ref || null,
+    data: first.data || nowISO(),
+    meio: first.meio || null,
+    parcelas: first.totalParcelas || 1,
+    cicloFatura: first.cicloFatura || null,
+    nf: first.nf || null
+  };
+
+  removeTxByIds(lastSavedIds);
+  botSay("Último lançamento carregado para edição. Me envie a frase corrigida ou ajuste os campos no chat.");
+  if($("chatInput")) $("chatInput").value = "";
+  setPill("Editar");
+}
+
+document.addEventListener("click", (e)=>{
+  const editBtn = e.target.closest("[data-edit-last]");
+  if(editBtn){
+    startEditLastSaved();
+    return;
+  }
+  const delBtn = e.target.closest("[data-delete-last]");
+  if(delBtn){
+    if(!lastSavedIds || !lastSavedIds.length){
+      botSay("Não há lançamento recente para excluir.");
+      return;
+    }
+    removeTxByIds(lastSavedIds);
+    botSay("Último lançamento excluído.");
+    lastSavedIds = [];
+    lastSavedSummary = null;
+    resetComposerAndDraft();
+    toast("Excluído");
+    return;
+  }
+});
+
+
+/* Boot */
+function bootChat(){
+  $("chatBox").innerHTML = "";
+  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo:`);
+  renderDueAlerts();
+}
+function renderAll(){
+  $("mesRef").value = monthNow();
+  $("filtroMeio").value = "";
+  $("filtroTipo").value = "";
+  $("buscaCat").value = "";
+  renderPainel();
+  renderTxTable();
+  renderContas();
+  renderBeneficios();
+  renderCats();
+  renderDueAlerts();
+  getBackupInfo();
+}
+
+(function init(){
+  if(!localStorage.getItem(STORE.DATA) && !localStorage.getItem(STORE.TX)){
+    data = JSON.parse(JSON.stringify(DEFAULTS.data));
+    tx = [];
+    persist("primeiro_uso");
+  } else {
+    makeBackup("init");
+  }
+  bootChat();
+  renderAll();
+  setTab("chat");
+  setPill("Pronto");
+})();
+
+
+
+</script>
+<script>
+(function(){
+  const ids = ["toggleTheme","toggleThemeMobile","toggleThemeConfig"];
+  const buttons = ids.map(id => document.getElementById(id)).filter(Boolean);
+  function syncThemeLabel(){
+    const dark = document.body.classList.contains("dark");
+    const label = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
+    buttons.forEach(btn => btn.textContent = label);
+  }
+  const saved = localStorage.getItem("theme") || "dark";
+  if(saved === "dark"){ document.body.classList.add("dark"); }
+  syncThemeLabel();
+  buttons.forEach(btn => btn.addEventListener("click", function(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    syncThemeLabel();
+  }));
+})();
+</script>
+
+<script>
+(function(){
+  const btn = document.getElementById("toggleTheme");
+  const saved = localStorage.getItem("theme") || "dark";
+  if(saved==="dark"){ document.body.classList.add("dark"); }
+  update();
+
+  function update(){
+    const dark = document.body.classList.contains("dark");
+    if(btn) btn.textContent = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
+  }
+
+  if(btn){
+    btn.onclick = function(){
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light");
+      update();
+    };
+  }
+})();
+</script>
+
+</body>
+</html>
