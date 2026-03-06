@@ -472,39 +472,6 @@ body.dark .msg.me{
 #tab-config .panelbox .title{margin-bottom:8px}
 #tab-config .panelbox .k{margin-bottom:4px}
 
-
-/* Ações compactas em Transações */
-.txSimpleActions{
-  display:flex;
-  gap:6px;
-  align-items:center;
-  justify-content:center;
-}
-.iconBtn{
-  width:36px !important;
-  min-width:36px;
-  height:36px;
-  padding:0 !important;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:12px;
-  font-size:16px;
-}
-@media (max-width:760px){
-  .txSimpleActions{
-    flex-direction:row;
-    flex-wrap:nowrap;
-    justify-content:flex-start;
-  }
-  .iconBtn{
-    width:34px !important;
-    min-width:34px;
-    height:34px;
-    font-size:15px;
-  }
-}
-
 </style>
 </head>
 
@@ -611,7 +578,7 @@ body.dark .msg.me{
           </div>
 
           <div class="line">
-            <div><div class="k">Saldo atual</div><div class="k">receitas − (banco + dinheiro)</div></div>
+            <div><div class="k">Saldo atual</div><div class="k">saldos iniciais + receitas − (banco + dinheiro)</div></div>
             <div class="v" id="saldoAtual">R$ 0,00</div>
           </div>
 
@@ -670,14 +637,17 @@ body.dark .msg.me{
       <!-- CONTAS E CARTÕES -->
       <section id="tab-contas" class="hidden">
         <div class="panelbox">
-          <div class="title">Contas (pix/débito)</div>
+          <div class="title">Contas (pix/débito)</div><div class="k">Você pode definir um saldo inicial para cada conta.</div>
           <div class="row">
             <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Mercado Pago, Nubank..." /></div>
             <div><label for="apelidoConta">Apelidos (vírgula)</label><input id="apelidoConta" placeholder="Ex: mp, mercadopago, roxinho" /></div>
           </div>
-          <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
+          <div class="row">
+            <div><label for="saldoInicialConta">Saldo inicial</label><input id="saldoInicialConta" inputmode="decimal" placeholder="Ex: 1500 ou 1500,00" /></div>
+            <div><label>&nbsp;</label><button class="btn" id="btnAddConta" type="button" style="margin-top:0">Adicionar conta</button></div>
+          </div>
           <div class="divider"></div>
-          <div style="overflow:auto"><table><thead><tr><th>Conta</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyContas"></tbody></table></div>
+          <div style="overflow:auto"><table><thead><tr><th>Conta</th><th>Saldo inicial</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyContas"></tbody></table></div>
         </div>
 
         <div class="panelbox">
@@ -794,9 +764,9 @@ const STORE = { TX:"fin_tx_chat_v1", DATA:"fin_data_chat_v1", BACKUP:"fin_backup
 const DEFAULTS = {
   data: {
     contas: [
-      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"] },
-      { name:"Nubank", aliases:["nu","nubank","roxinho"] },
-      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"] }
+      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"], initialBalance:0 },
+      { name:"Nubank", aliases:["nu","nubank","roxinho"], initialBalance:0 },
+      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"], initialBalance:0 }
     ],
     cartoes: [
       { name:"Nubank", aliases:["nu","nubank","roxinho"], fechamento:10, pagamento:17 },
@@ -1348,15 +1318,16 @@ function sumsForMonth(ym){
     if(t.meio==="Cartão") cartao += val;
     else if(t.meio==="Dinheiro") dinheiro += val;
     else if(t.meio==="Benefício"){
-      // benefício fica no menu Benefícios, fora do painel principal
+      // benefício fora do painel principal
     } else banco += val;
   }
 
+  const initialBalances = (data.contas||[]).reduce((acc, c)=>acc + (Number(c.initialBalance)||0), 0);
   const saidas = banco + dinheiro + cartao;
-  const saldoAtual = receitas - (banco + dinheiro);
+  const saldoAtual = initialBalances + receitas - (banco + dinheiro);
   const saldoFinal = saldoAtual - cartao;
 
-  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal};
+  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal,initialBalances};
 }
 function renderPainel(){
   const ym = monthNow();
@@ -1407,7 +1378,7 @@ function renderTxTable(){
       const valClass = (t.tipo==="Receita") ? "pos" : "neg";
       const ref = t.ref || "—";
       const extra = (t.meio==="Cartão" && t.totalParcelas) ? ` (${t.parcela}/${t.totalParcelas})` : "";
-      tr.innerHTML = `<td>${t.data}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="txSimpleActions"><button class="btn secondary iconBtn" title="Editar" aria-label="Editar" data-edit-tx="${t.id}">✏️</button><button class="btn danger iconBtn" title="Excluir" aria-label="Excluir" data-del="${t.id}">🗑️</button></div></td>`;
+      tr.innerHTML = `<td>${t.data}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="txSimpleActions"><button class="btn secondary" data-edit-tx="${t.id}">Editar</button><button class="btn danger" data-del="${t.id}">Excluir</button></div></td>`;
       tbody.appendChild(tr);
     }
   }
@@ -1475,7 +1446,7 @@ function renderContas(){
   for(let i=0;i<data.contas.length;i++){
     const c = data.contas[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${brl(c.initialBalance||0)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
     tb.appendChild(tr);
   }
   const tb2 = $("tbodyCartoes"); tb2.innerHTML="";
@@ -1530,12 +1501,13 @@ document.addEventListener("click", (e)=>{
 $("btnAddConta").addEventListener("click", ()=>{
   const name = ($("novaConta").value||"").trim();
   const aliases = ($("apelidoConta").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
+  const initialBalance = parseBR($("saldoInicialConta").value) || 0;
   if(!name){ toast("Digite o nome"); return; }
   data.contas = data.contas || [];
   if(data.contas.some(x=>normalize(x.name)===normalize(name))){ toast("Conta já existe"); return; }
-  data.contas.unshift({ name, aliases });
-  $("novaConta").value=""; $("apelidoConta").value="";
-  persist("add_conta"); renderContas(); toast("Conta adicionada");
+  data.contas.unshift({ name, aliases, initialBalance });
+  $("novaConta").value=""; $("apelidoConta").value=""; $("saldoInicialConta").value="";
+  persist("add_conta"); renderContas(); renderPainel(); toast("Conta adicionada");
 });
 $("btnAddCartao").addEventListener("click", ()=>{
   const name = ($("novoCartao").value||"").trim();
@@ -1795,24 +1767,9 @@ document.addEventListener("click", (e)=>{
 
 /* Boot */
 function bootChat(){
-  const box = document.getElementById("chatBox");
-  box.innerHTML = "";
-
-  const hora = new Date().getHours();
-  let saudacao = "Boa noite";
-
-  if(hora < 12) saudacao = "Bom dia";
-  else if(hora < 18) saudacao = "Boa tarde";
-
-  const msg = document.createElement("div");
-  msg.className = "msg bot";
-  msg.innerHTML = `
-    ${saudacao} 😊<br>
-    Seja bem-vindo(a).<br>
-    Como posso ajudá-lo?
-  `;
-
-  box.appendChild(msg);
+  $("chatBox").innerHTML = "";
+  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo(a)?`);
+  renderDueAlerts();
 }
 function renderAll(){
   $("mesRef").value = monthNow();
@@ -1912,5 +1869,3 @@ localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"li
 
 </body>
 </html>
-
-
