@@ -9,151 +9,79 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-512.png">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000000">
 
 <style>
-:root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --text:#0f172a;
-  --muted:#6b7280;
-  --line:#e5e7eb;
-  --btn:#0f172a;
-  --btnText:#ffffff;
-}
-
-body.dark{
-  --bg:#0b0f14;
-  --card:#0f172a;
-  --text:#f8fafc;
-  --muted:#94a3b8;
-  --line:#1f2937;
-  --btn:#ffffff;
-  --btnText:#000000;
-}
-
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#000;
+  color:#fff;
 }
-
 header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
   padding:20px;
-  border-bottom:1px solid var(--line);
-}
-
-h1{
-  margin:0;
   font-size:22px;
-  letter-spacing:-0.5px;
+  font-weight:bold;
+  border-bottom:1px solid #222;
 }
-
-button{
-  border:none;
-  padding:10px 16px;
-  border-radius:12px;
-  font-weight:600;
-  cursor:pointer;
-  background:var(--btn);
-  color:var(--btnText);
-}
-
 .container{
-  max-width:600px;
-  margin:auto;
   padding:20px;
 }
-
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:20px;
+.chatbox{
+  border:1px solid #222;
+  padding:15px;
+  border-radius:10px;
   min-height:200px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.05);
+  margin-bottom:15px;
 }
-
 input{
   width:100%;
-  margin-top:20px;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--line);
+  padding:12px;
+  border-radius:8px;
+  border:none;
   font-size:16px;
-  background:var(--card);
-  color:var(--text);
 }
-
-input:focus{
-  outline:none;
-  border-color:#6366f1;
-}
-
-.actions{
-  margin-top:15px;
-}
-
-.entry{
+button{
   margin-top:10px;
-  font-weight:500;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  background:#fff;
+  color:#000;
+  cursor:pointer;
+}
+button:hover{
+  opacity:0.9;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Finance App</h1>
-  <button onclick="toggleTheme()" id="themeBtn">🌙</button>
-</header>
+<header>Finance App</header>
 
 <div class="container">
-  <div class="card" id="chatBox">
-    <strong>O que vamos registrar hoje?</strong>
+  <div class="chatbox" id="chat">
+    <p>O que vamos registrar hoje?</p>
   </div>
 
   <input type="text" id="entrada" placeholder="Digite aqui...">
-
-  <div class="actions">
-    <button onclick="registrar()">Registrar</button>
-  </div>
+  <button onclick="registrar()">Registrar</button>
 </div>
 
 <script>
-const THEME_KEY="finance_theme";
-
-function applyTheme(){
-  const saved = localStorage.getItem(THEME_KEY) || "light";
-  document.body.classList.toggle("dark", saved === "dark");
-  document.getElementById("themeBtn").textContent = saved === "dark" ? "☀️" : "🌙";
-}
-
-function toggleTheme(){
-  const current = localStorage.getItem(THEME_KEY) || "light";
-  const next = current === "dark" ? "light" : "dark";
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme();
-}
-
 function registrar(){
   const input = document.getElementById("entrada");
-  const box = document.getElementById("chatBox");
+  const chat = document.getElementById("chat");
   if(input.value.trim() === "") return;
 
-  const p = document.createElement("div");
-  p.className="entry";
+  const p = document.createElement("p");
   p.textContent = input.value.charAt(0).toUpperCase() + input.value.slice(1);
-  box.appendChild(p);
+  chat.appendChild(p);
 
-  input.value="";
+  input.value = "";
 }
-
-applyTheme();
 </script>
 
 </body>
