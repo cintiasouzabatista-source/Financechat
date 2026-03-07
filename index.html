@@ -8,7 +8,7 @@
         :root {
             --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
             --primary: #00e676; --secondary: #ff5252; --accent: #2979ff; 
-            --warning: #ffb74d;
+            --warning: #ffb74d; --recurring: #ba68c8;
         }
 
         body {
@@ -18,22 +18,23 @@
 
         header {
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: flex-start;
-            background: var(--card); border-bottom: 1px solid #333;
+            background: var(--card); border-bottom: 1px solid #333; z-index: 10;
         }
 
-        .header-stats { display: flex; gap: 25px; }
+        .header-stats { display: flex; gap: 20px; }
         .stat-group { display: flex; flex-direction: column; }
-        .label-small { font-size: 0.65rem; color: #888; text-transform: uppercase; font-weight: bold; }
-        .val-header { font-size: 1.2rem; font-weight: bold; }
+        .label-small { font-size: 0.6rem; color: #888; text-transform: uppercase; font-weight: bold; }
+        .val-header { font-size: 1.1rem; font-weight: bold; }
         .val-saldo { color: var(--primary); }
         .val-fatura { color: var(--warning); }
 
-        .month-nav { display: flex; align-items: center; gap: 10px; background: #252525; padding: 5px 12px; border-radius: 8px; border: 1px solid #444; }
-        .btn-month { background: none; border: none; color: white; cursor: pointer; font-weight: bold; padding: 5px; }
+        .header-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        .btn-zerar { background: rgba(255, 82, 82, 0.1); border: 1px solid var(--secondary); color: var(--secondary); font-size: 0.6rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
 
         .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 160px; }
         .view.active { display: flex; }
 
+        /* Card com Timer e Recorrência */
         .card-mov {
             background: var(--card); border-radius: 12px; padding: 18px; position: relative;
             width: 100%; max-width: 450px; margin-bottom: 15px; border-left: 6px solid var(--accent);
@@ -43,12 +44,16 @@
         .card-mov.despesa { border-left-color: var(--secondary); }
         .card-mov.parcelado { border-left-color: var(--warning); }
 
+        .timer-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent); width: 100%; border-radius: 12px 12px 0 0; transition: width 0.1s linear; }
+
         .card-tipo { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 4px; }
         .card-nome { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
         .card-cat { font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; display: block; }
         .card-valor { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
-        .card-data { font-size: 0.75rem; color: #888; margin-bottom: 10px; font-weight: 500; }
-        .card-parcela-info { background: rgba(255, 183, 77, 0.1); color: var(--warning); padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; }
+        .card-data { font-size: 0.75rem; color: #666; margin-bottom: 10px; }
+        
+        .opt-recorrente { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-bottom: 15px; color: var(--recurring); cursor: pointer; font-weight: bold; }
+        .card-parcela-info { background: rgba(255, 183, 77, 0.1); color: var(--warning); padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; }
 
         #input-wrapper { position: fixed; bottom: 80px; width: 100%; padding: 0 20px; box-sizing: border-box; }
         .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 10px 18px; border-radius: 30px; border: 1px solid #333; }
@@ -67,17 +72,16 @@
     <div class="header-stats">
         <div class="stat-group">
             <span class="label-small">Saldo Disponível</span>
-            <span id="header-total" class="val-header val-saldo">R$ 5.200,00</span>
+            <span id="header-total" class="val-header val-saldo">R$ 0,00</span>
         </div>
         <div class="stat-group">
             <span class="label-small">Fatura <span id="label-mes-fatura">MAIO</span></span>
             <span id="header-fatura" class="val-header val-fatura">R$ 0,00</span>
         </div>
     </div>
-    <div class="month-nav">
-        <button class="btn-month" onclick="changeMonth(-1)">❮</button>
-        <span id="display-month" style="font-size:0.75rem; font-weight:bold;">MAIO 2026</span>
-        <button class="btn-month" onclick="changeMonth(1)">❯</button>
+    <div class="header-actions">
+        <button class="btn-zerar" onclick="zerarSistema()">🗑️ Zerar Sistema</button>
+        <div style="font-size:0.7rem; font-weight:bold; color:#666;">MAIO 2026</div>
     </div>
 </header>
 
@@ -92,7 +96,7 @@
 </div>
 
 <div id="view-saldo" class="view"><h3>Detalhes das Contas</h3></div>
-<div id="view-resumo" class="view"><h3>Resumo Mensal</h3></div>
+<div id="view-resumo" class="view"><h3>Resumo</h3></div>
 <div id="view-graficos" class="view"><h3>Gráficos</h3></div>
 
 <nav>
@@ -104,39 +108,38 @@
 
 <script>
     let transacoes = [];
-    let saldoBase = 5200;
-    let meses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+    let saldoBase = 0; 
     let mesAtualIndex = 4; // Maio
 
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+
+    function zerarSistema() {
+        if(confirm("Deseja limpar todos os dados e zerar o saldo?")) {
+            transacoes = [];
+            saldoBase = 0;
+            document.getElementById('chat-messages').innerHTML = "";
+            updateUI();
+        }
+    }
 
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-    function changeMonth(delta) {
-        mesAtualIndex = (mesAtualIndex + delta + 12) % 12;
-        updateUI();
-    }
-
     function updateUI() {
-        const nomeMes = meses[mesAtualIndex];
-        document.getElementById('display-month').innerText = `${nomeMes} 2026`;
-        document.getElementById('label-mes-fatura').innerText = nomeMes;
-
         let totalFaturaMes = 0;
         transacoes.forEach(t => {
-            if (t.parcelas > 1 && t.confirmada) {
-                let mesFinal = t.mesInicio + t.parcelas - 1;
-                if (mesAtualIndex >= t.mesInicio && mesAtualIndex <= mesFinal) {
-                    totalFaturaMes += (t.valor / t.parcelas);
+            if (t.confirmada) {
+                if (t.parcelas > 1) {
+                    let mesFinal = t.mesInicio + t.parcelas - 1;
+                    if (mesAtualIndex >= t.mesInicio && mesAtualIndex <= mesFinal) {
+                        totalFaturaMes += (t.valor / t.parcelas);
+                    }
                 }
             }
         });
-
         document.getElementById('header-total').innerText = format(saldoBase);
         document.getElementById('header-fatura').innerText = format(totalFaturaMes);
-        renderizarCards();
     }
 
     function processInput() {
@@ -150,68 +153,81 @@
         const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
         
         let tipo = text.toLowerCase().includes('recebi') ? 'receita' : 'despesa';
-        
-        // Extração do nome com Capitalização Automática
-        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '')
-                          .replace(/\d+\s*(x|vezes)/gi, '')
-                          .replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
+        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '').replace(/\d+\s*(x|vezes)/gi, '').replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
         
         let nomeFinal = nomeRaw ? capitalizeFirstLetter(nomeRaw) : "Lançamento";
 
-        const novaTransacao = {
+        createCard({
             id: Date.now(),
             nome: nomeFinal,
             valor: valorTotal,
             tipo: tipo,
             parcelas: numParcelas,
             mesInicio: mesAtualIndex,
-            dataRegistro: new Date().toLocaleDateString('pt-BR'), // Data importante para relatórios
-            confirmada: false,
-            categoria: text.toLowerCase().includes("tv") ? "ELETRÔNICOS" : "GERAL"
-        };
-
-        transacoes.push(novaTransacao);
-        updateUI();
+            dataRegistro: "07/03/2026",
+            recorrente: false,
+            confirmada: false
+        });
         input.value = '';
     }
 
-    function renderizarCards() {
+    function createCard(t) {
         const container = document.getElementById('chat-messages');
-        container.innerHTML = '';
+        const cardId = t.id;
+        const card = document.createElement('div');
+        card.className = `card-mov ${t.parcelas > 1 ? 'parcelado' : t.tipo}`;
+        card.id = cardId;
+
+        card.innerHTML = `
+            <div class="timer-bar" id="bar-${cardId}"></div>
+            <div class="card-tipo">${t.tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
+            <span class="card-nome">${t.nome}</span>
+            <span class="card-cat">📂 GERAL</span>
+            <div class="card-valor">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+            <div class="card-data">📅 Registro: ${t.dataRegistro}</div>
+            
+            ${t.parcelas > 1 ? `<div class="card-parcela-info">💳 Parcelado: ${t.parcelas}x de R$ ${(t.valor/t.parcelas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
+
+            <label class="opt-recorrente">
+                <input type="checkbox" onchange="toggleRecorrente(${cardId}, this.checked)"> 🔄 Esta despesa é recorrente?
+            </label>
+
+            <div id="actions-${cardId}" style="display:flex; gap:10px;">
+                <button onclick="confirmar(${cardId})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar Agora</button>
+                <button onclick="document.getElementById('${cardId}').remove()" style="background:rgba(255,255,255,0.05); border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer;">Excluir</button>
+            </div>
+        `;
         
-        transacoes.forEach(t => {
-            const card = document.createElement('div');
-            card.className = `card-mov ${t.parcelas > 1 ? 'parcelado' : t.tipo}`;
-            const valorParcela = t.valor / t.parcelas;
-
-            card.innerHTML = `
-                <div class="card-tipo">${t.tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
-                <span class="card-nome">${t.nome}</span>
-                <span class="card-cat">📂 ${t.categoria}</span>
-                <div class="card-valor">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-                <div class="card-data">📅 Registro: ${t.dataRegistro}</div>
-                
-                ${t.parcelas > 1 ? `
-                    <div class="card-parcela-info">
-                        💳 Parcela: R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2})} (${t.parcelas}x)
-                    </div>
-                ` : ''}
-
-                <div style="margin-top:15px;">
-                    ${!t.confirmada ? 
-                        `<button onclick="confirmar(${t.id})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; width:100%;">Confirmar</button>` : 
-                        `<span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">✅ Confirmado e Salvo</span>`
-                    }
-                </div>
-            `;
-            container.appendChild(card);
-        });
+        container.appendChild(card);
         container.scrollTop = container.scrollHeight;
+
+        // Timer de 10 segundos
+        let timeLeft = 100;
+        const interval = setInterval(() => {
+            timeLeft -= 1; 
+            const bar = document.getElementById(`bar-${cardId}`);
+            if(bar) bar.style.width = timeLeft + '%';
+            if(timeLeft <= 0) {
+                clearInterval(interval);
+                confirmar(cardId, t);
+            }
+        }, 100);
+        card.dataset.interval = interval;
+        transacoes.push(t);
     }
 
-    function confirmar(id) {
+    function toggleRecorrente(id, checked) {
         let t = transacoes.find(x => x.id === id);
+        if(t) t.recorrente = checked;
+    }
+
+    function confirmar(id, objManual = null) {
+        const card = document.getElementById(id);
+        let t = transacoes.find(x => x.id === id);
+        
         if(!t || t.confirmada) return;
+        
+        clearInterval(card.dataset.interval);
         t.confirmada = true;
 
         if(t.tipo === 'receita') {
@@ -219,6 +235,14 @@
         } else if (t.parcelas === 1) {
             saldoBase -= t.valor;
         }
+
+        const bar = document.getElementById(`bar-${id}`);
+        if(bar) bar.style.display = 'none';
+        document.getElementById(`actions-${id}`).innerHTML = `
+            <span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">
+                ✅ Confirmado ${t.recorrente ? '(Recorrente)' : ''}
+            </span>
+        `;
         updateUI();
     }
 
