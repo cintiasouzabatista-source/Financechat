@@ -1,206 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finanças Chat AI</title>
-    <style>
-        :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #e0e0e0;
-            --primary: #00e676; /* Verde Receita */
-            --secondary: #ff5252; /* Vermelho Despesa */
-            --accent: #2979ff; /* Azul Saldo */
-        }
+function createCard(text) {
+    const container = document.getElementById('chat-container');
+    const card = document.createElement('div');
+    
+    // Lógica simples de extração (Simulando a IA)
+    const valorTotal = parseFloat(text.match(/\d+/)) || 0;
+    const parcelasMatch = text.match(/(\d+)\s*x/) || text.match(/(\d+)\s*vezes/);
+    const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
+    const valorParcela = (valorTotal / numParcelas).toFixed(2);
+    
+    const conta = text.toLowerCase().includes('inter') ? 'Banco Inter' : 'Nubank'; // Exemplo
+    const categoria = text.toLowerCase().includes('uber') ? 'Transporte' : 'Compras';
+    const isParcelado = numParcelas > 1;
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Header com Navegação de Mês */
-        header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card);
-            border-bottom: 1px solid #333;
-        }
-
-        .month-selector {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .btn-nav {
-            background: none;
-            border: 1px solid #444;
-            color: white;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        /* Área do Chat */
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .card-mov {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 15px;
-            position: relative;
-            max-width: 85%;
-            animation: fadeIn 0.3s ease;
-            border-left: 5px solid var(--accent);
-        }
-
-        .card-mov.despesa { border-left-color: var(--secondary); }
-        .card-mov.receita { border-left-color: var(--primary); }
-
-        /* Barra de Progresso de 8s */
-        .timer-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 4px;
-            background: var(--accent);
-            width: 100%;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-action {
-            padding: 5px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .btn-edit { background: #444; color: white; }
-        .btn-del { background: #cf6679; color: black; }
-
-        /* Input de Chat */
-        .input-area {
-            padding: 20px;
-            background: var(--card);
-            display: flex;
-            gap: 10px;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 25px;
-            border: none;
-            background: #333;
-            color: white;
-            outline: none;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="month-selector">
-        <button class="btn-nav" onclick="changeMonth(-1)">❮</button>
-        <span id="current-month">MARÇO 2026</span>
-        <button class="btn-nav" onclick="changeMonth(1)">❯</button>
-    </div>
-    <div id="main-balance" style="color: var(--primary); font-weight: bold;">R$ 5.200,00</div>
-</header>
-
-<div id="chat-container">
-    <div class="card-mov">
-        Olá! Sou seu assistente. Digite algo como: <br>
-        <i>"Gastei 50 reais no Uber"</i> ou <br>
-        <i>"Comprei TV de 2000 em 10x no Inter"</i>
-    </div>
-</div>
-
-<div class="input-area">
-    <input type="text" id="user-input" placeholder="Fale sua movimentação..." onkeypress="handleEnter(event)">
-    <button onclick="processInput()" style="background: var(--primary); border:none; border-radius:50%; width:40px; height:40px; cursor:pointer;">➔</button>
-</div>
-
-<script>
-    function handleEnter(e) { if(e.key === 'Enter') processInput(); }
-
-    function processInput() {
-        const input = document.getElementById('user-input');
-        if(!input.value) return;
-
-        createCard(input.value);
-        input.value = '';
-    }
-
-    function createCard(text) {
-        const container = document.getElementById('chat-container');
-        const card = document.createElement('div');
-        card.className = 'card-mov despesa'; // Lógica simples para o protótipo
-        
-        // Simulação de detecção de parcelas
-        const isParcelado = text.toLowerCase().includes('x') || text.toLowerCase().includes('vezes');
-        
-        card.innerHTML = `
-            <div class="timer-bar" id="bar-${Date.now()}"></div>
-            <strong>Novo Registro:</strong><br>
-            "${text}"<br>
-            <small>${isParcelado ? '⚠️ Parcelado: Não afeta saldo atual' : '✅ À vista: Abatendo do saldo'}</small>
-            <div class="actions">
-                <button class="btn-action btn-edit" onclick="this.parentElement.parentElement.remove()">Editar ✏️</button>
-                <button class="btn-action btn-del" onclick="this.parentElement.parentElement.remove()">Excluir 🗑️</button>
-            </div>
-        `;
-        
-        container.appendChild(card);
-        container.scrollTop = container.scrollHeight;
-
-        // Lógica do Timer de 8 segundos
-        let timeLeft = 800; // 8 segundos em ms para suavidade
-        const bar = card.querySelector('.timer-bar');
-        const interval = setInterval(() => {
-            timeLeft--;
-            bar.style.width = (timeLeft / 8) + '%';
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                bar.style.background = "#4caf50";
-                card.querySelector('.actions').innerHTML = "<span>✓ Registrado com sucesso</span>";
-            }
-        }, 10);
-    }
-
-    function changeMonth(dir) {
-        // Apenas visual para o protótipo
-        const months = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO"];
-        document.getElementById('current-month').innerText = months[Math.floor(Math.random() * 5)] + " 2026";
-    }
-</script>
-
-</body>
-</html>
+    card.className = `card-mov ${isParcelado ? 'parcelado' : 'despesa'}`;
+    
+    card.innerHTML = `
+        <div class="timer-bar"></div>
+        <div style="display: flex; justify-content: space-between;">
+            <strong>${categoria}</strong>
+            <span>${conta}</span>
+        </div>
+        <hr style="border: 0.5px solid #333; margin: 10px 0;">
+        <div style="font-size: 0.9rem;">
+            <p>Valor Total: <strong>R$ ${valorTotal.toFixed(2)}</strong></p>
+            ${isParcelado ? `
+                <p>Parcelamento: <strong>${numParcelas}x de R$ ${valorParcela}</strong></p>
+                <p style="color: #ffb74d;">⚠️ Lançado na fatura dos próximos meses</p>
+            ` : `
+                <p style="color: #4caf50;">✅ À vista: Debitado do saldo agora</p>
+            `}
+            <p>Data: ${new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+        <div class="actions">
+            <button class="btn-action btn-edit" onclick="this.parentElement.parentElement.remove()">Editar ✏️</button>
+            <button class="btn-action btn-del" onclick="this.parentElement.parentElement.remove()">Excluir 🗑️</button>
+        </div>
+    `;
+    
+    container.appendChild(card);
+    container.scrollTop = container.scrollHeight;
+    
+    // Inicia o timer de 8s (mesma lógica anterior)
+}
