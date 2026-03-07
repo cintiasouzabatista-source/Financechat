@@ -3,193 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Dashboard Pro</title>
+    <title>Finance Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; margin: 0; display: flex; height: 100vh; overflow: hidden; color: #333; }
+        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* SIDEBAR PROFISSIONAL */
-        .sidebar { width: 220px; background: white; border-right: 1px solid #f0f0f0; display: flex; flex-direction: column; padding: 2rem 1rem; flex-shrink: 0; }
-        .logo { font-weight: 800; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 2.5rem; padding-left: 1rem; letter-spacing: -0.05em; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 1rem; border-radius: 0.8rem; color: #888; font-weight: 600; font-size: 12px; margin-bottom: 0.3rem; cursor: pointer; }
-        .nav-item.active { background: #f4f4f4; color: #1d3b91; }
-
-        /* CARD CENTRALIZADO E COMPACTO */
-        .main-content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; align-items: center; }
-        .dashboard-container { width: 100%; max-width: 650px; }
+        /* Barra Lateral */
+        .sidebar { width: 260px; background-color: white; border-right: 1px solid #f0f0f0; display: flex; flex-direction: column; padding: 2rem; }
+        .nav-item { padding: 0.8rem 1rem; border-radius: 1rem; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.2s; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px; }
+        .nav-item.active { background-color: #f4f4f4; color: #1d3b91; }
         
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; }
-        .dashboard-label { font-weight: 700; color: #d0d0d0; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.7rem; }
-        .balance-val { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; }
-
-        /* ELEMENTOS DO CHAT */
-        .btn-quick { background: #f4f4f4; border-radius: 2rem; padding: 0.4rem 0.9rem; font-size: 9px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: 0.2s; }
-        .btn-quick:hover { border-color: #1d3b91; color: #1d3b91; background: white; }
-        .input-chat { background-color: #f4f4f4; border: none; border-radius: 1rem; padding: 1rem 1.5rem; width: 100%; outline: none; font-size: 0.9rem; }
-
-        /* REVISÃO TIPO CARD */
-        .card-revisao { background: white; border-radius: 2rem; padding: 2rem; border: 1px solid #f2f2f2; box-shadow: 0 10px 25px rgba(0,0,0,0.03); position: relative; overflow: hidden; margin-top: 1rem; }
-        .progress-bar { height: 4px; background-color: #1d3b91; width: 100%; position: absolute; bottom: 0; left: 0; transition: width 8s linear; }
+        /* Área Principal */
+        .main-content { flex: 1; overflow-y: auto; padding: 3rem; display: flex; flex-direction: column; }
         
-        /* LISTA DE ITENS */
-        .mov-card { background: white; border-radius: 1.2rem; padding: 1rem 1.5rem; border: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-        .mov-desc { font-weight: 700; font-size: 0.75rem; text-transform: uppercase; }
-        .mov-val { font-weight: 700; font-size: 0.85rem; }
+        /* Elementos do Chat */
+        .chat-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .input-finance { background-color: #f4f4f4; border: none; border-radius: 1.5rem; padding: 1.5rem; width: 100%; outline: none; font-size: 16px; }
+        
+        /* Card de Revisão */
+        .card-revisao { background: white; border-radius: 2.5rem; padding: 2.5rem; border: 1px solid #f0f0f0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; margin-top: 2rem; }
+        .progress-bar { height: 5px; background-color: #1d3b91; width: 100%; position: absolute; bottom: 0; left: 0; transition: width 8s linear; }
+        
+        /* Gráfico */
+        .chart-bar { height: 8px; border-radius: 10px; background-color: #1d3b91; transition: width 1s ease-out; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="logo">Finance</div>
-        <nav>
-            <div class="nav-item active"><span>💬</span> Chat</div>
-            <div class="nav-item"><span>📊</span> Saldos</div>
-            <div class="nav-item"><span>📅</span> Calendário</div>
-            <div class="nav-item"><span>⚙️</span> Ajustes</div>
+        <h1 class="font-bold text-xl tracking-tighter uppercase mb-12">Finance</h1>
+        <nav class="flex-1">
+            <div class="nav-item active">💬 Chat</div>
+            <div class="nav-item">📊 Saldos</div>
+            <div class="nav-item">📅 Calendário</div>
+            <div class="nav-item">⚙️ Ajustes</div>
         </nav>
+        <div class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Versão Teste 1.0</div>
     </aside>
 
     <main class="main-content">
-        <div class="dashboard-container">
-            <header class="header">
-                <h2 class="dashboard-label">Dashboard</h2>
-                <div class="text-right">
-                    <p class="text-[9px] font-bold text-gray-300 uppercase tracking-widest mb-1">Saldo Atual</p>
-                    <p id="saldo-topo" class="balance-val text-green-500">R$ 0,00</p>
-                </div>
-            </header>
+        <header class="flex justify-between items-center mb-12 max-w-[800px] mx-auto w-full">
+            <h2 class="font-bold text-lg uppercase tracking-widest text-gray-400">Dashboard</h2>
+            <div class="text-right">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Balanço do Mês</p>
+                <p id="saldo-topo" class="text-green-500 font-bold text-2xl leading-none">R$ 0,00</p>
+            </div>
+        </header>
 
-            <div class="flex flex-wrap gap-2 mb-5">
-                <button onclick="comando('Salário 5000')" class="btn-quick !bg-green-50 text-green-700">💰 Salário</button>
-                <button onclick="comando('Uber 25')" class="btn-quick">🚗 Uber</button>
-                <button onclick="comando('iFood 60')" class="btn-quick">🍕 iFood</button>
-                <button onclick="comando('Mercado 150')" class="btn-quick">🛒 Mercado</button>
+        <div class="chat-container">
+            <div class="flex flex-wrap gap-3 mb-6">
+                <button onclick="comandoRapido('Uber 25')" class="bg-gray-100 px-4 py-2 rounded-full text-[11px] font-bold uppercase hover:bg-gray-200">🚗 Uber</button>
+                <button onclick="comandoRapido('iFood 60')" class="bg-gray-100 px-4 py-2 rounded-full text-[11px] font-bold uppercase hover:bg-gray-200">🍕 iFood</button>
             </div>
 
-            <div id="box-entrada">
-                <input type="text" id="chat-input" class="input-chat" placeholder="Ex: paguei 300 mercado ou recebi 5000 salario">
+            <div id="input-area">
+                <input type="text" id="chat-input" class="input-finance" placeholder="Ex: paguei 300 mercado">
             </div>
 
-            <div id="card-revisao" class="hidden card-revisao">
-                <div class="flex justify-between items-center mb-5">
-                    <span class="text-gray-300 text-[9px] font-bold uppercase tracking-widest">Revisar</span>
-                    <span id="label-tipo" class="px-3 py-1 rounded-full text-[8px] font-bold uppercase"></span>
+            <div id="card-revisao" class="hidden card-revisao animate-in fade-in zoom-in duration-300">
+                <div class="flex justify-between mb-8">
+                    <span class="text-gray-400 text-[11px] font-bold uppercase">Revisar Lançamento</span>
+                    <span id="label-parcelas" class="text-gray-400 text-[11px] font-bold uppercase">1X DE R$ 0,00</span>
                 </div>
-                <div class="space-y-4">
-                    <input id="rev-desc" type="text" class="input-chat font-bold uppercase text-lg !bg-white border border-gray-100" onfocus="pausar()">
-                    <div class="flex gap-3">
-                        <input id="rev-valor" type="text" class="input-chat flex-1 font-bold !bg-white border border-gray-100" oninput="recalc()">
-                        <input id="rev-parc" type="text" class="input-chat w-16 text-center font-bold !bg-white border border-gray-100" value="1">
+                <div class="space-y-6">
+                    <input id="rev-desc" type="text" class="input-finance font-bold uppercase" onfocus="pararTimer()">
+                    <div class="flex gap-4">
+                        <input id="rev-valor" type="text" class="input-finance flex-1" oninput="atualizarLabel()">
+                        <input id="rev-parc" type="text" class="input-finance w-24 text-center" value="1" oninput="atualizarLabel()">
                     </div>
-                    <div class="flex justify-between items-center pt-4">
-                        <button onclick="cancelar()" class="text-red-400 font-bold text-[9px] uppercase tracking-wider">Excluir</button>
-                        <button onclick="confirmar()" class="bg-black text-white px-8 py-3 rounded-xl text-[9px] font-bold uppercase shadow-md">Confirmar</button>
+                    <div class="flex gap-4">
+                        <input id="rev-cat" type="text" class="input-finance flex-1 text-sm uppercase" readonly>
+                        <select id="rev-fixa" class="input-finance flex-1 text-sm font-bold text-blue-600">
+                            <option value="nao">NÃO É FIXA</option>
+                            <option value="sim">LANÇAR 12 MESES</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-between pt-4">
+                        <button onclick="cancelar()" class="text-red-500 font-bold text-[11px] uppercase">Excluir</button>
+                        <button onclick="confirmar()" class="bg-black text-white px-10 py-4 rounded-2xl text-[11px] font-bold uppercase">Confirmar</button>
                     </div>
                 </div>
                 <div id="progress-bar" class="progress-bar"></div>
             </div>
 
-            <div id="dashboard-data" class="mt-10">
-                <div class="bg-white p-6 rounded-[2rem] border border-gray-50 shadow-sm mb-8">
-                    <h3 class="text-[9px] font-bold text-gray-300 uppercase tracking-widest mb-6 text-center">Gastos por Categoria (%)</h3>
-                    <div id="container-grafico" class="space-y-4"></div>
+            <div id="dashboard-info" class="mt-12 space-y-10">
+                <div class="bg-white p-8 rounded-[2rem] border border-gray-50">
+                    <h3 class="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-8 text-center">Resumo de Gastos (%)</h3>
+                    <div id="container-grafico" class="space-y-6"></div>
                 </div>
-                
-                <h3 class="text-[9px] font-bold text-gray-300 uppercase tracking-widest mb-4 ml-2">Histórico</h3>
-                <div id="lista-mov"></div>
+                <div id="lista-movimentacoes" class="space-y-3"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let dados = JSON.parse(localStorage.getItem('finance_v6')) || [];
-        let tAtivo = null;
-
-        window.onload = render;
+        let transacoes = [];
+        let timer = null;
 
         document.getElementById('chat-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') comando(e.target.value);
+            if (e.key === 'Enter') processar(e.target.value);
         });
 
-        function comando(t) {
-            const v = (t.match(/\d+/) || [0])[0];
-            const d = t.split(' ')[0].toUpperCase();
+        function comandoRapido(t) { processar(t); }
+
+        function processar(texto) {
+            const vMatch = texto.match(/\d+/);
+            const valor = vMatch ? parseFloat(vMatch[0]) : 0;
+            const desc = texto.split(' ')[0].toUpperCase();
+
+            document.getElementById('rev-desc').value = desc;
+            document.getElementById('rev-valor').value = valor.toFixed(2);
+            document.getElementById('rev-cat').value = desc;
             
-            // CORREÇÃO: Lógica para identificar receita
-            const eReceita = (d.includes('SALARI') || d.includes('RECEB') || d.includes('PIX'));
-            const tipo = eReceita ? 'entrada' : 'saida';
-            
-            document.getElementById('rev-desc').value = d;
-            document.getElementById('rev-valor').value = parseFloat(v).toFixed(2);
-            document.getElementById('label-tipo').innerText = tipo === 'entrada' ? 'RECEITA' : 'DESPESA';
-            document.getElementById('label-tipo').className = `px-3 py-1 rounded-full text-[8px] font-bold uppercase ${tipo === 'entrada' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`;
-            
-            document.getElementById('box-entrada').classList.add('hidden');
+            document.getElementById('input-area').classList.add('hidden');
             document.getElementById('card-revisao').classList.remove('hidden');
-            startTimer();
+            document.getElementById('dashboard-info').classList.add('opacity-20');
+            
+            iniciarTimer();
+            atualizarLabel();
         }
 
-        function startTimer() {
+        function iniciarTimer() {
             const bar = document.getElementById('progress-bar');
-            bar.style.display = 'block'; bar.style.width = '100%';
+            bar.style.transition = 'none'; bar.style.width = '100%';
             setTimeout(() => { bar.style.transition = 'width 8s linear'; bar.style.width = '0%'; }, 50);
-            tAtivo = setTimeout(confirmar, 8000);
+            timer = setTimeout(confirmar, 8000);
         }
 
-        function pausar() { clearTimeout(tAtivo); document.getElementById('progress-bar').style.display = 'none'; }
+        function pararTimer() { 
+            clearTimeout(timer); 
+            document.getElementById('progress-bar').style.display = 'none'; 
+        }
 
         function confirmar() {
-            const desc = document.getElementById('rev-desc').value;
-            const valor = parseFloat(document.getElementById('rev-valor').value);
-            const tipo = document.getElementById('label-tipo').innerText === 'RECEITA' ? 'entrada' : 'saida';
-            
-            dados.push({ id: Date.now(), desc, valor, tipo });
-            localStorage.setItem('finance_v6', JSON.stringify(dados));
-            render(); cancelar();
+            const t = {
+                desc: document.getElementById('rev-desc').value,
+                valor: parseFloat(document.getElementById('rev-valor').value),
+                cat: document.getElementById('rev-cat').value,
+                fixa: document.getElementById('rev-fixa').value === 'sim'
+            };
+            transacoes.push(t);
+            renderizar();
+            cancelar();
         }
 
         function cancelar() {
-            clearTimeout(tAtivo);
+            clearTimeout(timer);
             document.getElementById('card-revisao').classList.add('hidden');
-            document.getElementById('box-entrada').classList.remove('hidden');
+            document.getElementById('input-area').classList.remove('hidden');
+            document.getElementById('dashboard-info').classList.remove('opacity-20');
             document.getElementById('chat-input').value = '';
         }
 
-        function render() {
-            const l = document.getElementById('lista-mov');
-            const g = document.getElementById('container-grafico');
-            let saldo = 0; let cats = {}; let totalGasto = 0;
-            l.innerHTML = ''; g.innerHTML = '';
+        function renderizar() {
+            const lista = document.getElementById('lista-movimentacoes');
+            const graf = document.getElementById('container-grafico');
+            let total = 0; let cats = {};
 
-            dados.slice().reverse().forEach(t => {
-                if(t.tipo === 'entrada') {
-                    saldo += t.valor;
-                } else {
-                    saldo -= t.valor;
-                    totalGasto += t.valor;
-                    cats[t.desc] = (cats[t.desc] || 0) + t.valor;
-                }
-                
-                l.innerHTML += `
-                    <div class="mov-card">
-                        <div><p class="mov-desc">${t.desc}</p><p class="text-[8px] text-gray-300 font-bold uppercase">Hoje</p></div>
-                        <p class="mov-val ${t.tipo === 'entrada' ? 'text-green-500' : 'text-red-500'}">${t.tipo === 'entrada' ? '+' : '-'} R$ ${t.valor.toFixed(2)}</p>
+            lista.innerHTML = '';
+            transacoes.forEach(t => {
+                total += t.valor;
+                cats[t.cat] = (cats[t.cat] || 0) + t.valor;
+                lista.innerHTML += `
+                    <div class="movimentacao-card">
+                        <span class="font-bold text-xs uppercase">${t.desc}</span>
+                        <span class="font-bold text-red-500">- R$ ${t.valor.toFixed(2)}</span>
                     </div>`;
             });
 
-            document.getElementById('saldo-topo').innerText = `R$ ${saldo.toFixed(2)}`;
-            document.getElementById('saldo-topo').className = `balance-val ${saldo >= 0 ? 'text-green-500' : 'text-red-500'}`;
-
-            // Renderizar gráficos apenas para gastos (Despesas)
+            document.getElementById('saldo-topo').innerText = `- R$ ${total.toFixed(2)}`;
+            
+            graf.innerHTML = '';
             for(let c in cats) {
-                const p = totalGasto > 0 ? ((cats[c]/totalGasto)*100).toFixed(1) : 0;
-                g.innerHTML += `
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-[9px] font-bold uppercase"><span>${c}</span><span>${p}%</span></div>
-                        <div class="w-full bg-gray-50 h-1 rounded-full overflow-hidden"><div class="bg-[#1d3b91] h-full" style="width:${p}%"></div></div>
+                const perc = ((cats[c]/total)*100).toFixed(1);
+                graf.innerHTML += `
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-[10px] font-bold uppercase"><span>${c}</span><span>${perc}%</span></div>
+                        <div class="w-full bg-gray-50 h-2 rounded-full"><div class="chart-bar" style="width:${perc}%"></div></div>
                     </div>`;
             }
+        }
+
+        function atualizarLabel() {
+            const v = parseFloat(document.getElementById('rev-valor').value) || 0;
+            const p = parseInt(document.getElementById('rev-parc').value) || 1;
+            document.getElementById('label-parcelas').innerText = `${p}X DE R$ ${(v/p).toFixed(2)}`;
         }
     </script>
 </body>
