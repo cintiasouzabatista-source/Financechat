@@ -1,1 +1,63 @@
+<section id="tela-saldos" class="max-w-3xl mx-auto px-4 py-8">
+    
+    <div class="flex items-center justify-between mb-8 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+        <button onclick="mudarMes(-1)" class="p-2 text-gray-400 hover:text-black">❮</button>
+        <span id="label-mes" class="font-bold text-xs uppercase tracking-widest text-[#1d3b91]">Março 2026</span>
+        <button onclick="mudarMes(1)" class="p-2 text-gray-400 hover:text-black">❯</button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="bg-white p-6 rounded-[2.5rem] border border-gray-50 shadow-sm text-center">
+            <p class="text-[10px] font-bold text-gray-300 uppercase mb-1">Entradas</p>
+            <p id="resumo-entradas" class="text-green-500 font-bold text-xl">R$ 0,00</p>
+        </div>
+        <div class="bg-white p-6 rounded-[2.5rem] border border-gray-50 shadow-sm text-center">
+            <p class="text-[10px] font-bold text-gray-300 uppercase mb-1">Saídas</p>
+            <p id="resumo-saidas" class="text-red-500 font-bold text-xl">R$ 0,00</p>
+        </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-[3rem] border border-gray-50 shadow-sm mb-8">
+        <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-8 text-center">Gastos por Categoria</h3>
+        
+        <div id="container-grafico" class="space-y-6">
+            <div class="space-y-2">
+                <div class="flex justify-between text-[10px] font-bold uppercase">
+                    <span>Alimentação</span>
+                    <span class="text-gray-400">R$ 450,00</span>
+                </div>
+                <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+                    <div class="bg-[#1d3b91] h-full transition-all duration-1000" style="width: 45%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="w-full py-5 bg-[#f4f4f4] rounded-[1.5rem] text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:bg-gray-200 transition-colors">
+        Ver Extrato Completo (PDF/CSV)
+    </button>
+</section>
+
+<script>
+    // Lógica para controle dos 12 meses e Saldos
+    let mesReferencia = new Date(2026, 2, 1); // Março 2026
+
+    function mudarMes(delta) {
+        mesReferencia.setMonth(mesReferencia.getMonth() + delta);
+        const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        document.getElementById('label-mes').innerText = `${meses[mesReferencia.getMonth()]} ${mesReferencia.getFullYear()}`;
+        
+        // Aqui você chamaria a função para recarregar os dados do banco/localStorage
+        console.log("Navegando para:", mesReferencia.getMonth());
+        
+        // Se o mês for futuro e tivermos "Contas Fixas", elas já apareceriam aqui automaticamente
+        atualizarGrafico();
+    }
+
+    function atualizarGrafico() {
+        // Exemplo de como a barra de progresso deve se comportar
+        const container = document.getElementById('container-grafico');
+        // Lógica para calcular percentuais e injetar o HTML das barras
+    }
+</script>
 
