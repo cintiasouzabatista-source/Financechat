@@ -34,7 +34,6 @@
         .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 160px; }
         .view.active { display: flex; }
 
-        /* Card com Timer e Recorrência */
         .card-mov {
             background: var(--card); border-radius: 12px; padding: 18px; position: relative;
             width: 100%; max-width: 450px; margin-bottom: 15px; border-left: 6px solid var(--accent);
@@ -75,13 +74,13 @@
             <span id="header-total" class="val-header val-saldo">R$ 0,00</span>
         </div>
         <div class="stat-group">
-            <span class="label-small">Fatura <span id="label-mes-fatura">MAIO</span></span>
+            <span class="label-small">Fatura <span id="label-mes-fatura">MARÇO</span></span>
             <span id="header-fatura" class="val-header val-fatura">R$ 0,00</span>
         </div>
     </div>
     <div class="header-actions">
         <button class="btn-zerar" onclick="zerarSistema()">🗑️ Zerar Sistema</button>
-        <div style="font-size:0.7rem; font-weight:bold; color:#666;">MAIO 2026</div>
+        <div style="font-size:0.7rem; font-weight:bold; color:#666;">07/03/2026</div>
     </div>
 </header>
 
@@ -89,15 +88,15 @@
     <div id="chat-messages"></div>
     <div id="input-wrapper">
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Ex: internet 100" onkeypress="if(event.key==='Enter') processInput()">
+            <input type="text" id="user-input" placeholder="Ex: Tv 2000 em três vezes" onkeypress="if(event.key==='Enter') processInput()">
             <button onclick="processInput()" style="background:var(--primary); border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">➔</button>
         </div>
     </div>
 </div>
 
-<div id="view-saldo" class="view"><h3>Detalhes das Contas</h3></div>
-<div id="view-resumo" class="view"><h3>Resumo</h3></div>
-<div id="view-graficos" class="view"><h3>Gráficos</h3></div>
+<div id="view-saldo" class="view"><h3>Minhas Contas</h3></div>
+<div id="view-resumo" class="view"><h3>Resumo Mensal</h3></div>
+<div id="view-graficos" class="view"><h3>Relatórios</h3></div>
 
 <nav>
     <button class="nav-item active" onclick="showView('chat', this)"><i>💬</i>Chat</button>
@@ -109,7 +108,11 @@
 <script>
     let transacoes = [];
     let saldoBase = 0; 
-    let mesAtualIndex = 4; // Maio
+
+    const extensoNumeros = {
+        "uma": 1, "duas": 2, "três": 3, "quatro": 4, "cinco": 5, "seis": 6, 
+        "sete": 7, "oito": 8, "nove": 9, "dez": 10, "onze": 11, "doze": 12
+    };
 
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
@@ -123,19 +126,15 @@
     }
 
     function capitalizeFirstLetter(string) {
+        if (!string) return "";
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     function updateUI() {
         let totalFaturaMes = 0;
         transacoes.forEach(t => {
-            if (t.confirmada) {
-                if (t.parcelas > 1) {
-                    let mesFinal = t.mesInicio + t.parcelas - 1;
-                    if (mesAtualIndex >= t.mesInicio && mesAtualIndex <= mesFinal) {
-                        totalFaturaMes += (t.valor / t.parcelas);
-                    }
-                }
+            if (t.confirmada && t.parcelas > 1) {
+                totalFaturaMes += (t.valor / t.parcelas);
             }
         });
         document.getElementById('header-total').innerText = format(saldoBase);
@@ -144,18 +143,38 @@
 
     function processInput() {
         const input = document.getElementById('user-input');
-        const text = input.value.trim();
+        let text = input.value.trim();
         if(!text) return;
+
+        // LIMPAR O INPUT IMEDIATAMENTE APÓS PEGAR O TEXTO
+        input.value = '';
 
         const valorMatch = text.match(/(\d+[\d,.]*)/);
         let valorTotal = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
+        
+        let numParcelas = 1;
         const parcelasMatch = text.toLowerCase().match(/(\d+)\s*(x|vezes)/);
-        const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
+        
+        if (parcelasMatch) {
+            numParcelas = parseInt(parcelasMatch[1]);
+        } else {
+            for (let word in extensoNumeros) {
+                if (text.toLowerCase().includes(word + " vezes")) {
+                    numParcelas = extensoNumeros[word];
+                    break;
+                }
+            }
+        }
         
         let tipo = text.toLowerCase().includes('recebi') ? 'receita' : 'despesa';
-        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '').replace(/\d+\s*(x|vezes)/gi, '').replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
         
-        let nomeFinal = nomeRaw ? capitalizeFirstLetter(nomeRaw) : "Lançamento";
+        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '')
+                          .replace(/\d+\s*(x|vezes)/gi, '')
+                          .replace(/(paguei|recebi|gastei|no|na|vezes|em|dividido)/gi, '');
+        
+        for (let word in extensoNumeros) { nomeRaw = nomeRaw.replace(word, ""); }
+        
+        let nomeFinal = capitalizeFirstLetter(nomeRaw.trim() || "Lançamento");
 
         createCard({
             id: Date.now(),
@@ -163,12 +182,10 @@
             valor: valorTotal,
             tipo: tipo,
             parcelas: numParcelas,
-            mesInicio: mesAtualIndex,
             dataRegistro: "07/03/2026",
             recorrente: false,
             confirmada: false
         });
-        input.value = '';
     }
 
     function createCard(t) {
@@ -186,22 +203,21 @@
             <div class="card-valor">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
             <div class="card-data">📅 Registro: ${t.dataRegistro}</div>
             
-            ${t.parcelas > 1 ? `<div class="card-parcela-info">💳 Parcelado: ${t.parcelas}x de R$ ${(t.valor/t.parcelas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
+            ${t.parcelas > 1 ? `<div class="card-parcela-info">💳 Parcelas: ${t.parcelas}x de R$ ${(t.valor/t.parcelas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
 
             <label class="opt-recorrente">
-                <input type="checkbox" onchange="toggleRecorrente(${cardId}, this.checked)"> 🔄 Esta despesa é recorrente?
+                <input type="checkbox" onchange="toggleRecorrente(${cardId}, this.checked)"> 🔄 Recorrente mensal?
             </label>
 
             <div id="actions-${cardId}" style="display:flex; gap:10px;">
-                <button onclick="confirmar(${cardId})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar Agora</button>
-                <button onclick="document.getElementById('${cardId}').remove()" style="background:rgba(255,255,255,0.05); border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer;">Excluir</button>
+                <button onclick="confirmar(${cardId})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar</button>
+                <button onclick="excluirCard(${cardId})" style="background:rgba(255,255,255,0.05); border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer;">Excluir</button>
             </div>
         `;
         
         container.appendChild(card);
         container.scrollTop = container.scrollHeight;
 
-        // Timer de 10 segundos
         let timeLeft = 100;
         const interval = setInterval(() => {
             timeLeft -= 1; 
@@ -209,9 +225,9 @@
             if(bar) bar.style.width = timeLeft + '%';
             if(timeLeft <= 0) {
                 clearInterval(interval);
-                confirmar(cardId, t);
+                confirmar(cardId);
             }
-        }, 100);
+        }, 100); 
         card.dataset.interval = interval;
         transacoes.push(t);
     }
@@ -221,7 +237,16 @@
         if(t) t.recorrente = checked;
     }
 
-    function confirmar(id, objManual = null) {
+    function excluirCard(id) {
+        const card = document.getElementById(id);
+        if(card) {
+            clearInterval(card.dataset.interval);
+            card.remove();
+            transacoes = transacoes.filter(t => t.id !== id);
+        }
+    }
+
+    function confirmar(id) {
         const card = document.getElementById(id);
         let t = transacoes.find(x => x.id === id);
         
@@ -240,7 +265,7 @@
         if(bar) bar.style.display = 'none';
         document.getElementById(`actions-${id}`).innerHTML = `
             <span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">
-                ✅ Confirmado ${t.recorrente ? '(Recorrente)' : ''}
+                ✅ Processado ${t.recorrente ? '(Recorrente)' : ''}
             </span>
         `;
         updateUI();
