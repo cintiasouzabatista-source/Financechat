@@ -91,7 +91,7 @@
             </div>
 
             <div class="bg-white p-8 rounded-[3rem] border border-gray-50 shadow-sm mb-10">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-10 text-center">Gastos por Categoria</h3>
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-10 text-center">Distribuição de Gastos</h3>
                 <div id="container-grafico" class="space-y-8"></div>
             </div>
 
@@ -117,7 +117,6 @@
         let autoSaveTimer = null;
         const categoriasFixas = ['ALUGUEL', 'INTERNET', 'CONDOMINIO', 'ACADEMIA'];
 
-        // Inicialização
         window.onload = () => { renderizarTudo(); };
 
         function comandoRapido(texto) { processar(texto); document.getElementById('container-entrada').classList.add('hidden'); }
@@ -181,11 +180,12 @@
             const lista = document.getElementById('lista-movimentacoes');
             const graf = document.getElementById('container-grafico');
             const saldoEl = document.getElementById('saldo-topo');
-            let saldo = 0; let cats = {};
+            let saldo = 0; let cats = {}; let totalGasto = 0;
 
             lista.innerHTML = '';
             transacoes.slice().reverse().forEach(t => {
                 saldo -= t.valor;
+                totalGasto += t.valor;
                 cats[t.cat] = (cats[t.cat] || 0) + t.valor;
                 lista.innerHTML += `
                     <div class="movimentacao-card">
@@ -201,9 +201,17 @@
             graf.innerHTML = '';
             const max = Math.max(...Object.values(cats), 1);
             for(let c in cats) {
-                const perc = (cats[c]/max)*100;
-                graf.innerHTML += `<div class="space-y-2"><div class="flex justify-between text-[10px] font-bold uppercase"><span>${c}</span><span>R$ ${cats[c].toFixed(2)}</span></div>
-                <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden"><div class="bg-[#1d3b91] h-full transition-all duration-1000" style="width: ${perc}%"></div></div></div>`;
+                const percRelativo = (cats[c]/max)*100;
+                const percAbsoluto = totalGasto > 0 ? ((cats[c]/totalGasto)*100).toFixed(1) : 0;
+                graf.innerHTML += `<div class="space-y-2">
+                    <div class="flex justify-between text-[10px] font-bold uppercase tracking-tighter">
+                        <span>${c} <span class="text-gray-300 ml-2">${percAbsoluto}%</span></span>
+                        <span class="text-[#1d3b91]">R$ ${cats[c].toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden">
+                        <div class="bg-[#1d3b91] h-full transition-all duration-1000" style="width: ${percRelativo}%"></div>
+                    </div>
+                </div>`;
             }
         }
 
