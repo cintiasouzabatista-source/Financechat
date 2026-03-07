@@ -8,7 +8,7 @@
         :root {
             --bg: #121212; --card: #1e1e1e; --text: #e0e0e0;
             --primary: #00e676; --secondary: #ff5252; --accent: #2979ff; 
-            --warning: #ffb74d; --recurring: #ba68c8;
+            --warning: #ffb74d;
         }
 
         body {
@@ -16,25 +16,25 @@
             margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        /* Header com Saldo e Fatura */
         header {
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: flex-start;
-            background: var(--card); border-bottom: 1px solid #333; z-index: 10;
+            background: var(--card); border-bottom: 1px solid #333;
         }
 
         .header-stats { display: flex; gap: 25px; }
         .stat-group { display: flex; flex-direction: column; }
         .label-small { font-size: 0.65rem; color: #888; text-transform: uppercase; font-weight: bold; }
         .val-header { font-size: 1.2rem; font-weight: bold; }
-        
         .val-saldo { color: var(--primary); }
         .val-fatura { color: var(--warning); }
 
-        /* Container de Telas */
+        /* Estilo do Seletor de Meses */
+        .month-nav { display: flex; align-items: center; gap: 10px; background: #252525; padding: 5px 12px; border-radius: 8px; border: 1px solid #444; }
+        .btn-month { background: none; border: none; color: white; cursor: pointer; font-weight: bold; padding: 5px; }
+
         .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 160px; }
         .view.active { display: flex; }
 
-        /* Card de Registro (Layout Rígido) */
         .card-mov {
             background: var(--card); border-radius: 12px; padding: 18px; position: relative;
             width: 100%; max-width: 450px; margin-bottom: 15px; border-left: 6px solid var(--accent);
@@ -44,21 +44,16 @@
         .card-mov.despesa { border-left-color: var(--secondary); }
         .card-mov.parcelado { border-left-color: var(--warning); }
 
-        .timer-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent); width: 100%; border-radius: 12px 12px 0 0; }
-
-        .card-tipo { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-        .card-nome { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; margin-bottom: 2px; }
+        .card-tipo { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+        .card-nome { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
         .card-cat { font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; display: block; }
         .card-valor { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
-        .card-data { font-size: 0.75rem; color: #666; margin-bottom: 10px; }
         .card-parcela-info { background: rgba(255, 183, 77, 0.1); color: var(--warning); padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; }
 
-        /* Input */
         #input-wrapper { position: fixed; bottom: 80px; width: 100%; padding: 0 20px; box-sizing: border-box; }
         .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 10px 18px; border-radius: 30px; border: 1px solid #333; }
         input { flex: 1; padding: 5px; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
 
-        /* Nav */
         nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; }
         .nav-item { background: none; border: none; color: #888; cursor: pointer; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item.active { color: var(--primary); }
@@ -72,21 +67,25 @@
     <div class="header-stats">
         <div class="stat-group">
             <span class="label-small">Saldo Disponível</span>
-            <span id="header-total" class="val-header val-saldo">R$ 0,00</span>
+            <span id="header-total" class="val-header val-saldo">R$ 5.200,00</span>
         </div>
         <div class="stat-group">
-            <span class="label-small">Fatura Aberta</span>
+            <span class="label-small">Fatura <span id="label-mes-fatura">MAIO</span></span>
             <span id="header-fatura" class="val-header val-fatura">R$ 0,00</span>
         </div>
     </div>
-    <div style="background:#333; padding:5px 12px; border-radius:8px; font-size:0.75rem; font-weight:bold;">MAIO 2026</div>
+    <div class="month-nav">
+        <button class="btn-month" onclick="changeMonth(-1)">❮</button>
+        <span id="display-month" style="font-size:0.75rem; font-weight:bold;">MAIO 2026</span>
+        <button class="btn-month" onclick="changeMonth(1)">❯</button>
+    </div>
 </header>
 
 <div id="view-chat" class="view active">
     <div id="chat-messages"></div>
     <div id="input-wrapper">
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Ex: TV 2000 10x" onkeypress="if(event.key==='Enter') processInput()">
+            <input type="text" id="user-input" placeholder="Ex: TV 2000 3x" onkeypress="if(event.key==='Enter') processInput()">
             <button onclick="processInput()" style="background:var(--primary); border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">➔</button>
         </div>
     </div>
@@ -104,22 +103,41 @@
 </nav>
 
 <script>
-    let saldoGeral = 5200; // Valor inicial exemplo
-    let faturaAberta = 0;
+    // Banco de Dados fictício para armazenar as transações
+    let transacoes = [];
+    let saldoBase = 5200;
+    let meses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+    let mesAtualIndex = 4; // Começa em Maio
 
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    function updateHeader() {
-        document.getElementById('header-total').innerText = format(saldoGeral);
-        document.getElementById('header-fatura').innerText = format(faturaAberta);
+    function changeMonth(delta) {
+        mesAtualIndex = (mesAtualIndex + delta + 12) % 12;
+        updateUI();
     }
 
-    function showView(viewId, btn) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + viewId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('input-wrapper').style.display = (viewId === 'chat') ? 'block' : 'none';
+    function updateUI() {
+        const nomeMes = meses[mesAtualIndex];
+        document.getElementById('display-month').innerText = `${nomeMes} 2026`;
+        document.getElementById('label-mes-fatura').innerText = nomeMes;
+
+        // Calcular Fatura do Mês Selecionado
+        let totalFaturaMes = 0;
+        transacoes.forEach(t => {
+            if (t.parcelas > 1) {
+                // Verifica se o mês selecionado está dentro do range das parcelas
+                let mesFinal = t.mesInicio + t.parcelas - 1;
+                if (mesAtualIndex >= t.mesInicio && mesAtualIndex <= mesFinal) {
+                    totalFaturaMes += (t.valor / t.parcelas);
+                }
+            }
+        });
+
+        document.getElementById('header-total').innerText = format(saldoBase);
+        document.getElementById('header-fatura').innerText = format(totalFaturaMes);
+        
+        // Filtrar cards do chat pelo mês (opcional, para visualização rápida)
+        renderizarCards();
     }
 
     function processInput() {
@@ -134,81 +152,78 @@
         
         let tipo = text.toLowerCase().includes('recebi') ? 'receita' : 'despesa';
         let nome = text.replace(valorMatch ? valorMatch[0] : '', '').replace(/\d+\s*(x|vezes)/gi, '').replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
-        
-        // Categorização simples
-        let categoria = "GERAL";
-        if(text.toLowerCase().includes("uber")) categoria = "TRANSPORTE";
-        if(text.toLowerCase().includes("tv")) categoria = "ELETRÔNICOS";
 
-        createCard(tipo, nome || "Lançamento", categoria, valorTotal, numParcelas);
+        const novaTransacao = {
+            id: Date.now(),
+            nome: nome || "Lançamento",
+            valor: valorTotal,
+            tipo: tipo,
+            parcelas: numParcelas,
+            mesInicio: mesAtualIndex,
+            confirmada: false,
+            categoria: text.toLowerCase().includes("tv") ? "ELETRÔNICOS" : "GERAL"
+        };
+
+        transacoes.push(novaTransacao);
+        renderizarCards();
         input.value = '';
     }
 
-    function createCard(tipo, nome, categoria, valor, parcelas) {
+    function renderizarCards() {
         const container = document.getElementById('chat-messages');
-        const cardId = 'card-' + Date.now();
-        const dataStr = new Date().toLocaleDateString('pt-BR');
-        const vParcela = valor / parcelas;
-
-        const card = document.createElement('div');
-        card.className = `card-mov ${parcelas > 1 ? 'parcelado' : tipo}`;
-        card.id = cardId;
-
-        card.innerHTML = `
-            <div class="timer-bar" id="bar-${cardId}"></div>
-            <div class="card-tipo">${tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
-            <span class="card-nome">${nome}</span>
-            <span class="card-cat">📂 ${categoria}</span>
-            <div class="card-valor">R$ ${valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-            <div class="card-data">📅 Registro: ${dataStr}</div>
+        container.innerHTML = '';
+        
+        transacoes.forEach(t => {
+            const card = document.createElement('div');
+            card.className = `card-mov ${t.parcelas > 1 ? 'parcelado' : t.tipo}`;
             
-            ${parcelas > 1 ? `
-                <div class="card-parcela-info">
-                    💳 Parcelado: ${parcelas}x de R$ ${vParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+            const valorExibido = t.parcelas > 1 ? (t.valor / t.parcelas) : t.valor;
+            const statusLabel = t.confirmada ? "✅ Registro Processado" : "⏳ Aguardando Confirmação";
+
+            card.innerHTML = `
+                <div class="card-tipo">${t.tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
+                <span class="card-nome">${t.nome}</span>
+                <span class="card-cat">📂 ${t.categoria}</span>
+                <div class="card-valor">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                
+                ${t.parcelas > 1 ? `
+                    <div class="card-parcela-info">
+                        💳 Parcela neste mês: R$ ${valorExibido.toLocaleString('pt-BR', {minimumFractionDigits: 2})} 
+                        (${t.parcelas}x)
+                    </div>
+                ` : ''}
+
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    ${!t.confirmada ? `<button onclick="confirmar(${t.id})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar</button>` : `<span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">${statusLabel}</span>`}
                 </div>
-            ` : ''}
-
-            <div id="actions-${cardId}" style="margin-top:15px; display:flex; gap:10px;">
-                <button onclick="confirmar('${cardId}', ${valor}, '${tipo}', ${parcelas})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar</button>
-                <button onclick="document.getElementById('${cardId}').remove()" style="background:rgba(255,255,255,0.05); border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer;">Excluir</button>
-            </div>
-        `;
-
-        container.appendChild(card);
+            `;
+            container.appendChild(card);
+        });
         container.scrollTop = container.scrollHeight;
-
-        let timeLeft = 100;
-        const interval = setInterval(() => {
-            timeLeft -= 1.25;
-            if(document.getElementById(`bar-${cardId}`)) document.getElementById(`bar-${cardId}`).style.width = timeLeft + '%';
-            if(timeLeft <= 0) { clearInterval(interval); confirmar(cardId, valor, tipo, parcelas); }
-        }, 100);
-        card.dataset.interval = interval;
     }
 
-    function confirmar(id, valor, tipo, parcelas) {
-        const card = document.getElementById(id);
-        if(!card || card.dataset.confirmado) return;
-        clearInterval(card.dataset.interval);
-        card.dataset.confirmado = "true";
+    function confirmar(id) {
+        let t = transacoes.find(x => x.id === id);
+        if(!t || t.confirmada) return;
 
-        // Lógica de Saldo vs Fatura
-        if(tipo === 'receita') {
-            saldoGeral += valor;
-        } else {
-            if(parcelas > 1) {
-                faturaAberta += valor; // Vai para o cartão
-            } else {
-                saldoGeral -= valor; // Sai do banco na hora
-            }
+        t.confirmada = true;
+        if(t.tipo === 'receita') {
+            saldoBase += t.valor;
+        } else if (t.parcelas === 1) {
+            saldoBase -= t.valor;
         }
-
-        if(document.getElementById(`bar-${id}`)) document.getElementById(`bar-${id}`).style.display = 'none';
-        document.getElementById(`actions-${id}`).innerHTML = "<span style='color:var(--primary); font-size:0.85rem; font-weight:bold;'>✅ Registro Processado</span>";
-        updateHeader();
+        // Se for parcelado, a lógica de somar na fatura já está no updateUI()
+        updateUI();
     }
 
-    updateHeader();
+    function showView(viewId, btn) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    updateUI();
 </script>
 </body>
 </html>
