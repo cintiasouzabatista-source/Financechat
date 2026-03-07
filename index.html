@@ -457,6 +457,32 @@ body.dark .msg.me{
   }
 }
 
+
+.contaCell{
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:500;
+}
+.bankIcon{
+font-size:18px;
+}
+.actionIcons{
+display:flex;
+gap:6px;
+justify-content:flex-end;
+}
+.iconBtn{
+border:none;
+background:transparent;
+cursor:pointer;
+font-size:16px;
+}
+.deleteConta{
+color:#ef4444;
+font-weight:bold;
+}
+
 </style>
 </head>
 
@@ -621,6 +647,12 @@ body.dark .msg.me{
           <div class="row">
             <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Mercado Pago, Nubank..." /></div>
             <div><label for="apelidoConta">Apelidos (vírgula)</label><input id="apelidoConta" placeholder="Ex: mp, mercadopago, roxinho" /></div>
+<div><label for="saldoConta">Saldo inicial</label><input id="saldoConta" placeholder="Ex: 1200" /></div>
+<div style="display:flex;align-items:end">
+<label style="display:flex;gap:6px;align-items:center">
+<input type="checkbox" id="contaPadrao">Conta padrão
+</label>
+</div>
           </div>
           <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
           <div class="divider"></div>
@@ -1243,6 +1275,8 @@ function handleChatReply(msg){
   }
 
   if(!draft.ref){
+const contaPadrao = (data.contas||[]).find(c=>c.padrao);
+if(contaPadrao){ draft.ref = contaPadrao.name; }
     if(draft.meio==="Cartão"){
       const c = findByAlias(data.cartoes||[], msg) || findByAlias(data.contas||[], msg);
       if(c){ draft.ref = c; draft.cicloFatura = computeBillCycle(draft.ref, draft.data); }
@@ -1444,7 +1478,7 @@ function renderContas(){
   for(let i=0;i<data.contas.length;i++){
     const c = data.contas[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td class="contaCell"><span class="bankIcon">${c.icon || "🏦"}</span>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><div class="actionIcons"><button class="iconBtn editConta">✏️</button><button class="iconBtn deleteConta" data-del-conta="${i}">✖</button></div></td>`;
     tb.appendChild(tr);
   }
   const tb2 = $("tbodyCartoes"); tb2.innerHTML="";
@@ -1452,7 +1486,7 @@ function renderContas(){
   for(let i=0;i<data.cartoes.length;i++){
     const c = data.cartoes[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.fechamento)}</td><td>${escapeHtml(c.pagamento)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td class="contaCell"><span class="bankIcon">${c.icon || "🏦"}</span>${escapeHtml(c.name)}</td><td>${escapeHtml(c.fechamento)}</td><td>${escapeHtml(c.pagamento)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
     tb2.appendChild(tr);
   }
 }
@@ -1502,7 +1536,10 @@ $("btnAddConta").addEventListener("click", ()=>{
   if(!name){ toast("Digite o nome"); return; }
   data.contas = data.contas || [];
   if(data.contas.some(x=>normalize(x.name)===normalize(name))){ toast("Conta já existe"); return; }
-  data.contas.unshift({ name, aliases });
+  const saldoInicial = parseFloat($("saldoConta").value) || 0;
+const padrao = $("contaPadrao").checked;
+if(padrao){ data.contas.forEach(c=>c.padrao=false); }
+data.contas.unshift({ name, aliases, saldoInicial, padrao, icon:"🏦" });
   $("novaConta").value=""; $("apelidoConta").value="";
   persist("add_conta"); renderContas(); toast("Conta adicionada");
 });
