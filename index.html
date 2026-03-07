@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finanças Chat AI</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --bg: #121212;
@@ -14,7 +13,7 @@
             --secondary: #ff5252;
             --accent: #2979ff; 
             --warning: #ffb74d; 
-            --recurring: #ba68c8; /* Roxo para recorrentes */
+            --recurring: #ba68c8;
         }
 
         body {
@@ -46,17 +45,17 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding-bottom: 100px;
+            gap: 15px;
+            padding-bottom: 120px;
         }
 
         .card-mov {
             background: var(--card);
-            border-radius: 15px;
-            padding: 18px;
+            border-radius: 12px;
+            padding: 15px;
             position: relative;
-            width: 90%;
-            max-width: 400px;
+            width: 95%;
+            max-width: 450px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border-left: 6px solid var(--accent);
             animation: slideIn 0.3s ease-out;
@@ -70,42 +69,50 @@
         .timer-bar {
             position: absolute;
             top: 0; left: 0;
-            height: 4px;
+            height: 3px;
             background: var(--accent);
             width: 100%;
-            border-radius: 15px 15px 0 0;
+            border-radius: 12px 12px 0 0;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.85rem;
-            color: #aaa;
+            font-size: 0.75rem;
+            color: #888;
             text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
-        .val-destaque { font-size: 1.3rem; font-weight: bold; color: #fff; margin: 10px 0; }
+        .despesa-nome {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+            display: block;
+        }
 
-        .actions { margin-top: 15px; display: flex; gap: 10px; }
+        .val-destaque { font-size: 1.4rem; font-weight: bold; color: var(--text); }
+
+        .actions { margin-top: 12px; display: flex; gap: 8px; }
         .btn-action {
             flex: 1;
-            padding: 10px;
+            padding: 8px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.8rem;
         }
         .btn-edit { background: #333; color: white; }
-        .btn-del { background: rgba(255, 82, 82, 0.15); color: var(--secondary); }
-        .btn-recorrente { background: rgba(186, 104, 200, 0.2); color: var(--recurring); border: 1px solid var(--recurring); }
+        .btn-del { background: rgba(255, 82, 82, 0.1); color: var(--secondary); border: 1px solid rgba(255, 82, 82, 0.2); }
 
         .input-wrapper { position: fixed; bottom: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, var(--bg) 40%); box-sizing: border-box; }
         .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 8px 15px; border-radius: 30px; border: 1px solid #333; }
         input { flex: 1; padding: 10px; border: none; background: transparent; color: white; outline: none; }
         .btn-send { background: var(--primary); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } }
     </style>
 </head>
 <body>
@@ -121,8 +128,8 @@
 
 <div id="chat-container">
     <div class="card-mov" style="border-left-color: #555;">
-        <p>👋 <strong>Dica de hoje:</strong></p>
-        <p style="font-size: 0.9rem; color: #aaa;">Para contas fixas, diga: "Paguei internet 100 reais <b>todo mês</b>". Eu já agendo para os próximos meses!</p>
+        <span class="despesa-nome">Assistente de Finanças</span>
+        <p style="font-size: 0.9rem; color: #aaa; margin: 0;">Ex: "Paguei <b>Energia Elétrica Residencia</b> 250 no Nubank todo mês"</p>
     </div>
 </div>
 
@@ -144,22 +151,32 @@
     function createCard(text) {
         const container = document.getElementById('chat-container');
         const cardId = 'card-' + Date.now();
+        const textoOriginal = text;
         const textoLimpo = text.toLowerCase();
         
-        // Extração de dados
+        // 1. Extração de Valor
         const valorMatch = text.match(/(\d+[\d,.]*)/);
         let valorTotal = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
+        
+        // 2. Extração de Nome da Despesa (Remove valor, parcelas e comandos)
+        let nomeDespesa = textoOriginal
+            .replace(valorMatch ? valorMatch[0] : '', '')
+            .replace(/\d+\s*(x|vezes)/gi, '')
+            .replace(/(paguei|gastei|recebi|no|na|com|todo mês|mensal|fixa)/gi, '')
+            .trim();
+        
+        if(!nomeDespesa) nomeDespesa = "Movimentação Geral";
+
+        // 3. Categorização Inteligente
+        let categoria = "Geral";
+        if(textoLimpo.includes("energia") || textoLimpo.includes("luz") || textoLimpo.includes("água") || textoLimpo.includes("internet")) categoria = "Contas Fixas";
+        if(textoLimpo.includes("residencia") || textoLimpo.includes("casa")) categoria += " / Residência";
+        if(textoLimpo.includes("mercado") || textoLimpo.includes("comida")) categoria = "Alimentação";
+
         const parcelasMatch = textoLimpo.match(/(\d+)\s*(x|vezes)/);
         const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
-        
-        // Lógica de Recorrência
-        const ehRecorrente = textoLimpo.includes("todo mês") || textoLimpo.includes("mensal") || textoLimpo.includes("fixa");
-        
+        const ehRecorrente = textoLimpo.includes("todo mês") || textoLimpo.includes("mensal");
         let conta = textoLimpo.includes("inter") ? "Banco Inter" : (textoLimpo.includes("nubank") ? "Nubank" : "Carteira");
-        let categoria = "Geral";
-        if(textoLimpo.includes("internet") || textoLimpo.includes("net")) categoria = "Contas Fixas";
-        if(textoLimpo.includes("aluguel")) categoria = "Moradia";
-        if(textoLimpo.includes("academia")) categoria = "Saúde";
 
         const card = document.createElement('div');
         card.className = `card-mov ${ehRecorrente ? 'recorrente' : (numParcelas > 1 ? 'parcelado' : 'despesa')}`;
@@ -171,15 +188,16 @@
                 <span>📂 ${categoria}</span>
                 <span>💳 ${conta}</span>
             </div>
+            <span class="despesa-nome">${nomeDespesa}</span>
             <div class="card-body">
                 <div class="val-destaque">R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-                ${ehRecorrente ? `<p style="color: var(--recurring)">🔄 <b>Conta Recorrente:</b> Lançada para todos os meses.</p>` : 
-                  (numParcelas > 1 ? `<p>🔹 ${numParcelas}x de R$ ${(valorTotal/numParcelas).toFixed(2).replace('.',',')}</p>` : `<p>🔹 Pagamento à vista</p>`)}
-                
-                <p style="font-size: 0.8rem; color: #888;">📅 Registro: ${new Date().toLocaleDateString('pt-BR')}</p>
+                <div style="font-size: 0.85rem; margin-top: 5px;">
+                    ${ehRecorrente ? `<span style="color: var(--recurring)">🔄 Recorrente Mensal</span>` : 
+                      (numParcelas > 1 ? `<span>🔹 ${numParcelas}x de R$ ${(valorTotal/numParcelas).toFixed(2).replace('.',',')}</span>` : `<span>🔹 Pagamento à vista</span>`)}
+                </div>
+                <p style="font-size: 0.75rem; color: #666; margin-top: 8px;">📅 Registro: ${new Date().toLocaleDateString('pt-BR')}</p>
             </div>
             <div class="actions" id="actions-${cardId}">
-                ${(!ehRecorrente && categoria === "Geral") ? `<button class="btn-action btn-recorrente" onclick="setRecorrente('${cardId}')">Tornar Fixo? 🔄</button>` : ''}
                 <button class="btn-action btn-edit" onclick="document.getElementById('${cardId}').remove()">✏️ Editar</button>
                 <button class="btn-action btn-del" onclick="document.getElementById('${cardId}').remove()">🗑️ Excluir</button>
             </div>
@@ -196,18 +214,10 @@
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 bar.style.display = 'none';
-                document.getElementById(`actions-${cardId}`).innerHTML = "<span style='color: var(--primary); font-size: 0.85rem;'>✅ Confirmado</span>";
+                document.getElementById(`actions-${cardId}`).innerHTML = "<span style='color: var(--primary); font-size: 0.8rem;'>✅ Confirmado</span>";
             }
         }, 100);
         card.dataset.interval = interval;
-    }
-
-    function setRecorrente(id) {
-        const card = document.getElementById(id);
-        clearInterval(card.dataset.interval); // Para o timer para o usuário ver a mudança
-        card.className = "card-mov recorrente";
-        card.querySelector('.card-body').innerHTML += `<p style="color: var(--recurring)">🔄 Alterado para recorrente!</p>`;
-        document.getElementById(`actions-${id}`).innerHTML = "<span style='color: var(--primary); font-size: 0.85rem;'>✅ Salvo como Conta Fixa</span>";
     }
 </script>
 </body>
