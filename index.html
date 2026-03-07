@@ -16,53 +16,61 @@
             margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
+        /* Header Compacto */
         header {
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
             background: var(--card); border-bottom: 1px solid #333; z-index: 10;
         }
-
-        .header-stats { display: flex; gap: 20px; }
+        .header-stats { display: flex; gap: 15px; }
         .stat-group { display: flex; flex-direction: column; }
-        .label-small { font-size: 0.6rem; color: #888; text-transform: uppercase; font-weight: bold; }
-        .val-header { font-size: 1.1rem; font-weight: bold; }
+        .label-small { font-size: 0.55rem; color: #888; text-transform: uppercase; font-weight: bold; }
+        .val-header { font-size: 0.95rem; font-weight: bold; }
         .val-saldo { color: var(--primary); }
         .val-fatura { color: var(--warning); }
+        .btn-zerar { background: none; border: 1px solid #444; color: #666; font-size: 0.5rem; padding: 2px 5px; border-radius: 4px; cursor: pointer; }
 
-        .header-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .btn-zerar { background: rgba(255, 82, 82, 0.1); border: 1px solid var(--secondary); color: var(--secondary); font-size: 0.6rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
-
-        .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 160px; }
+        .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 12px; padding-bottom: 140px; }
         .view.active { display: flex; }
 
+        /* Card Mobile Reduzido */
         .card-mov {
-            background: var(--card); border-radius: 12px; padding: 18px; position: relative;
-            width: 100%; max-width: 450px; margin-bottom: 15px; border-left: 6px solid var(--accent);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;
+            background: var(--card); border-radius: 10px; padding: 12px; position: relative;
+            width: 100%; max-width: 100%; margin-bottom: 10px; border-left: 4px solid var(--accent);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;
         }
         .card-mov.receita { border-left-color: var(--primary); }
         .card-mov.despesa { border-left-color: var(--secondary); }
         .card-mov.parcelado { border-left-color: var(--warning); }
 
-        .timer-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent); width: 100%; border-radius: 12px 12px 0 0; transition: width 0.1s linear; }
+        .timer-bar { position: absolute; top: 0; left: 0; height: 2px; background: var(--accent); width: 100%; border-radius: 10px 10px 0 0; }
 
-        .card-tipo { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 4px; }
-        .card-nome { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
-        .card-cat { font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; display: block; }
-        .card-valor { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
-        .card-data { font-size: 0.75rem; color: #666; margin-bottom: 10px; }
+        .card-row-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .card-tipo { font-size: 0.6rem; font-weight: bold; color: #888; text-transform: uppercase; }
+        .card-data { font-size: 0.6rem; color: #555; }
         
-        .opt-recorrente { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-bottom: 15px; color: var(--recurring); cursor: pointer; font-weight: bold; }
-        .card-parcela-info { background: rgba(255, 183, 77, 0.1); color: var(--warning); padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; }
+        .card-nome { font-size: 1rem; font-weight: bold; color: #fff; display: block; margin-bottom: 2px; }
+        .card-valor { font-size: 1.2rem; font-weight: bold; margin-bottom: 6px; }
+        
+        /* Estilo Recorrente Visível */
+        .btn-recorrente { 
+            background: #252525; border: 1px solid #444; color: #888; 
+            padding: 4px 8px; border-radius: 20px; font-size: 0.65rem; 
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            margin-bottom: 8px; transition: 0.2s;
+        }
+        .btn-recorrente.active { background: rgba(186, 104, 200, 0.2); border-color: var(--recurring); color: var(--recurring); }
 
-        #input-wrapper { position: fixed; bottom: 80px; width: 100%; padding: 0 20px; box-sizing: border-box; }
-        .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 10px 18px; border-radius: 30px; border: 1px solid #333; }
-        input { flex: 1; padding: 5px; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
+        .card-parcela-info { font-size: 0.75rem; color: var(--warning); font-weight: bold; margin-bottom: 8px; border-top: 1px solid #333; padding-top: 5px; }
 
-        nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; }
-        .nav-item { background: none; border: none; color: #888; cursor: pointer; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        #input-wrapper { position: fixed; bottom: 70px; width: 100%; padding: 0 15px; box-sizing: border-box; }
+        .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 8px; background: #252525; padding: 8px 15px; border-radius: 25px; border: 1px solid #333; }
+        input { flex: 1; padding: 4px; border: none; background: transparent; color: white; outline: none; font-size: 0.95rem; }
+
+        nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; }
+        .nav-item { background: none; border: none; color: #888; cursor: pointer; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 3px; }
         .nav-item.active { color: var(--primary); }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } }
     </style>
 </head>
 <body>
@@ -70,17 +78,17 @@
 <header>
     <div class="header-stats">
         <div class="stat-group">
-            <span class="label-small">Saldo Disponível</span>
+            <span class="label-small">Saldo</span>
             <span id="header-total" class="val-header val-saldo">R$ 0,00</span>
         </div>
         <div class="stat-group">
-            <span class="label-small">Fatura <span id="label-mes-fatura">MARÇO</span></span>
+            <span class="label-small">Fatura</span>
             <span id="header-fatura" class="val-header val-fatura">R$ 0,00</span>
         </div>
     </div>
-    <div class="header-actions">
-        <button class="btn-zerar" onclick="zerarSistema()">🗑️ Zerar Sistema</button>
-        <div style="font-size:0.7rem; font-weight:bold; color:#666;">07/03/2026</div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end;">
+        <span style="font-size:0.6rem; color:#666; font-weight:bold;">07/03/2026</span>
+        <button class="btn-zerar" onclick="zerarSistema()">ZERAR</button>
     </div>
 </header>
 
@@ -88,130 +96,76 @@
     <div id="chat-messages"></div>
     <div id="input-wrapper">
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Ex: Tv 2000 em três vezes" onkeypress="if(event.key==='Enter') processInput()">
-            <button onclick="processInput()" style="background:var(--primary); border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">➔</button>
+            <input type="text" id="user-input" placeholder="Tv 2000 em 10x" onkeypress="if(event.key==='Enter') processInput()">
+            <button onclick="processInput()" style="background:var(--primary); border:none; border-radius:50%; width:32px; height:32px; cursor:pointer;">➔</button>
         </div>
     </div>
 </div>
 
-<div id="view-saldo" class="view"><h3>Minhas Contas</h3></div>
-<div id="view-resumo" class="view"><h3>Resumo Mensal</h3></div>
-<div id="view-graficos" class="view"><h3>Relatórios</h3></div>
-
 <nav>
     <button class="nav-item active" onclick="showView('chat', this)"><i>💬</i>Chat</button>
-    <button class="nav-item" onclick="showView('saldo', this)"><i>💳</i>Saldos</button>
+    <button class="nav-item" onclick="showView('saldo', this)"><i>💳</i>Contas</button>
     <button class="nav-item" onclick="showView('resumo', this)"><i>📈</i>Resumo</button>
-    <button class="nav-item" onclick="showView('graficos', this)"><i>📊</i>Gráficos</button>
 </nav>
 
 <script>
     let transacoes = [];
     let saldoBase = 0; 
-
-    const extensoNumeros = {
-        "uma": 1, "duas": 2, "três": 3, "quatro": 4, "cinco": 5, "seis": 6, 
-        "sete": 7, "oito": 8, "nove": 9, "dez": 10, "onze": 11, "doze": 12
-    };
+    const extensoNumeros = {"uma":1,"duas":2,"três":3,"quatro":4,"cinco":5,"seis":6,"sete":7,"oito":8,"nove":9,"dez":10,"onze":11,"doze":12};
 
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-
-    function zerarSistema() {
-        if(confirm("Deseja limpar todos os dados e zerar o saldo?")) {
-            transacoes = [];
-            saldoBase = 0;
-            document.getElementById('chat-messages').innerHTML = "";
-            updateUI();
-        }
-    }
-
-    function capitalizeFirstLetter(string) {
-        if (!string) return "";
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
+    function zerarSistema() { if(confirm("Zerar tudo?")) { transacoes = []; saldoBase = 0; document.getElementById('chat-messages').innerHTML = ""; updateUI(); } }
+    function capitalizeFirstLetter(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
     function updateUI() {
-        let totalFaturaMes = 0;
-        transacoes.forEach(t => {
-            if (t.confirmada && t.parcelas > 1) {
-                totalFaturaMes += (t.valor / t.parcelas);
-            }
-        });
+        let fatura = 0;
+        transacoes.forEach(t => { if (t.confirmada && t.parcelas > 1) fatura += (t.valor / t.parcelas); });
         document.getElementById('header-total').innerText = format(saldoBase);
-        document.getElementById('header-fatura').innerText = format(totalFaturaMes);
+        document.getElementById('header-fatura').innerText = format(fatura);
     }
 
     function processInput() {
         const input = document.getElementById('user-input');
         let text = input.value.trim();
         if(!text) return;
-
-        // LIMPAR O INPUT IMEDIATAMENTE APÓS PEGAR O TEXTO
         input.value = '';
 
         const valorMatch = text.match(/(\d+[\d,.]*)/);
-        let valorTotal = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
-        
-        let numParcelas = 1;
-        const parcelasMatch = text.toLowerCase().match(/(\d+)\s*(x|vezes)/);
-        
-        if (parcelasMatch) {
-            numParcelas = parseInt(parcelasMatch[1]);
-        } else {
-            for (let word in extensoNumeros) {
-                if (text.toLowerCase().includes(word + " vezes")) {
-                    numParcelas = extensoNumeros[word];
-                    break;
-                }
-            }
-        }
+        let valor = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
+        let parcelas = 1;
+        const pMatch = text.toLowerCase().match(/(\d+)\s*(x|vezes)/);
+        if (pMatch) parcelas = parseInt(pMatch[1]);
+        else { for(let w in extensoNumeros) { if(text.toLowerCase().includes(w + " vezes")) parcelas = extensoNumeros[w]; } }
         
         let tipo = text.toLowerCase().includes('recebi') ? 'receita' : 'despesa';
+        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '').replace(/\d+\s*(x|vezes)/gi, '').replace(/(paguei|recebi|gastei|no|na|vezes|em|dividido)/gi, '');
+        for(let w in extensoNumeros) nomeRaw = nomeRaw.replace(w, "");
         
-        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '')
-                          .replace(/\d+\s*(x|vezes)/gi, '')
-                          .replace(/(paguei|recebi|gastei|no|na|vezes|em|dividido)/gi, '');
-        
-        for (let word in extensoNumeros) { nomeRaw = nomeRaw.replace(word, ""); }
-        
-        let nomeFinal = capitalizeFirstLetter(nomeRaw.trim() || "Lançamento");
-
-        createCard({
-            id: Date.now(),
-            nome: nomeFinal,
-            valor: valorTotal,
-            tipo: tipo,
-            parcelas: numParcelas,
-            dataRegistro: "07/03/2026",
-            recorrente: false,
-            confirmada: false
-        });
+        createCard({ id: Date.now(), nome: capitalizeFirstLetter(nomeRaw.trim() || "Lançamento"), valor, tipo, parcelas, data: "07/03/2026", recorrente: false, confirmada: false });
     }
 
     function createCard(t) {
         const container = document.getElementById('chat-messages');
-        const cardId = t.id;
         const card = document.createElement('div');
         card.className = `card-mov ${t.parcelas > 1 ? 'parcelado' : t.tipo}`;
-        card.id = cardId;
+        card.id = t.id;
 
         card.innerHTML = `
-            <div class="timer-bar" id="bar-${cardId}"></div>
-            <div class="card-tipo">${t.tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
+            <div class="timer-bar" id="bar-${t.id}"></div>
+            <div class="card-row-top">
+                <span class="card-tipo">${t.tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</span>
+                <span class="card-data">${t.data}</span>
+            </div>
             <span class="card-nome">${t.nome}</span>
-            <span class="card-cat">📂 GERAL</span>
             <div class="card-valor">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-            <div class="card-data">📅 Registro: ${t.dataRegistro}</div>
             
-            ${t.parcelas > 1 ? `<div class="card-parcela-info">💳 Parcelas: ${t.parcelas}x de R$ ${(t.valor/t.parcelas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
+            ${t.parcelas > 1 ? `<div class="card-parcela-info">💳 ${t.parcelas}x de R$ ${(t.valor/t.parcelas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
 
-            <label class="opt-recorrente">
-                <input type="checkbox" onchange="toggleRecorrente(${cardId}, this.checked)"> 🔄 Recorrente mensal?
-            </label>
+            <button class="btn-recorrente" onclick="toggleRec(this, ${t.id})">🔄 Recorrente?</button>
 
-            <div id="actions-${cardId}" style="display:flex; gap:10px;">
-                <button onclick="confirmar(${cardId})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar</button>
-                <button onclick="excluirCard(${cardId})" style="background:rgba(255,255,255,0.05); border:1px solid #444; color:#aaa; padding:10px; border-radius:8px; cursor:pointer;">Excluir</button>
+            <div id="actions-${t.id}" style="display:flex; gap:8px;">
+                <button onclick="confirmar(${t.id})" style="background:var(--primary); border:none; padding:8px; border-radius:6px; cursor:pointer; font-weight:bold; flex:2; font-size:0.75rem;">Confirmar</button>
+                <button onclick="excluirCard(${t.id})" style="background:#252525; border:1px solid #444; color:#888; padding:8px; border-radius:6px; flex:1; font-size:0.75rem;">Excluir</button>
             </div>
         `;
         
@@ -220,54 +174,41 @@
 
         let timeLeft = 100;
         const interval = setInterval(() => {
-            timeLeft -= 1; 
-            const bar = document.getElementById(`bar-${cardId}`);
+            timeLeft -= 1.5; 
+            const bar = document.getElementById(`bar-${t.id}`);
             if(bar) bar.style.width = timeLeft + '%';
-            if(timeLeft <= 0) {
-                clearInterval(interval);
-                confirmar(cardId);
-            }
-        }, 100); 
+            if(timeLeft <= 0) { clearInterval(interval); confirmar(t.id); }
+        }, 150); 
         card.dataset.interval = interval;
         transacoes.push(t);
     }
 
-    function toggleRecorrente(id, checked) {
+    function toggleRec(btn, id) {
         let t = transacoes.find(x => x.id === id);
-        if(t) t.recorrente = checked;
+        if(t) {
+            t.recorrente = !t.recorrente;
+            btn.classList.toggle('active');
+            btn.innerHTML = t.recorrente ? "✅ Recorrente" : "🔄 Recorrente?";
+        }
     }
 
     function excluirCard(id) {
         const card = document.getElementById(id);
-        if(card) {
-            clearInterval(card.dataset.interval);
-            card.remove();
-            transacoes = transacoes.filter(t => t.id !== id);
-        }
+        if(card) { clearInterval(card.dataset.interval); card.remove(); transacoes = transacoes.filter(t => t.id !== id); }
     }
 
     function confirmar(id) {
         const card = document.getElementById(id);
         let t = transacoes.find(x => x.id === id);
-        
         if(!t || t.confirmada) return;
-        
         clearInterval(card.dataset.interval);
         t.confirmada = true;
-
-        if(t.tipo === 'receita') {
-            saldoBase += t.valor;
-        } else if (t.parcelas === 1) {
-            saldoBase -= t.valor;
-        }
-
+        if(t.tipo === 'receita') saldoBase += t.valor;
+        else if (t.parcelas === 1) saldoBase -= t.valor;
+        
         const bar = document.getElementById(`bar-${id}`);
         if(bar) bar.style.display = 'none';
-        document.getElementById(`actions-${id}`).innerHTML = `
-            <span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">
-                ✅ Processado ${t.recorrente ? '(Recorrente)' : ''}
-            </span>
-        `;
+        document.getElementById(`actions-${id}`).innerHTML = `<span style="color:var(--primary); font-size:0.7rem; font-weight:bold;">✅ Efivado ${t.recorrente ? '(Recorrente)' : ''}</span>`;
         updateUI();
     }
 
