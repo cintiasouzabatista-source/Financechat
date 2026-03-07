@@ -432,133 +432,29 @@ body.dark .msg.me{
 }
 
 
-/* Transações simples */
-#tab-transacoes .txSimpleActions{display:flex;gap:8px;flex-wrap:wrap}
-#tab-transacoes .txSimpleActions .btn{width:auto}
-@media (max-width:760px){
-  #tab-transacoes th,#tab-transacoes td{padding:8px 6px;font-size:12px}
-  #tab-transacoes .txSimpleActions{flex-direction:column}
-  #tab-transacoes .txSimpleActions .btn{width:100%}
-}
-
-
-.monthNav{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:8px;
-  align-items:center;
-}
-.monthDisplay{
-  border:1px solid var(--stroke);
-  background:var(--panel);
-  color:var(--text);
-  border-radius:14px;
-  padding:12px;
-  min-height:46px;
-  display:flex;
-  align-items:center;
-}
-.monthBtn{
-  width:auto;
-  min-width:46px;
-  height:46px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 12px;
-}
-
-
-#tab-config .panelbox .title{margin-bottom:8px}
-#tab-config .panelbox .k{margin-bottom:4px}
-
-
-/* ===== Visual profissional ===== */
-:root{
-  --bg-grad: radial-gradient(circle at top left, rgba(16,185,129,.08), transparent 26%),
-             radial-gradient(circle at top right, rgba(59,130,246,.08), transparent 24%);
-}
-body{ background: var(--bg-grad), var(--bg); }
-body.dark{
-  --bg-grad: radial-gradient(circle at top left, rgba(52,211,153,.08), transparent 26%),
-             radial-gradient(circle at top right, rgba(96,165,250,.08), transparent 24%);
-}
-.sidebar{ padding:18px 16px; }
-.brand{ margin-bottom:8px; }
-.brand .logo{ width:40px;height:40px;border-radius:14px; box-shadow:0 8px 20px rgba(16,185,129,.15); }
-.nav{ gap:8px; }
-.nav button{ padding:12px 12px; border-radius:16px; transition:.18s ease; position:relative; }
-.nav button.active{ box-shadow: inset 0 0 0 1px rgba(16,185,129,.18), 0 10px 20px rgba(16,185,129,.08); }
-.nav button .ico{ width:24px; font-size:15px; }
-.main{ padding:0 16px 40px; }
-.container{ max-width:1040px; padding-top:18px; }
-.panelbox,.card,.line,table{ border-radius:22px; }
-.panelbox{ padding:18px; }
-.title{ font-size:15px; font-weight:600; color:var(--text); }
-.k{ font-size:12px; }
-.v{ font-size:22px; font-weight:700; }
-.line{ padding:14px 16px; }
-.chatBox{ min-height:56vh; padding:14px; border-radius:22px; }
-.msg{ border-radius:18px; padding:12px 14px; }
-.chatComposer input{ min-height:48px; }
-.btn{ border-radius:14px; font-weight:600; }
-.topbar{ padding:12px 14px; }
-.top-title,.pill{ font-weight:600; }
-.softBadge{
-  display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-  border:1px solid var(--stroke); background:rgba(15,23,42,.03); font-size:12px;
-}
-body.dark .softBadge{ background:rgba(255,255,255,.04); }
-.sectionHero{
-  display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;
-}
-.sectionHero .heroTitle{ display:flex; flex-direction:column; gap:4px; }
-.sectionHero .heroTitle strong{ font-size:16px; }
-.sectionHero .heroTitle span{ font-size:12px; color:var(--muted); }
-.menuNote{
-  margin-top:12px; padding:12px; border:1px dashed var(--stroke); border-radius:16px;
-  font-size:12px; color:var(--muted); background:rgba(15,23,42,.02);
-}
-body.dark .menuNote{ background:rgba(255,255,255,.03); }
-@media (max-width:760px){
-  .main{ padding:0 12px 28px; }
-  .container{ padding-top:12px; }
-  .panelbox{ padding:14px; border-radius:18px; }
-  .card,.line,table,.chatBox{ border-radius:18px; }
-}
-
-
-/* ===== Contas e cartões clean ===== */
-.cleanPanel .k{margin-bottom:2px}
-.row-3{grid-template-columns:1.2fr 1fr 0.8fr}
-.bankCell{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.bankLogo{
-  width:34px;
-  height:34px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-  border:1px solid var(--stroke);
-  background:rgba(15,23,42,.04);
-}
-.bankMeta{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-.bankMeta small{
-  color:var(--muted);
-  font-size:11px;
-}
-@media (max-width:760px){
-  .row-3{grid-template-columns:1fr}
-  .bankLogo{width:30px;height:30px;border-radius:10px}
+/* ===== Transações mobile ===== */
+@media (max-width: 760px){
+  #tab-transacoes .panelbox{ padding:12px; }
+  #tab-transacoes table{ font-size:11px; }
+  #tab-transacoes th, #tab-transacoes td{ padding:8px 6px; }
+  #tab-transacoes th:nth-child(2), #tab-transacoes td:nth-child(2){ display:none; } /* esconde Tipo */
+  #tab-transacoes th:nth-child(3), #tab-transacoes td:nth-child(3){ display:none; } /* esconde Meio */
+  #tab-transacoes th:nth-child(1){ min-width:72px; }
+  #tab-transacoes th:nth-child(4){ min-width:98px; }
+  #tab-transacoes th:nth-child(5){ min-width:84px; }
+  #tab-transacoes th:nth-child(6){ min-width:82px; }
+  #tab-transacoes th:nth-child(7){ min-width:116px; }
+  #tab-transacoes .actionBtns{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:stretch;
+  }
+  #tab-transacoes .actionBtns .btn{
+    width:100%;
+    padding:8px 10px;
+    font-size:12px;
+  }
 }
 
 </style>
@@ -580,12 +476,14 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
       <button data-tab="painel"><span class="ico">🏠</span>Painel</button>
       <button data-tab="transacoes"><span class="ico">🧾</span>Transações</button>
       <button data-tab="contas"><span class="ico">💳</span>Contas e Cartões</button>
-      
+      <button data-tab="beneficios"><span class="ico">🎫</span>Benefícios</button>
       <button data-tab="relatorios"><span class="ico">📊</span>Relatórios</button>
       <button data-tab="config"><span class="ico">⚙️</span>Configurações</button>
     </nav>
-    <div class="menuNote">Finance AI • controle financeiro inteligente</div>
-
+<div style="margin-top:12px;padding:0 10px">
+<button id="toggleTheme" class="btn secondary" type="button">🌙 Tema escuro</button>
+</div>
+    <div class="theme-box"><button id="toggleTheme" class="btn secondary theme-toggle" type="button">🌙 Tema escuro</button></div>
   </aside>
 
   <main class="main">
@@ -614,24 +512,17 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
           <button data-tab="painel"><span class="ico">🏠</span>Painel</button>
           <button data-tab="transacoes"><span class="ico">🧾</span>Transações</button>
           <button data-tab="contas"><span class="ico">💳</span>Contas e Cartões</button>
-          
+          <button data-tab="beneficios"><span class="ico">🎫</span>Benefícios</button>
           <button data-tab="relatorios"><span class="ico">📊</span>Relatórios</button>
           <button data-tab="config"><span class="ico">⚙️</span>Configurações</button>
         </nav>
-
+        <div class="theme-box"><button id="toggleThemeMobile" class="btn secondary theme-toggle" type="button">🌙 Tema escuro</button></div>
       </div>
     </div>
 
     <div class="container">
       <!-- CHAT -->
       <section id="tab-chat">
-        <div class="sectionHero">
-          <div class="heroTitle">
-            <strong>Chat financeiro</strong>
-            <span>Lançamentos rápidos com linguagem natural</span>
-          </div>
-          <div class="softBadge">💬 Finance AI</div>
-        </div>
         <div class="panelbox">
           <div class="chatWrap">
             <div class="chatBox" id="chatBox"></div>
@@ -664,13 +555,6 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
 
       <!-- PAINEL -->
       <section id="tab-painel" class="hidden">
-        <div class="sectionHero">
-          <div class="heroTitle">
-            <strong>Painel financeiro</strong>
-            <span>Visão clara das entradas, saídas e projeção</span>
-          </div>
-          <div class="softBadge">📊 Resumo</div>
-        </div>
         <div class="panelbox">
           <div class="title">Cards do mês</div>
           <div class="cards">
@@ -682,7 +566,7 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
           </div>
 
           <div class="line">
-            <div><div class="k">Saldo atual</div><div class="k">saldo inicial + receitas − (banco + dinheiro)</div></div>
+            <div><div class="k">Saldo atual</div><div class="k">receitas − (banco + dinheiro)</div></div>
             <div class="v" id="saldoAtual">R$ 0,00</div>
           </div>
 
@@ -700,24 +584,9 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
 
       <!-- TRANSAÇÕES -->
       <section id="tab-transacoes" class="hidden">
-        <div class="sectionHero">
-          <div class="heroTitle">
-            <strong>Transações</strong>
-            <span>Histórico do mês com filtros e edição rápida</span>
-          </div>
-          <div class="softBadge">🧾 Histórico</div>
-        </div>
         <div class="panelbox">
           <div class="row">
-            <div>
-  <label for="mesRef">Mês</label>
-  <div class="monthNav">
-    <button class="btn secondary monthBtn" id="btnPrevMes" type="button">◀</button>
-    <div class="monthDisplay" id="mesDisplay">—</div>
-    <button class="btn secondary monthBtn" id="btnNextMes" type="button">▶</button>
-  </div>
-  <input id="mesRef" type="month" style="display:none" />
-</div>
+            <div><label for="mesRef">Mês</label><input id="mesRef" type="month" /></div>
             <div><label for="filtroMeio">Filtro (meio)</label>
               <select id="filtroMeio">
                 <option value="">Todos</option>
@@ -738,129 +607,101 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
 
           <div style="overflow:auto">
             <table>
-              <thead><tr><th>Data</th><th>Conta</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead>
+              <thead><tr><th>Data</th><th>Tipo</th><th>Meio</th><th>Conta</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead>
               <tbody id="tbodyTx"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      
       <!-- CONTAS E CARTÕES -->
       <section id="tab-contas" class="hidden">
-        <div class="sectionHero">
-          <div class="heroTitle">
-            <strong>Contas e cartões</strong>
-            <span>Cadastre bancos, cartões e dados iniciais</span>
+        <div class="panelbox">
+          <div class="title">Contas (pix/débito)</div>
+          <div class="row">
+            <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Mercado Pago, Nubank..." /></div>
+            <div><label for="apelidoConta">Apelidos (vírgula)</label><input id="apelidoConta" placeholder="Ex: mp, mercadopago, roxinho" /></div>
           </div>
-          <div class="softBadge">💳 Cadastro</div>
+          <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
+          <div class="divider"></div>
+          <div style="overflow:auto"><table><thead><tr><th>Conta</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyContas"></tbody></table></div>
         </div>
 
-        <div class="panelbox cleanPanel">
-          <div class="title">Contas</div>
-          <div class="k">Use saldo inicial para começar o controle sem precisar lançar tudo manualmente.</div>
-          <div class="divider"></div>
-
-          <div class="row row-3">
-            <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Nubank, Mercado Pago..." /></div>
-            <div><label for="apelidoConta">Apelidos</label><input id="apelidoConta" placeholder="Ex: nu, mp, roxinho" /></div>
-            <div><label for="saldoInicialConta">Saldo inicial</label><input id="saldoInicialConta" inputmode="decimal" placeholder="Ex: 1500" /></div>
-          </div>
-
-          <button class="btn" id="btnAddConta" type="button" style="margin-top:12px">Adicionar conta</button>
-
-          <div class="divider"></div>
-
-          <div style="overflow:auto">
-            <table>
-              <thead><tr><th>Banco</th><th>Conta</th><th>Saldo inicial</th><th>Apelidos</th><th></th></tr></thead>
-              <tbody id="tbodyContas"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="panelbox cleanPanel">
-          <div class="title">Cartões</div>
-          <div class="k">Cadastre fechamento, pagamento e limite para acompanhar melhor sua fatura.</div>
-          <div class="divider"></div>
-
-          <div class="row row-3">
+        <div class="panelbox">
+          <div class="title">Cartões (crédito)</div>
+          <div class="row">
             <div><label for="novoCartao">Nome</label><input id="novoCartao" placeholder="Ex: Nubank, Mercado Pago..." /></div>
-            <div><label for="apelidoCartao">Apelidos</label><input id="apelidoCartao" placeholder="Ex: nu, mp, roxinho" /></div>
-            <div><label for="limiteCartao">Limite</label><input id="limiteCartao" inputmode="decimal" placeholder="Ex: 2500" /></div>
+            <div><label for="apelidoCartao">Apelidos (vírgula)</label><input id="apelidoCartao" placeholder="Ex: nu, roxinho, mp" /></div>
           </div>
-
           <div class="row">
             <div><label for="fechaDia">Fechamento (dia)</label><input id="fechaDia" inputmode="numeric" placeholder="Ex: 10" /></div>
             <div><label for="pagaDia">Pagamento (dia)</label><input id="pagaDia" inputmode="numeric" placeholder="Ex: 17" /></div>
           </div>
-
-          <button class="btn" id="btnAddCartao" type="button" style="margin-top:12px">Adicionar cartão</button>
-
+          <button class="btn" id="btnAddCartao" type="button" style="margin-top:10px">Adicionar cartão</button>
           <div class="divider"></div>
-
-          <div style="overflow:auto">
-            <table>
-              <thead><tr><th>Banco</th><th>Cartão</th><th>Limite</th><th>Fech.</th><th>Pgto</th><th>Apelidos</th><th></th></tr></thead>
-              <tbody id="tbodyCartoes"></tbody>
-            </table>
-          </div>
+          <div style="overflow:auto"><table><thead><tr><th>Cartão</th><th>Fech.</th><th>Pgto</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyCartoes"></tbody></table></div>
         </div>
       </section>
 
-
       <!-- BENEFÍCIOS -->
-      
+      <section id="tab-beneficios" class="hidden">
+        <div class="panelbox">
+          <div class="title">Benefícios (menu separado)</div>
+          <div class="row">
+            <div><label>Ativar Benefícios</label>
+              <select id="benAtivo"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </div>
+            <div><label>&nbsp;</label><button class="btn" id="btnSalvarBen" type="button">Salvar</button></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div><label for="novoBen">Nome do benefício</label><input id="novoBen" placeholder="Ex: VR, VA, Combustível" /></div>
+            <div><label for="apelidoBen">Apelidos (vírgula)</label><input id="apelidoBen" placeholder="Ex: vale refeição, vale alimentação" /></div>
+          </div>
+          <button class="btn" id="btnAddBen" type="button" style="margin-top:10px">Adicionar benefício</button>
+          <div class="divider"></div>
+          <div style="overflow:auto"><table><thead><tr><th>Benefício</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyBen"></tbody></table></div>
+        </div>
+      </section>
 
       <!-- RELATÓRIOS -->
       <section id="tab-relatorios" class="hidden">
-        <div class="sectionHero">
-          <div class="heroTitle">
-            <strong>Gráficos</strong>
-            <span>Análises visuais para acompanhar seus gastos</span>
-          </div>
-          <div class="softBadge">📈 Relatórios</div>
-        </div>
         <div class="panelbox">
-          <div class="title">Gráficos</div>
-          <div class="k">Resumo visual das despesas do mês selecionado.</div>
+          <div class="title">Relatórios</div>
+          <div class="k">Ordem do maior para o menor.</div>
+          <div class="divider"></div>
+
+          <div class="title">Despesas por categoria (%)</div>
+          <div id="rankCats"></div>
 
           <div class="divider"></div>
 
-          <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
-            <div class="title">Despesas por categoria (%)</div>
-            <canvas id="barCategorias" height="260"></canvas>
+          <div class="row">
+            <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
+              <div class="title">Contas (pizza %)</div>
+              <canvas id="pieContas" height="220"></canvas>
+            </div>
+            <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
+              <div class="title">Cartões (barras %)</div>
+              <canvas id="barCartoes" height="220"></canvas>
+            </div>
           </div>
 
           <div class="divider"></div>
 
           <div class="panelbox" style="box-shadow:none; border:1px solid var(--stroke)">
-            <div class="title">Contas (%)</div>
-            <canvas id="pieContas" height="240"></canvas>
+            <div class="title">Benefícios (linhas)</div>
+            <canvas id="lineBen" height="220"></canvas>
           </div>
         </div>
       </section>
 
       <!-- CONFIG -->
       <section id="tab-config" class="hidden">
-        <div class="sectionHero">
-          <div class="heroTitle">
-            <strong>Configurações</strong>
-            <span>Personalize o app e gerencie seus dados</span>
-          </div>
-          <div class="softBadge">⚙️ Ajustes</div>
-        </div>
         <div class="panelbox">
-          <div class="title">Tema</div>
-          <div class="k">Escolha como o Finance AI deve aparecer. O botão abaixo alterna entre claro e escuro.</div>
-          <div class="divider"></div>
-          <div class="row">
-            <button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button>
-          </div>
-        </div>
-
-        <div class="panelbox">
-          <div class="title">Categorias</div>
+          <div class="title">Tema</div><div class="row"><button class="btn secondary" id="toggleThemeConfig" type="button">🌙 Tema escuro</button></div><div class="divider"></div><div class="title">Categorias (receitas e despesas)</div>
           <div class="row">
             <div><label for="catTipo">Tipo</label><select id="catTipo"><option value="Despesa">Despesa</option><option value="Receita">Receita</option></select></div>
             <div><label for="catNome">Nova categoria</label><input id="catNome" placeholder="Ex: Farmácia, Academia, Reembolso..." /></div>
@@ -876,8 +717,8 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
         </div>
 
         <div class="panelbox">
-          <div class="title">Backup e importação</div>
-          <div class="k">Exporte seu backup ou importe um arquivo salvo.</div>
+          <div class="title">Backup automático</div>
+          <div class="k">Sempre salva por cima do último backup.</div>
           <div class="divider"></div>
 
           <div class="row">
@@ -887,11 +728,7 @@ body.dark .menuNote{ background:rgba(255,255,255,.03); }
 
           <div class="divider"></div>
           <div class="tag" id="backupInfo">—</div>
-        </div>
 
-        <div class="panelbox">
-          <div class="title">Reset financeiro</div>
-          <div class="k">Use apenas se quiser limpar todos os dados do app.</div>
           <div class="divider"></div>
           <button class="btn danger" id="btnResetAll" type="button">🧹 Zerar tudo</button>
         </div>
@@ -911,13 +748,13 @@ const STORE = { TX:"fin_tx_chat_v1", DATA:"fin_data_chat_v1", BACKUP:"fin_backup
 const DEFAULTS = {
   data: {
     contas: [
-      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"], saldoInicial:0 },
-      { name:"Nubank", aliases:["nu","nubank","roxinho"], saldoInicial:0 },
-      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"], saldoInicial:0 }
+      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"] },
+      { name:"Nubank", aliases:["nu","nubank","roxinho"] },
+      { name:"Dinheiro", aliases:["dinheiro","cash","especie","espécie"] }
     ],
     cartoes: [
-      { name:"Nubank", aliases:["nu","nubank","roxinho"], fechamento:10, pagamento:17, limite:0 },
-      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"], fechamento:10, pagamento:17, limite:0 }
+      { name:"Nubank", aliases:["nu","nubank","roxinho"], fechamento:10, pagamento:17 },
+      { name:"Mercado Pago", aliases:["mp","mercadopago","mercado pago"], fechamento:10, pagamento:17 }
     ],
     beneficios: [
       { name:"VR", aliases:["vr","vale refeicao","vale refeição","refeicao","refeição"] },
@@ -999,24 +836,6 @@ function monthFromIso(iso){
   if(!y||!m) return null;
   return `${y}-${m}`;
 }
-
-function ymToLongLabel(ym){
-  if(!ym) return "—";
-  const [y,m] = ym.split("-").map(Number);
-  const dt = new Date(y, (m||1)-1, 1);
-  return dt.toLocaleDateString("pt-BR", { month:"long", year:"numeric" });
-}
-function shiftMonth(ym, offset){
-  const [y,m] = ym.split("-").map(Number);
-  const dt = new Date(y, (m||1)-1 + offset, 1);
-  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
-}
-function syncMesDisplay(){
-  if($("mesDisplay") && $("mesRef")){
-    $("mesDisplay").textContent = ymToLongLabel($("mesRef").value || monthNow());
-  }
-}
-
 function labelMonth(ym){
   const [y,m] = ym.split("-");
   return `${m}/${y}`;
@@ -1031,30 +850,6 @@ function loadJSON(key, fallback){
 function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 function normalize(s){
   return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
-}
-
-
-function getBankMeta(name){
-  const n = normalize(name);
-  const map = [
-    { keys:["nubank","nu","roxinho"], icon:"💜", label:"Nubank" },
-    { keys:["mercado pago","mercadopago","mp"], icon:"💙", label:"Mercado Pago" },
-    { keys:["inter","banco inter"], icon:"🟠", label:"Inter" },
-    { keys:["itau","itaú"], icon:"🟧", label:"Itaú" },
-    { keys:["bradesco"], icon:"🔴", label:"Bradesco" },
-    { keys:["santander"], icon:"🔺", label:"Santander" },
-    { keys:["caixa"], icon:"🔷", label:"Caixa" },
-    { keys:["banco do brasil","bb"], icon:"🟨", label:"Banco do Brasil" },
-    { keys:["picpay"], icon:"🟢", label:"PicPay" },
-    { keys:["neon"], icon:"🔵", label:"Neon" },
-    { keys:["c6"], icon:"⚫", label:"C6" },
-    { keys:["dinheiro","cash"], icon:"💵", label:"Dinheiro" }
-  ];
-  for(const item of map){
-    if(item.keys.some(k => n.includes(normalize(k)))) return item;
-  }
-  const first = (String(name||"?").trim()[0] || "?").toUpperCase();
-  return { icon:first, label:name || "Conta" };
 }
 
 let data = loadJSON(STORE.DATA, DEFAULTS.data);
@@ -1489,16 +1284,15 @@ function sumsForMonth(ym){
     if(t.meio==="Cartão") cartao += val;
     else if(t.meio==="Dinheiro") dinheiro += val;
     else if(t.meio==="Benefício"){
-      // benefício fica fora do painel principal
+      // benefício fica no menu Benefícios, fora do painel principal
     } else banco += val;
   }
 
-  const saldoInicial = (data.contas||[]).reduce((acc,c)=> acc + (Number(c.saldoInicial)||0), 0);
   const saidas = banco + dinheiro + cartao;
-  const saldoAtual = saldoInicial + receitas - (banco + dinheiro);
+  const saldoAtual = receitas - (banco + dinheiro);
   const saldoFinal = saldoAtual - cartao;
 
-  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal,saldoInicial};
+  return {receitas,banco,dinheiro,cartao,saidas,saldoAtual,saldoFinal};
 }
 function renderPainel(){
   const ym = monthNow();
@@ -1526,7 +1320,6 @@ function renderPainel(){
 /* Transações */
 function renderTxTable(){
   const ym = $("mesRef").value || monthNow();
-  syncMesDisplay();
   const meio = $("filtroMeio").value || "";
   const tipo = $("filtroTipo").value || "";
   const busca = normalize($("buscaCat").value || "");
@@ -1541,7 +1334,7 @@ function renderTxTable(){
   tbody.innerHTML = "";
   if(list.length===0){
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="5" style="color:var(--muted)">Sem lançamentos.</td>`;
+    tr.innerHTML = `<td colspan="7" style="color:var(--muted)">Sem lançamentos.</td>`;
     tbody.appendChild(tr);
   } else {
     for(const t of list){
@@ -1549,7 +1342,7 @@ function renderTxTable(){
       const valClass = (t.tipo==="Receita") ? "pos" : "neg";
       const ref = t.ref || "—";
       const extra = (t.meio==="Cartão" && t.totalParcelas) ? ` (${t.parcela}/${t.totalParcelas})` : "";
-      tr.innerHTML = `<td>${t.data}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="txSimpleActions"><button class="btn secondary" data-edit-tx="${t.id}">Editar</button><button class="btn danger" data-del="${t.id}">Excluir</button></div></td>`;
+      tr.innerHTML = `<td>${t.data}</td><td>${t.tipo}</td><td>${t.meio}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="actionBtns"><button class="btn secondary" style="width:auto" data-edit-tx="${t.id}">Editar</button><button class="btn danger" style="width:auto" data-del="${t.id}">Excluir</button></div></td>`;
       tbody.appendChild(tr);
     }
   }
@@ -1574,11 +1367,12 @@ function loadTxToDraft(item){
   tx = tx.filter(x => x.id !== item.id);
   persist("editar_transacao");
   setTab("chat");
-  botSay("Lançamento carregado para edição. Envie a frase corrigida.");
+  if($("chatInput")) $("chatInput").value = "";
+  botSay("Lançamento carregado para edição. Envie a frase corrigida ou ajuste pelo chat.");
   renderAll();
 }
 
- document.addEventListener("click", (e)=>{
+document.addEventListener("click", (e)=>{
   const editBtn = e.target.closest("[data-edit-tx]");
   if(editBtn){
     const id = editBtn.getAttribute("data-edit-tx");
@@ -1594,18 +1388,6 @@ function loadTxToDraft(item){
   toast("Excluído");
   renderAll();
 });
-
-if($("btnPrevMes")) $("btnPrevMes").addEventListener("click", ()=>{
-  $("mesRef").value = shiftMonth($("mesRef").value || monthNow(), -1);
-  syncMesDisplay();
-  renderTxTable();
-});
-if($("btnNextMes")) $("btnNextMes").addEventListener("click", ()=>{
-  $("mesRef").value = shiftMonth($("mesRef").value || monthNow(), 1);
-  syncMesDisplay();
-  renderTxTable();
-});
-
 ["mesRef","filtroMeio","filtroTipo","buscaCat"].forEach(id=>{
   $(id).addEventListener("input", ()=>{ renderTxTable(); renderPainel(); });
 });
@@ -1616,47 +1398,16 @@ function renderContas(){
   data.contas = data.contas || [];
   for(let i=0;i<data.contas.length;i++){
     const c = data.contas[i];
-    const meta = getBankMeta(c.name);
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>
-        <div class="bankCell">
-          <div class="bankLogo">${meta.icon}</div>
-          <div class="bankMeta">
-            <strong>${escapeHtml(meta.label)}</strong>
-            <small>banco</small>
-          </div>
-        </div>
-      </td>
-      <td>${escapeHtml(c.name)}</td>
-      <td>${brl(c.saldoInicial||0)}</td>
-      <td>${escapeHtml((c.aliases||[]).join(", "))}</td>
-      <td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
     tb.appendChild(tr);
   }
-
   const tb2 = $("tbodyCartoes"); tb2.innerHTML="";
   data.cartoes = data.cartoes || [];
   for(let i=0;i<data.cartoes.length;i++){
     const c = data.cartoes[i];
-    const meta = getBankMeta(c.name);
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>
-        <div class="bankCell">
-          <div class="bankLogo">${meta.icon}</div>
-          <div class="bankMeta">
-            <strong>${escapeHtml(meta.label)}</strong>
-            <small>cartão</small>
-          </div>
-        </div>
-      </td>
-      <td>${escapeHtml(c.name)}</td>
-      <td>${brl(c.limite||0)}</td>
-      <td>${escapeHtml(c.fechamento)}</td>
-      <td>${escapeHtml(c.pagamento)}</td>
-      <td>${escapeHtml((c.aliases||[]).join(", "))}</td>
-      <td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.fechamento)}</td><td>${escapeHtml(c.pagamento)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
     tb2.appendChild(tr);
   }
 }
@@ -1703,18 +1454,16 @@ document.addEventListener("click", (e)=>{
 $("btnAddConta").addEventListener("click", ()=>{
   const name = ($("novaConta").value||"").trim();
   const aliases = ($("apelidoConta").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
-  const saldoInicial = parseBR($("saldoInicialConta").value) || 0;
   if(!name){ toast("Digite o nome"); return; }
   data.contas = data.contas || [];
   if(data.contas.some(x=>normalize(x.name)===normalize(name))){ toast("Conta já existe"); return; }
-  data.contas.unshift({ name, aliases, saldoInicial });
-  $("novaConta").value=""; $("apelidoConta").value=""; $("saldoInicialConta").value="";
-  persist("add_conta"); renderContas(); renderPainel(); toast("Conta adicionada");
+  data.contas.unshift({ name, aliases });
+  $("novaConta").value=""; $("apelidoConta").value="";
+  persist("add_conta"); renderContas(); toast("Conta adicionada");
 });
 $("btnAddCartao").addEventListener("click", ()=>{
   const name = ($("novoCartao").value||"").trim();
   const aliases = ($("apelidoCartao").value||"").split(",").map(s=>normalize(s)).filter(Boolean);
-  const limite = parseBR($("limiteCartao").value) || 0;
   const fechamento = parseBR($("fechaDia").value);
   const pagamento = parseBR($("pagaDia").value);
   if(!name){ toast("Digite o nome"); return; }
@@ -1722,8 +1471,8 @@ $("btnAddCartao").addEventListener("click", ()=>{
   if(!Number.isFinite(pagamento) || pagamento<1 || pagamento>31){ toast("Pagamento inválido"); return; }
   data.cartoes = data.cartoes || [];
   if(data.cartoes.some(x=>normalize(x.name)===normalize(name))){ toast("Cartão já existe"); return; }
-  data.cartoes.unshift({ name, aliases, limite, fechamento: Math.round(fechamento), pagamento: Math.round(pagamento) });
-  $("novoCartao").value=""; $("apelidoCartao").value=""; $("limiteCartao").value=""; $("fechaDia").value=""; $("pagaDia").value="";
+  data.cartoes.unshift({ name, aliases, fechamento: Math.round(fechamento), pagamento: Math.round(pagamento) });
+  $("novoCartao").value=""; $("apelidoCartao").value=""; $("fechaDia").value=""; $("pagaDia").value="";
   persist("add_cartao"); renderContas(); toast("Cartão adicionado"); renderDueAlerts();
 });
 $("btnSalvarBen").addEventListener("click", ()=>{
@@ -1812,7 +1561,7 @@ document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState=
 window.addEventListener("pagehide", ()=> autoBackupOnExit());
 
 /* Charts */
-let pie=null, barCategorias=null;
+let pie=null, bar=null, line=null;
 function sumBy(list, keyFn){
   const m = new Map();
   for(const t of list){
@@ -1821,87 +1570,161 @@ function sumBy(list, keyFn){
   }
   return Array.from(m.entries()).sort((a,b)=>b[1]-a[1]);
 }
-function renderCharts(){
-  const ym = $("mesRef")?.value || monthNow();
-  const list = tx.filter(t => {
-    if(t.tipo !== "Despesa") return false;
-    if(t.meio === "Cartão") return (t.cicloFatura || monthFromIso(t.data)) === ym;
-    return monthFromIso(t.data) === ym;
-  });
-
-  const cats = sumBy(list, t => t.categoria || "Outros");
-  const totalCats = cats.reduce((a,[,v]) => a + v, 0) || 1;
-  const catLabels = cats.map(([k]) => k);
-  const catValues = cats.map(([,v]) => Number(((v/totalCats)*100).toFixed(1)));
-
-  const contasBase = list.filter(t => t.meio !== "Dinheiro");
-  const contas = sumBy(contasBase, t => t.ref || t.meio);
-  const ctxCats = $("barCategorias");
-  const ctxPie = $("pieContas");
-
-  if(barCategorias) barCategorias.destroy();
-  if(pie) pie.destroy();
-
-  barCategorias = new Chart(ctxCats, {
-    type:"bar",
-    data:{
-      labels: catLabels,
-      datasets:[{ label:"% do total", data: catValues }]
-    },
-    options:{
-      indexAxis:"y",
-      responsive:true,
-      plugins:{ legend:{ display:false } },
-      scales:{ x:{ beginAtZero:true, suggestedMax:100 } }
-    }
-  });
-
-  pie = new Chart(ctxPie, {
-    type:"pie",
-    data:{
-      labels: contas.map(([k]) => k),
-      datasets:[{ data: contas.map(([,v]) => v) }]
-    },
-    options:{
-      responsive:true,
-      plugins:{ legend:{ position:"bottom" } }
-    }
-  });
+function renderRankCats(ym){
+  const list = tx.filter(t => monthFromIso(t.data)===ym && t.tipo==="Despesa");
+  const sums = sumBy(list, t => t.categoria || "Outros");
+  const total = sums.reduce((a,[,v])=>a+v,0) || 0;
+  const host = $("rankCats");
+  if(total<=0){ host.innerHTML = `<div class="tag">Sem despesas.</div>`; return; }
+  host.innerHTML = sums.map(([k,v])=>{
+    const pct = Math.round((v/total)*100);
+    return `<div class="tag" style="display:flex; justify-content:space-between; gap:10px; margin:6px 0"><span>${escapeHtml(k)}</span><span>${pct}% • ${brl(v)}</span></div>`;
+  }).join("");
 }
+function renderCharts(){
+  const ym = monthNow();
+  renderRankCats(ym);
+
+  const list = tx.filter(t => monthFromIso(t.data)===ym && t.tipo==="Despesa");
+  const contas = list.filter(t => (t.meio==="PIX" || t.meio==="Débito" || t.meio==="Dinheiro")).map(t=>({k: t.ref || t.meio, v:Number(t.valor)||0}));
+  const cartoes = list.filter(t => t.meio==="Cartão");
+  const bens = list.filter(t => t.meio==="Benefício");
+
+  const sumContas = new Map();
+  for(const x of contas){ sumContas.set(x.k, (sumContas.get(x.k)||0) + x.v); }
+  const labelsC = Array.from(sumContas.keys());
+  const valuesC = Array.from(sumContas.values());
+
+  const sumCart = sumBy(cartoes, t => t.ref || "Cartão");
+  const totalCart = sumCart.reduce((a,[,v])=>a+v,0) || 1;
+  const labelsK = sumCart.map(([k])=>k);
+  const valuesK = sumCart.map(([,v])=> Math.round((v/totalCart)*100));
+
+  const daysInMonth = new Date(Number(ym.split("-")[0]), Number(ym.split("-")[1]), 0).getDate();
+  const dayLabels = Array.from({length: daysInMonth}, (_,i)=>String(i+1));
+  const benNames = (data.beneficiosAtivo ? (data.beneficios||[]).map(b=>b.name) : []);
+  const datasets = benNames.map(name=>{
+    const arr = Array.from({length: daysInMonth}, ()=>0);
+    for(const t of bens){
+      if(t.ref!==name) continue;
+      const d = Number(String(t.data).split("-")[2]);
+      if(d>=1 && d<=daysInMonth) arr[d-1] += Number(t.valor)||0;
+    }
+    return { label:name, data: arr, tension:.25, spanGaps:true };
+  });
+
+  const ctxP = $("pieContas");
+  if(pie) pie.destroy();
+  pie = new Chart(ctxP, { type:"pie", data:{ labels: labelsC, datasets:[{ data: valuesC }] }, options:{ responsive:true, plugins:{ legend:{ position:"bottom" } } } });
+
+  const ctxB = $("barCartoes");
+  if(bar) bar.destroy();
+  bar = new Chart(ctxB, { type:"bar", data:{ labels: labelsK, datasets:[{ label:"% do total", data: valuesK }] }, options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ suggestedMax:100 } } } });
+
+  const ctxL = $("lineBen");
+  if(line) line.destroy();
+  line = new Chart(ctxL, { type:"line", data:{ labels: dayLabels, datasets }, options:{ responsive:true, plugins:{ legend:{ position:"bottom" } }, scales:{ y:{ beginAtZero:true } } } });
+}
+
+
+/* ===== pós-salvar / reset ===== */
+let lastSavedIds = [];
+let lastSavedSummary = null;
+
+function resetComposerAndDraft(){
+  if($("chatInput")) $("chatInput").value = "";
+  draft = null;
+  showDraft(false);
+  if($("draftSummary")) $("draftSummary").textContent = "—";
+  if($("draftHint")) $("draftHint").textContent = "—";
+  setPill("Pronto");
+}
+
+function renderSavedSummary(summaryText, ids){
+  const box = $("chatBox");
+  const wrap = document.createElement("div");
+  wrap.className = "msg bot";
+  wrap.innerHTML = `
+    <div>${escapeHtml(summaryText).replace(/\n/g,"<br>")}</div>
+    <div style="margin-top:8px"><strong>Salvo ✅</strong></div>
+    <div class="actionRow">
+      <button class="miniBtn" data-edit-last="1">Editar</button>
+      <button class="miniBtn" data-delete-last="1">Excluir</button>
+    </div>
+  `;
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
+  lastSavedIds = [...ids];
+  lastSavedSummary = summaryText;
+}
+
+function removeTxByIds(ids){
+  const before = tx.length;
+  tx = tx.filter(item => !ids.includes(item.id));
+  if(tx.length !== before){
+    persist("excluir_ultimo_lancamento");
+    renderAll();
+  }
+}
+
+function startEditLastSaved(){
+  if(!lastSavedIds || !lastSavedIds.length) return;
+  const items = tx.filter(item => lastSavedIds.includes(item.id));
+  if(!items.length){
+    botSay("Não encontrei o último lançamento para editar.");
+    return;
+  }
+
+  const first = items[0];
+  draft = {
+    tipo: first.tipo,
+    categoria: first.categoria,
+    valor: items.reduce((a,t)=>a+(Number(t.valor)||0),0),
+    ref: first.ref || null,
+    data: first.data || nowISO(),
+    meio: first.meio || null,
+    parcelas: first.totalParcelas || 1,
+    cicloFatura: first.cicloFatura || null,
+    nf: first.nf || null
+  };
+
+  removeTxByIds(lastSavedIds);
+  botSay("Último lançamento carregado para edição. Me envie a frase corrigida ou ajuste os campos no chat.");
+  if($("chatInput")) $("chatInput").value = "";
+  setPill("Editar");
+}
+
+document.addEventListener("click", (e)=>{
+  const editBtn = e.target.closest("[data-edit-last]");
+  if(editBtn){
+    startEditLastSaved();
+    return;
+  }
+  const delBtn = e.target.closest("[data-delete-last]");
+  if(delBtn){
+    if(!lastSavedIds || !lastSavedIds.length){
+      botSay("Não há lançamento recente para excluir.");
+      return;
+    }
+    removeTxByIds(lastSavedIds);
+    botSay("Último lançamento excluído.");
+    lastSavedIds = [];
+    lastSavedSummary = null;
+    resetComposerAndDraft();
+    toast("Excluído");
+    return;
+  }
+});
+
 
 /* Boot */
 function bootChat(){
-  const box = document.getElementById("chatBox");
-  if(!box) return;
-
-  // só cria a mensagem se o chat estiver vazio
-  if(box.innerHTML.trim() !== "") return;
-
-  const hora = new Date().getHours();
-  let saudacao = "Boa noite";
-  if(hora < 12) saudacao = "Bom dia";
-  else if(hora < 18) saudacao = "Boa tarde";
-
-  const msg = document.createElement("div");
-  msg.className = "msg bot";
-  msg.innerHTML = `
-    ${saudacao} 😊<br>
-    Seja bem-vindo(a).<br>
-    Como posso ajudá-lo:
-  `;
-
-  box.appendChild(msg);
-  box.scrollTop = box.scrollHeight;
-
+  $("chatBox").innerHTML = "";
+  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo:`);
   renderDueAlerts();
 }
-
-(data.contas||[]).forEach(c => { if(typeof c.saldoInicial === "undefined") c.saldoInicial = 0; });
-(data.cartoes||[]).forEach(c => { if(typeof c.limite === "undefined") c.limite = 0; });
-
 function renderAll(){
   $("mesRef").value = monthNow();
-  syncMesDisplay();
   $("filtroMeio").value = "";
   $("filtroTipo").value = "";
   $("buscaCat").value = "";
@@ -1922,50 +1745,56 @@ function renderAll(){
   } else {
     makeBackup("init");
   }
-
+  bootChat();
   renderAll();
   setTab("chat");
   setPill("Pronto");
-
-  setTimeout(() => {
-    bootChat();
-  }, 50);
 })();
 
 
 
 </script>
-
-<script id="themeToggleScript">
+<script>
 (function(){
-  const btn = document.getElementById("toggleThemeConfig");
-  const saved = localStorage.getItem("theme") || "dark";
-  if(saved === "dark"){
-    document.body.classList.add("dark");
-  }else{
-    document.body.classList.remove("dark");
-  }
-
-  function syncLabel(){
-    if(!btn) return;
+  const ids = ["toggleTheme","toggleThemeMobile","toggleThemeConfig"];
+  const buttons = ids.map(id => document.getElementById(id)).filter(Boolean);
+  function syncThemeLabel(){
     const dark = document.body.classList.contains("dark");
-    btn.textContent = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
+    const label = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
+    buttons.forEach(btn => btn.textContent = label);
+  }
+  const saved = localStorage.getItem("theme") || "dark";
+  if(saved === "dark"){ document.body.classList.add("dark"); }
+  syncThemeLabel();
+  buttons.forEach(btn => btn.addEventListener("click", function(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    syncThemeLabel();
+  }));
+})();
+</script>
+
+<script>
+(function(){
+  const btn = document.getElementById("toggleTheme");
+  const saved = localStorage.getItem("theme") || "dark";
+  if(saved==="dark"){ document.body.classList.add("dark"); }
+  update();
+
+  function update(){
+    const dark = document.body.classList.contains("dark");
+    if(btn) btn.textContent = dark ? "☀️ Tema claro" : "🌙 Tema escuro";
   }
 
   if(btn){
-    btn.addEventListener("click", function(){
+    btn.onclick = function(){
       document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-      syncLabel();
-    });
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light");
+      update();
+    };
   }
-
-  syncLabel();
 })();
 </script>
 
 </body>
 </html>
-
-
-
