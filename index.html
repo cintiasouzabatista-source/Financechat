@@ -16,146 +16,213 @@
             margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
+        /* Header com Saldo à Esquerda */
         header {
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: var(--card); border-bottom: 1px solid #333;
+            background: var(--card); border-bottom: 1px solid #333; z-index: 10;
         }
 
-        #chat-container {
-            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column;
-            gap: 15px; padding-bottom: 120px;
-        }
+        .header-left { display: flex; flex-direction: column; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
 
+        .label-saldo { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .val-header { color: var(--primary); font-size: 1.3rem; font-weight: bold; }
+
+        /* Container de Telas */
+        .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 150px; }
+        .view.active { display: flex; }
+
+        /* Cards do Chat */
         .card-mov {
             background: var(--card); border-radius: 12px; padding: 15px; position: relative;
-            width: 95%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border-left: 6px solid var(--accent); animation: slideIn 0.3s ease-out;
+            width: 100%; max-width: 450px; margin-bottom: 15px; border-left: 6px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;
         }
-
         .card-mov.receita { border-left-color: var(--primary); }
         .card-mov.despesa { border-left-color: var(--secondary); }
-        .card-mov.parcelado { border-left-color: var(--warning); }
-        .card-mov.recorrente { border-left-color: var(--recurring); }
 
-        .timer-bar {
-            position: absolute; top: 0; left: 0; height: 3px;
-            background: var(--accent); width: 100%; border-radius: 12px 12px 0 0;
+        .timer-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent); width: 100%; border-radius: 12px 12px 0 0; }
+
+        /* Menu Inferior */
+        nav {
+            position: fixed; bottom: 0; width: 100%; background: var(--card);
+            display: flex; justify-content: space-around; padding: 12px 0;
+            border-top: 1px solid #333; z-index: 100;
         }
+        .nav-item { background: none; border: none; color: #888; cursor: pointer; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item.active { color: var(--primary); }
 
-        .card-header { display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; text-transform: uppercase; }
-        .despesa-nome { font-size: 1.1rem; font-weight: bold; color: #fff; margin: 5px 0; display: block; }
-        .val-destaque { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
+        /* Cards de Resumo */
+        .balance-card { background: var(--card); border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; }
+        .val-large { font-size: 1.8rem; font-weight: bold; margin: 5px 0; }
 
-        .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-action {
-            flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer;
-            font-weight: bold; font-size: 0.8rem; min-width: 80px;
-        }
-        .btn-edit { background: #333; color: white; }
-        .btn-del { background: rgba(255, 82, 82, 0.1); color: var(--secondary); border: 1px solid rgba(255, 82, 82, 0.2); }
-        .btn-fix { background: rgba(186, 104, 200, 0.2); color: var(--recurring); border: 1px solid var(--recurring); }
-
-        .input-wrapper { position: fixed; bottom: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, var(--bg) 40%); box-sizing: border-box; }
-        .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 8px 15px; border-radius: 30px; border: 1px solid #333; }
-        input { flex: 1; padding: 10px; border: none; background: transparent; color: white; outline: none; }
-        .btn-send { background: var(--primary); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; }
-
+        /* Input flutuante */
+        #input-wrapper { position: fixed; bottom: 80px; width: 100%; padding: 0 20px; box-sizing: border-box; transition: 0.3s; }
+        .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 10px 18px; border-radius: 30px; border: 1px solid #333; }
+        input { flex: 1; padding: 5px; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
+        
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: bold;">❮ MARÇO 2026 ❯</div>
-    <div style="color: var(--primary); font-weight: bold;">R$ 5.200,00</div>
+    <div class="header-left">
+        <span class="label-saldo">Saldo Disponível</span>
+        <span id="header-total" class="val-header">R$ 0,00</span>
+    </div>
+    <div class="header-right">
+        <button class="btn-nav" style="background:#333; border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;">❮ MAR 2026 ❯</button>
+    </div>
 </header>
 
-<div id="chat-container"></div>
-
-<div class="input-wrapper">
-    <div class="input-area">
-        <input type="text" id="user-input" placeholder="Ex: Energia Elétrica 250 Nubank" onkeypress="if(event.key==='Enter') processInput()">
-        <button class="btn-send" onclick="processInput()">➔</button>
+<div id="view-chat" class="view active">
+    <div id="chat-messages"></div>
+    <div id="input-wrapper">
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Ex: Recebi salario 5000" onkeypress="if(event.key==='Enter') processInput()">
+            <button onclick="processInput()" style="background:var(--primary); border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">➔</button>
+        </div>
     </div>
 </div>
 
+<div id="view-saldo" class="view">
+    <h3>Minhas Contas</h3>
+    <div class="balance-card">
+        <div class="label-saldo">Nubank</div>
+        <div id="saldo-nubank" class="val-large">R$ 0,00</div>
+    </div>
+    <button onclick="clearAll()" style="background:none; color:var(--secondary); border:1px solid var(--secondary); padding:10px; border-radius:5px; cursor:pointer; width:100%;">🗑️ Zerar Todos os Registros</button>
+</div>
+
+<div id="view-resumo" class="view">
+    <h3>Resumo Mensal</h3>
+    <div class="balance-card">
+        <div class="label-saldo" style="color:var(--primary)">Receitas (+)</div>
+        <div id="resumo-receita" class="val-large" style="color:var(--primary)">R$ 0,00</div>
+    </div>
+    <div class="balance-card">
+        <div class="label-saldo" style="color:var(--secondary)">Despesas (-)</div>
+        <div id="resumo-despesa" class="val-large" style="color:var(--secondary)">R$ 0,00</div>
+    </div>
+</div>
+
+<div id="view-graficos" class="view">
+    <h3>Relatórios</h3>
+    <div style="text-align:center; margin-top:50px; color:#555;">📊 Os gráficos serão gerados com base nos seus lançamentos.</div>
+</div>
+
+<nav>
+    <button class="nav-item active" onclick="showView('chat', this)"><i>💬</i>Chat</button>
+    <button class="nav-item" onclick="showView('saldo', this)"><i>💳</i>Saldos</button>
+    <button class="nav-item" onclick="showView('resumo', this)"><i>📈</i>Resumo</button>
+    <button class="nav-item" onclick="showView('graficos', this)"><i>📊</i>Gráficos</button>
+</nav>
+
 <script>
+    // Variáveis de Estado
+    let saldoGeral = 0;
+    let totalReceitas = 0;
+    let totalDespesas = 0;
+
+    function updateUI() {
+        const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('header-total').innerText = fmt(saldoGeral);
+        document.getElementById('resumo-receita').innerText = fmt(totalReceitas);
+        document.getElementById('resumo-despesa').innerText = fmt(totalDespesas);
+        document.getElementById('saldo-nubank').innerText = fmt(saldoGeral);
+    }
+
+    function showView(viewId, btn) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Esconde input se não for chat
+        document.getElementById('input-wrapper').style.display = (viewId === 'chat') ? 'block' : 'none';
+    }
+
     function processInput() {
         const input = document.getElementById('user-input');
-        if(!input.value.trim()) return;
-        createCard(input.value.trim());
+        const text = input.value.trim();
+        if(!text) return;
+
+        const valorMatch = text.match(/(\d+[\d,.]*)/);
+        let valor = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
+        let tipo = text.toLowerCase().includes('recebi') || text.toLowerCase().includes('salario') ? 'receita' : 'despesa';
+        let nome = text.replace(valorMatch ? valorMatch[0] : '', '').replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
+
+        createCard(nome, valor, tipo);
         input.value = '';
     }
 
-    function createCard(text) {
-        const container = document.getElementById('chat-container');
+    function createCard(nome, valor, tipo) {
+        const container = document.getElementById('chat-messages');
         const cardId = 'card-' + Date.now();
-        const textoLimpo = text.toLowerCase();
-        
-        const valorMatch = text.match(/(\d+[\d,.]*)/);
-        let valorTotal = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
-        
-        let nomeDespesa = text.replace(valorMatch ? valorMatch[0] : '', '')
-            .replace(/(paguei|gastei|no|na|nubank|inter|itau|carteira)/gi, '').trim();
-
-        let categoria = "Geral";
-        if(textoLimpo.match(/(energia|luz|água|internet|aluguel)/)) categoria = "Contas Fixas";
-        if(textoLimpo.includes("residencia")) categoria += " / Residência";
-
-        const ehRecorrente = textoLimpo.match(/(todo mês|mensal|recorrente)/);
-        const parcelasMatch = textoLimpo.match(/(\d+)\s*(x|vezes)/);
-        const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
-
         const card = document.createElement('div');
-        card.className = `card-mov ${ehRecorrente ? 'recorrente' : (numParcelas > 1 ? 'parcelado' : 'despesa')}`;
+        card.className = `card-mov ${tipo}`;
         card.id = cardId;
-        
+
         card.innerHTML = `
             <div class="timer-bar" id="bar-${cardId}"></div>
-            <div class="card-header"><span>📂 ${categoria}</span></div>
-            <span class="despesa-nome">${nomeDespesa || "Nova Despesa"}</span>
-            <div class="val-destaque">R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-            <div id="status-${cardId}" style="font-size: 0.85rem;">
-                ${ehRecorrente ? '<span style="color: var(--recurring)">🔄 Recorrente Mensal</span>' : 
-                (numParcelas > 1 ? `<span>🔹 ${numParcelas}x de R$ ${(valorTotal/numParcelas).toFixed(2)}</span>` : '<span>🔹 À vista</span>')}
-            </div>
-            <div class="actions" id="actions-${cardId}">
-                ${!ehRecorrente ? `<button class="btn-action btn-fix" onclick="setRecorrente('${cardId}')">Tornar Fixo? 🔄</button>` : ''}
-                <button class="btn-action btn-edit" onclick="document.getElementById('${cardId}').remove()">✏️</button>
-                <button class="btn-action btn-del" onclick="document.getElementById('${cardId}').remove()">🗑️</button>
+            <div style="font-size:0.7rem; color:#888; text-transform:uppercase;">${tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
+            <div style="font-weight:bold; font-size:1.1rem; color:#fff; margin:4px 0;">${nome || 'Movimentação'}</div>
+            <div style="font-size:1.4rem; font-weight:bold; color:${tipo === 'receita' ? 'var(--primary)' : 'var(--text)'}">R$ ${valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+            <div id="actions-${cardId}" style="margin-top:10px; display:flex; gap:10px;">
+                <button onclick="confirmar('${cardId}', ${valor}, '${tipo}')" style="background:var(--primary); border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar</button>
+                <button onclick="document.getElementById('${cardId}').remove()" style="background:rgba(255,255,255,0.05); border:1px solid #444; color:#aaa; padding:8px; border-radius:8px; cursor:pointer;">🗑️</button>
             </div>
         `;
         
         container.appendChild(card);
         container.scrollTop = container.scrollHeight;
 
+        // Timer de 8s automático
         let timeLeft = 100;
         const interval = setInterval(() => {
             timeLeft -= 1.25;
-            document.getElementById(`bar-${cardId}`).style.width = timeLeft + '%';
-            if (timeLeft <= 0) {
+            const bar = document.getElementById(`bar-${cardId}`);
+            if(bar) bar.style.width = timeLeft + '%';
+            if(timeLeft <= 0) {
                 clearInterval(interval);
-                finalize(cardId);
+                confirmar(cardId, valor, tipo);
             }
         }, 100);
         card.dataset.interval = interval;
     }
 
-    function setRecorrente(id) {
+    function confirmar(id, valor, tipo) {
         const card = document.getElementById(id);
+        if(!card || card.dataset.confirmado) return;
+        
         clearInterval(card.dataset.interval);
-        card.className = "card-mov recorrente";
-        document.getElementById(`bar-${id}`).style.display = 'none';
-        document.getElementById(`status-${id}`).innerHTML = '<span style="color: var(--recurring)">🔄 Salvo como Conta Fixa</span>';
-        document.getElementById(`actions-${id}`).innerHTML = "<small>✅ Registro atualizado para mensal</small>";
-    }
+        card.dataset.confirmado = "true";
+        
+        if(tipo === 'receita') {
+            saldoGeral += valor;
+            totalReceitas += valor;
+        } else {
+            saldoGeral -= valor;
+            totalDespesas += valor;
+        }
 
-    function finalize(id) {
         const bar = document.getElementById(`bar-${id}`);
         if(bar) bar.style.display = 'none';
-        const actions = document.getElementById(`actions-${id}`);
-        if(actions) actions.innerHTML = "<span style='color: var(--primary); font-size: 0.8rem;'>✅ Confirmado</span>";
+        document.getElementById(`actions-${id}`).innerHTML = "<span style='color:var(--primary); font-size:0.8rem;'>✅ Lançado no Saldo</span>";
+        
+        updateUI();
     }
+
+    function clearAll() {
+        if(confirm("Zerar todos os dados?")) {
+            saldoGeral = 0; totalReceitas = 0; totalDespesas = 0;
+            document.getElementById('chat-messages').innerHTML = "";
+            updateUI();
+        }
+    }
+
+    updateUI(); // Inicia zerado
 </script>
 </body>
 </html>
