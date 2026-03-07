@@ -586,7 +586,7 @@ body.dark .msg.me{
       <section id="tab-transacoes" class="hidden">
         <div class="panelbox">
           <div class="row">
-            <div><label for="mesRef">Mês</label><input id="mesRef" type="month" /></div>
+            <div><label for="mesRef">Mês</label><div class="monthNav"><button id="prevMonth">◀</button><input id="mesRef" type="month" /><button id="nextMonth">▶</button></div></div>
             <div><label for="filtroMeio">Filtro (meio)</label>
               <select id="filtroMeio">
                 <option value="">Todos</option>
@@ -1067,16 +1067,35 @@ function extractValue(text){
   if(!m) return null;
   return parseBR(m[1]);
 }
+
 function guessCategory(text, bucket){
-  const list = (data.categorias?.[bucket] || []);
-  const t = normalize(text);
-  for(const c of list){ if(t.includes(normalize(c))) return c; }
-  if(isWordIn(text, ["mercado","supermercado","padaria","feira"])) return "Mercado";
-  if(isWordIn(text, ["energia","luz","agua","água","internet","telefone"])) return "Contas";
-  if(isWordIn(text, ["uber","99","onibus","ônibus","metro","metrô","gasolina","etanol","combustivel","combustível"])) return "Transporte";
-  if(bucket==="Receita" && isWordIn(text, ["salario","salário","pagamento"])) return "Salário";
-  return "Outros";
+const t = normalize(text);
+
+const map = {
+Mercado:["mercado","supermercado","padaria","feira","hortifruti","acougue","açougue"],
+Transporte:["uber","99","taxi","gasolina","etanol","combustivel","combustível","posto","onibus","ônibus","metro","metrô","estacionamento"],
+Moradia:["aluguel","condominio","condomínio","iptu","manutencao","manutenção"],
+Contas:["energia","luz","agua","água","internet","telefone","celular","vivo","tim","claro","enel","sabesp"],
+Saúde:["farmacia","farmácia","remedio","remédio","medico","médico","dentista","consulta","exame"],
+Educação:["escola","faculdade","curso","mensalidade","material escolar"],
+Lazer:["cinema","bar","restaurante","viagem","hotel","passeio"],
+Assinaturas:["netflix","spotify","amazon","prime","disney","hbo","globoplay","youtube premium","icloud","google one"],
+Pets:["petshop","ração","racao","veterinario","veterinário"],
+Presentes:["presente","aniversario","aniversário","flor","flores"]
+};
+
+for(const cat in map){
+ if(map[cat].some(w=>t.includes(w))) return cat;
 }
+
+if(bucket==="Receita"){
+ if(t.includes("salario")||t.includes("salário")) return "Salário";
+ if(t.includes("reembolso")) return "Reembolso";
+}
+
+return "Outros";
+}
+
 function shouldAskFixedBill(text){
   return isWordIn(text, ["energia","luz","agua","água","internet","aluguel","condominio","condomínio","ipva","seguro","escola","mensalidade"]);
 }
@@ -1193,7 +1212,10 @@ function saveDraft(){
     list.push(draft.categoria);
     data.categorias[bucket] = list;
   }
-  const created = createTxFromDraft(draft);
+  if(shouldAskFixedBill(draft.categoria || "")){
+  botSay("Essa parece ser uma conta fixa. Deseja lançar para os próximos meses?");
+}
+const created = createTxFromDraft(draft);
   tx.push(...created);
   persist("lancamento_chat");
   botSummary(draft, created.map(x => x.id));
@@ -1342,7 +1364,7 @@ function renderTxTable(){
       const valClass = (t.tipo==="Receita") ? "pos" : "neg";
       const ref = t.ref || "—";
       const extra = (t.meio==="Cartão" && t.totalParcelas) ? ` (${t.parcela}/${t.totalParcelas})` : "";
-      tr.innerHTML = `<td>${t.data}</td><td>${t.tipo}</td><td>${t.meio}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="actionBtns"><button class="btn secondary" style="width:auto" data-edit-tx="${t.id}">Editar</button><button class="btn danger" style="width:auto" data-del="${t.id}">Excluir</button></div></td>`;
+      tr.innerHTML = `<td>${t.data}</td><td>${t.tipo}</td><td>${t.meio}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="actionBtns"><button class="btn secondary" style="width:auto" data-edit-tx="${t.id}" title="Editar">✏️</button><button class="btn danger" style="width:auto" data-del="${t.id}" title="Excluir">🗑</button></div></td>`;
       tbody.appendChild(tr);
     }
   }
@@ -1391,6 +1413,29 @@ document.addEventListener("click", (e)=>{
 ["mesRef","filtroMeio","filtroTipo","buscaCat"].forEach(id=>{
   $(id).addEventListener("input", ()=>{ renderTxTable(); renderPainel(); });
 });
+
+
+/* Month navigation */
+const prevBtn = document.getElementById("prevMonth");
+const nextBtn = document.getElementById("nextMonth");
+if(prevBtn && nextBtn){
+prevBtn.onclick = ()=>{
+  const v = document.getElementById("mesRef").value || monthNow();
+  let [y,m] = v.split("-").map(Number);
+  m--;
+  if(m===0){m=12;y--}
+  document.getElementById("mesRef").value = `${y}-${String(m).padStart(2,"0")}`;
+  renderTxTable();
+};
+nextBtn.onclick = ()=>{
+  const v = document.getElementById("mesRef").value || monthNow();
+  let [y,m] = v.split("-").map(Number);
+  m++;
+  if(m===13){m=1;y++}
+  document.getElementById("mesRef").value = `${y}-${String(m).padStart(2,"0")}`;
+  renderTxTable();
+};
+}
 
 /* Contas/cartões/benefícios */
 function renderContas(){
@@ -1720,7 +1765,7 @@ document.addEventListener("click", (e)=>{
 /* Boot */
 function bootChat(){
   $("chatBox").innerHTML = "";
-  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo:`);
+  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-la(o)?`);
   renderDueAlerts();
 }
 function renderAll(){
