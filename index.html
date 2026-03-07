@@ -55,73 +55,13 @@
   summary{cursor:pointer;font-weight:800}
   .pos{color:#065f46}
   .neg{color:#9f1239}
-
-  /* Layout with sidebar */
-  .app{display:flex;min-height:100vh}
-  .sidebar{
-    position:fixed;left:0;top:0;bottom:0;width:260px;
-    background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
-    border-right:1px solid var(--line);
-    padding:14px 12px;
-    display:flex;flex-direction:column;gap:10px;
-    z-index:30;
-    transform:translateX(-102%);
-    transition:transform .22s ease;
-  }
-  .sidebar.open{transform:translateX(0)}
-  .side-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .brand{font-weight:800;font-size:20px;letter-spacing:-.02em}
-  .side-sub{font-size:12px;color:var(--muted);margin-top:-2px}
-  .side-btn{
-    width:100%;
-    display:flex;align-items:center;gap:10px;
-    padding:12px 12px;border-radius:14px;
-    border:1px solid var(--line);
-    background:#fff;
-    font-weight:700;
-    cursor:pointer;
-  }
-  .side-btn.active{background:var(--okbg);border-color:#c8ead5}
-  .side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
-  .content{flex:1;margin-left:0}
-  @media (min-width: 980px){
-    .sidebar{transform:none;position:sticky;top:0;height:100vh}
-    .content{margin-left:260px}
-    .hamb{display:none}
-    .overlay{display:none}
-  }
-  .overlay{
-    position:fixed;inset:0;background:rgba(15,23,42,.22);
-    z-index:25;display:none;
-  }
-  .overlay.show{display:block}
-  header{position:sticky;top:0;z-index:20}
-  .hamb{
-    border:1px solid var(--line);background:#fff;border-radius:14px;
-    padding:10px 12px;font-weight:800;cursor:pointer;
-  }
-  .view{display:none}
-  .view.active{display:block}
-
-  /* Chat confirm bar */
-  .confirmbar{
-    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-    padding:10px;border-radius:16px;border:1px solid var(--line);
-    background:#fff;margin-top:8px;
-  }
-  .confirmbar .info{flex:1;color:var(--muted);font-size:12px;line-height:1.25}
-  .confirmbar button{padding:10px 12px}
-
 </style>
 </head>
 <body>
 <header>
-  <div style="display:flex;align-items:center;gap:10px">
-    <button class="hamb" id="btnMenu" type="button">☰</button>
-    <div>
-      <div class="t">Finance</div>
-      <div class="s" id="hdrSub">chat • motor A</div>
-    </div>
+  <div>
+    <div class="t">Finance</div>
+    <div class="s" id="hdrSub">chat • motor A (cartão: fatura atual + futuras separadas)</div>
   </div>
   <div class="row" style="flex:0;gap:8px">
     <span class="pill" id="pillUser">👤 Padrão</span>
@@ -131,323 +71,17 @@
 </header>
 
 <div class="wrap">
-<div class="app">
-  <div class="sidebar" id="sidebar">
-    <div class="side-head">
-      <div>
-        <div class="brand">Finance</div>
-        <div class="side-sub">menu</div>
-      </div>
-      <button class="btn-secondary" id="btnCloseMenu" type="button" style="padding:10px 12px">✕</button>
-    </div>
 
-    <button class="side-btn active" data-view="chat">💬 Chat</button>
-    <button class="side-btn" data-view="painel">📊 Painel</button>
-    <button class="side-btn" data-view="contas">💳 Contas & Cartões</button>
-    <button class="side-btn" data-view="fixas">📌 Contas Fixas</button>
-    <button class="side-btn" data-view="rel">📈 Relatórios</button>
-    <button class="side-btn" data-view="cfg">⚙️ Config</button>
-    <button class="side-btn" data-view="seg">🔐 Segurança/Backup</button>
-
-    <div class="side-foot">
-      <div class="small">Abre no Chat. Registros pedem confirmação.</div>
-    </div>
-  </div>
-  <div class="overlay" id="overlay"></div>
-
-  <div class="content">
-    <div class="wrap">
-      <section class="view active" id="view-chat"><section class="card chatbox">
+  <section class="card chatbox">
     <div class="messages" id="messages"></div>
     <div class="input-area">
       <input id="input" placeholder="Informe seus movimentos..." autocomplete="off" />
       <button id="btnSend" type="button">Enviar</button>
     </div>
-    <div class="confirmbar hidden" id="confirmBar">
-      <div class="info" id="confirmInfo">—</div>
-      <button id="btnConfirm" type="button">Finalizar</button>
-      <button class="btn-secondary" id="btnEdit" type="button">Editar</button>
-      <button class="btn-danger" id="btnCancel" type="button">Excluir</button>
-    </div>
     <div class="muted">Ex: “Recebi 1000 salário Nubank” • “Paguei energia 200 pix Mercado Pago” • “Gastei 300 mercado Dinheiro” • “Gastei 1200 celular cartão MP 6x” • “Paguei cartão Nubank”</div>
-  </section></section>
-      <section class="view" id="view-painel"><section class="card" style="margin-top:14px">
-    <div class="kpi">
-      <div class="h">Saldo Total</div>
-      <div class="v" id="saldoTotal">R$ 0,00</div>
-      <div class="l" style="grid-column:1 / -1;margin-top:-2px" id="insight">—</div>
+  </section>
 
-      <div class="l">Contas + Dinheiro</div>
-      <div class="l" style="text-align:right" id="saldoContas">R$ 0,00</div>
-
-      <div class="l">Cartões (fatura atual)</div>
-      <div class="l" style="text-align:right" id="saldoCartoes">R$ 0,00</div>
-
-      <div class="l">Parcelas futuras</div>
-      <div class="l" style="text-align:right" id="saldoFuturas">R$ 0,00</div>
-
-      <div class="l">Benefícios (VR+VA+Comb.)</div>
-      <div class="l" style="text-align:right" id="saldoBenef">R$ 0,00</div>
-    </div>
-
-    <div class="sep"></div>
-
-    <div class="kpi" style="grid-template-columns:1fr auto">
-      <div class="h">Reserva <span class="small">(meta 10k)</span></div>
-      <div class="v" id="saldoReserva">R$ 0,00</div>
-      <div class="small">Progresso</div>
-      <div class="small" style="text-align:right" id="progReserva">0,0%</div>
-    </div>
-    <div style="height:10px"></div>
-    <div style="height:10px;border-radius:999px;background:#eef2f7;overflow:hidden">
-      <div id="barReserva" style="height:10px;width:0%;background:#cfe8da"></div>
-    </div>
-
-    <div class="sep"></div>
-</details>
-  </section></section>
-      <section class="view" id="view-contas">
-<section class="card">
-  <div style="font-weight:900;font-size:20px;letter-spacing:-.02em">💳 Contas & Cartões</div>
-  <div class="muted" style="margin-top:6px">Fatura atual e parcelas futuras (separadas).</div>
-  <div class="sep"></div>
-  <div class="list" id="cardDetail2"></div>
-</section>
-</section>
-      <section class="view" id="view-fixas">
-<section class="card">
-  <div style="font-weight:900;font-size:20px;letter-spacing:-.02em">📌 Contas Fixas</div>
-  <div class="muted" style="margin-top:6px">Em seguida: cadastro + projeção automática no saldo projetado.</div>
-</section>
-</section>
-      <section class="view" id="view-rel">
-<section class="card">
-  <div style="font-weight:900;font-size:20px;letter-spacing:-.02em">📈 Relatórios</div>
-  <div class="muted" style="margin-top:6px">Em seguida: gráficos por categoria, contas e cartões (opcional).</div>
-</section>
-</section>
-      <section class="view" id="view-cfg"><section class="card"><details>
-      <summary>⚙️ Saldos iniciais (opcional) + regras de cartões</summary>
-      <div class="small" style="margin:6px 0 10px">Fica salvo no aparelho. Nesta versão, o cartão mostra <b>só a fatura atual</b> e separa <b>parcelas futuras</b>.</div>
-
-      <div class="row">
-        <div>
-          <div class="small">Conta Nubank</div>
-          <input id="iniContaNu" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Conta Mercado Pago</div>
-          <input id="iniContaMP" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <div>
-          <div class="small">Dinheiro</div>
-          <input id="iniDin" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Reserva</div>
-          <input id="iniRes" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div>
-          <div class="small">Cartão Nubank (fatura atual)</div>
-          <input id="iniCartNu" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Cartão Mercado Pago (fatura atual)</div>
-          <input id="iniCartMP" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div>
-          <div class="small">VR</div>
-          <input id="iniVR" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">VA</div>
-          <input id="iniVA" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <div>
-          <div class="small">Combustível</div>
-          <input id="iniComb" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Meta Reserva</div>
-          <input id="metaRes" inputmode="decimal" placeholder="10000" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div>
-          <div class="small">Fechamento Nubank (dia)</div>
-          <input id="fechNu" inputmode="numeric" placeholder="6" />
-        </div>
-        <div>
-          <div class="small">Fechamento MP (dia)</div>
-          <input id="fechMP" inputmode="numeric" placeholder="2" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <div>
-          <div class="small">Vencimento Nubank (dia)</div>
-          <input id="vencNu" inputmode="numeric" placeholder="7" />
-        </div>
-        <div>
-          <div class="small">Vencimento MP (dia)</div>
-          <input id="vencMP" inputmode="numeric" placeholder="7" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <button id="btnSaveIni" type="button">Salvar</button>
-        <button class="btn-secondary" id="btnLoadExample" type="button">Carregar seus saldos (exemplo)</button>
-        <button class="btn-danger" id="btnReset" type="button">Zerar tudo</button>
-      </div>
-    </details></section></section>
-      <section class="view" id="view-seg"><section class="card"><details>
-      <summary>⚙️ Saldos iniciais (opcional) + regras de cartões</summary>
-      <div class="small" style="margin:6px 0 10px">Fica salvo no aparelho. Nesta versão, o cartão mostra <b>só a fatura atual</b> e separa <b>parcelas futuras</b>.</div>
-
-      <div class="row">
-        <div>
-          <div class="small">Conta Nubank</div>
-          <input id="iniContaNu" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Conta Mercado Pago</div>
-          <input id="iniContaMP" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <div>
-          <div class="small">Dinheiro</div>
-          <input id="iniDin" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Reserva</div>
-          <input id="iniRes" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div>
-          <div class="small">Cartão Nubank (fatura atual)</div>
-          <input id="iniCartNu" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Cartão Mercado Pago (fatura atual)</div>
-          <input id="iniCartMP" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div>
-          <div class="small">VR</div>
-          <input id="iniVR" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">VA</div>
-          <input id="iniVA" inputmode="decimal" placeholder="0,00" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <div>
-          <div class="small">Combustível</div>
-          <input id="iniComb" inputmode="decimal" placeholder="0,00" />
-        </div>
-        <div>
-          <div class="small">Meta Reserva</div>
-          <input id="metaRes" inputmode="decimal" placeholder="10000" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div>
-          <div class="small">Fechamento Nubank (dia)</div>
-          <input id="fechNu" inputmode="numeric" placeholder="6" />
-        </div>
-        <div>
-          <div class="small">Fechamento MP (dia)</div>
-          <input id="fechMP" inputmode="numeric" placeholder="2" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <div>
-          <div class="small">Vencimento Nubank (dia)</div>
-          <input id="vencNu" inputmode="numeric" placeholder="7" />
-        </div>
-        <div>
-          <div class="small">Vencimento MP (dia)</div>
-          <input id="vencMP" inputmode="numeric" placeholder="7" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <button id="btnSaveIni" type="button">Salvar</button>
-        <button class="btn-secondary" id="btnLoadExample" type="button">Carregar seus saldos (exemplo)</button>
-        <button class="btn-danger" id="btnReset" type="button">Zerar tudo</button>
-      </div>
-    </details>
-
-    <div class="sep"></div>
-
-    <details>
-      <summary>📌 Detalhe cartões (por fatura)</summary>
-      <div class="small" style="margin:6px 0 10px">Aqui aparece o que vence agora (fatura atual) e o que já está comprometido para os próximos meses.</div>
-      <div class="list" id="cardDetail"></div>
-    
-    <div class="sep"></div>
-    <details>
-      <summary>🧯 Backup automático (15)</summary>
-      <div class="small" style="margin:6px 0 10px">
-        O app salva um backup automaticamente quando você sai/fecha ou troca de app. Mantém os <b>15 últimos</b> e depois substitui os mais antigos.
-      </div>
-      <div class="row">
-        <button id="btnRestoreLast2" type="button">Restaurar último backup</button>
-        <button class="btn-secondary" id="btnShowBackups" type="button">Ver backups</button>
-      </div>
-      <div id="backupList" class="list" style="margin-top:10px"></div>
-      
-      <div class="sep"></div>
-      <div class="small" style="margin:6px 0 8px">🔐 PIN (4 números) para Restaurar/Apagar</div>
-      <div class="row">
-        <input id="pinNew" inputmode="numeric" placeholder="Definir novo PIN (4 dígitos)" />
-        <button class="btn-secondary" id="btnSetPin" type="button">Definir/Alterar PIN</button>
-      </div>
-
-      <div class="small" style="margin:6px 0 8px">Importar arquivo JSON (manual):</div>
-      <input id="fileImport" type="file" accept="application/json" />
-      <div class="row" style="margin-top:10px">
-        <button class="btn-secondary" id="btnImportFile" type="button">Importar arquivo</button>
-        <button class="btn-danger" id="btnClearBackups" type="button">Apagar backups</button>
-      </div>
-      <div class="small" style="margin-top:10px">Dica: “Exportar” baixa um arquivo para você guardar fora do celular.</div>
-    </details></section></section>
-      <section class="card" style="margin-top:14px">
+  <section class="card" style="margin-top:14px">
     <div class="kpi">
       <div class="h">Saldo Total</div>
       <div class="v" id="saldoTotal">R$ 0,00</div>
@@ -620,9 +254,7 @@
     <div class="sep"></div>
     <div class="list" id="list"></div>
   </section>
-    </div>
-  </div>
-</div>
+
 </div>
 
 <div id="toast"></div>
@@ -811,7 +443,6 @@ let state=loadState();
 
 /* chat */
 function addMessage(text,who){
-  if(window.__silentBot && who==='bot') return;
   const div=document.createElement("div");
   div.className="msg "+(who==="user"?"user":"bot");
   div.innerHTML=String(text||"").replace(/\n/g,"<br>");
@@ -873,7 +504,6 @@ function inferGroupAndAccount(text){
   if(t.includes("vr")) return {grupo:"benef",conta:"vr"};
   if(t.includes("va")) return {grupo:"benef",conta:"va"};
   if(t.includes("combustivel")||t.includes("combustível")) return {grupo:"benef",conta:"combustivel"};
-  if(t.includes("reserva")||t.includes("poupanca")||t.includes("poupança")) return {grupo:"reserva",conta:"reserva"};
   if(t.includes("dinheiro")) return {grupo:"contas",conta:"dinheiro"};
   if(t.includes("conta nubank")||(t.includes("nubank")&&!t.includes("cartao")&&!t.includes("cartão"))) return {grupo:"contas",conta:"conta_nubank"};
   if(t.includes("conta mercado")||t.includes("conta mp")||(t.includes("mercado pago")&&!t.includes("cartao")&&!t.includes("cartão"))) return {grupo:"contas",conta:"conta_mp"};
@@ -1037,33 +667,6 @@ function handleMovement(raw){
     return;
   }
 
-
-  // reserva (transferência)
-  if(grupo==="reserva"){
-    const amt = Math.abs(val);
-    const origin = (t.includes("nubank")||t.includes(" nu")) ? "conta_nubank"
-                 : (t.includes("dinheiro")) ? "dinheiro"
-                 : "conta_mp";
-    const isWithdraw = t.startsWith("tirei") || t.startsWith("saquei") || t.includes("da reserva") || t.includes("tirar reserva");
-    if(isWithdraw){
-      applyToBalance("reserva", -amt);
-      applyToBalance(origin, +amt);
-      addLanc({ id:uuid(), ymd, desc:`Retirada da reserva`, valor:+amt, grupo:"contas", conta:origin, forma:"transferencia", tipo:"entrada" });
-      addLanc({ id:uuid(), ymd, desc:`Retirada da reserva`, valor:-amt, grupo:"reserva", conta:"reserva", forma:"transferencia", tipo:"saida" });
-      saveState(); renderAll();
-      addMessage(`✅ Retirado ${brl(amt)} da reserva para ${origin.replace("conta_","").toUpperCase()}.`, "bot");
-      return;
-    }
-    // Aporte
-    applyToBalance(origin, -amt);
-    applyToBalance("reserva", +amt);
-    addLanc({ id:uuid(), ymd, desc:`Reserva (aporte)`, valor:-amt, grupo:"contas", conta:origin, forma:"transferencia", tipo:"saida" });
-    addLanc({ id:uuid(), ymd, desc:`Reserva (aporte)`, valor:+amt, grupo:"reserva", conta:"reserva", forma:"transferencia", tipo:"entrada" });
-    saveState(); renderAll();
-    addMessage(`✅ Reserva +${brl(amt)} (saindo de ${origin.replace("conta_","").toUpperCase()}).`, "bot");
-    return;
-  }
-
   // normal (contas/benef)
   if(grupo==="benef"){ applyToBalance(conta, delta); }
   else { applyToBalance(conta, delta); }
@@ -1143,7 +746,7 @@ function renderList(){
     box.appendChild(div);
   }
 }
-function __renderCardDetail_original(){
+function renderCardDetail(){
   const box = $("cardDetail"); box.innerHTML="";
   const {curNu, curMP, sum} = cardSums();
 
@@ -1182,13 +785,6 @@ function __renderCardDetail_original(){
   renderCard("nubank", curNu, sum.nubank);
   renderCard("mp", curMP, sum.mp);
 }
-function renderCardDetail(mirror){
-  try{ __renderCardDetail_original(); }catch(_){ }
-  const src=document.getElementById('cardDetail');
-  const dst=document.getElementById('cardDetail2');
-  if(mirror && src && dst){ dst.innerHTML = src.innerHTML; }
-}
-
 
 /* config form */
 function setInput(id,val){ $(id).value=(Number(val)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -1382,161 +978,6 @@ $("btnImportFile").addEventListener("click", async ()=>{
   }catch(e){
     toast("Falha ao importar: " + (e.message||e));
   }
-});
-
-
-/* ===== Sidebar Navigation ===== */
-function setView(name){
-  const views = ["chat","painel","contas","fixas","rel","cfg","seg"];
-  for(const v of views){
-    const el = document.getElementById("view-"+v);
-    if(!el) continue;
-    el.classList.toggle("active", v===name);
-  }
-  document.querySelectorAll(".side-btn").forEach(b=>{
-    b.classList.toggle("active", b.dataset.view===name);
-  });
-  const titles = {
-    chat:"chat • motor A",
-    painel:"painel • saldos",
-    contas:"contas & cartões",
-    fixas:"contas fixas",
-    rel:"relatórios",
-    cfg:"configurações",
-    seg:"segurança & backup"
-  };
-  document.getElementById("hdrSub").textContent = titles[name] || "Finance";
-  closeMenu();
-  if(name==="contas"){ renderCardDetail(true); }
-}
-function openMenu(){
-  document.getElementById("sidebar").classList.add("open");
-  document.getElementById("overlay").classList.add("show");
-}
-function closeMenu(){
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("overlay").classList.remove("show");
-}
-document.getElementById("btnMenu").addEventListener("click", openMenu);
-document.getElementById("btnCloseMenu").addEventListener("click", closeMenu);
-document.getElementById("overlay").addEventListener("click", closeMenu);
-document.querySelectorAll(".side-btn").forEach(b=>{
-  b.addEventListener("click", ()=> setView(b.dataset.view));
-});
-
-/* ===== Chat Inteligente (v1) ===== */
-let draft=null; // {raw, summary}
-function showConfirm(html){
-  const bar=document.getElementById("confirmBar");
-  document.getElementById("confirmInfo").innerHTML = html;
-  bar.classList.remove("hidden");
-}
-function hideConfirm(){
-  const bar=document.getElementById("confirmBar");
-  bar.classList.add("hidden");
-  document.getElementById("confirmInfo").textContent="—";
-  draft=null;
-}
-function snapshotText(){
-  const totals = computeTotals();
-  return `📌 Saldo real agora: <b>${brl(totals.total)}</b><br>`+
-         `Contas+Dinheiro: ${brl(totals.contas)}<br>`+
-         `Cartões (fatura atual): ${brl(totals.cartoesAtual)}<br>`+
-         `Parcelas futuras: ${brl(totals.futuras)}<br>`+
-         `Benefícios: ${brl(totals.benef)}<br>`+
-         `Reserva: ${brl(state.saldos.reserva)}`;
-}
-function answerQuestion(raw){
-  const t = norm(raw);
-  if(t.includes("saldo") && (t.includes("atual") || t.includes("agora") || t.includes("geral") || t==="saldo")){
-    addMessage(snapshotText(),"bot"); return true;
-  }
-  if(t.includes("indo bem") || t.includes("estou bem") || t.includes("como estou")){
-    const totals = computeTotals();
-    addMessage(totals.total>=0 ? `✅ Você está indo bem: saldo real positivo em ${brl(totals.total)}.` : `⚠️ Atenção: faltam ${brl(Math.abs(totals.total))} para cobrir a fatura atual.`, "bot");
-    return true;
-  }
-  if(t.includes("cartao") || t.includes("cartão") || t.includes("fatura")){
-    setView("contas");
-    addMessage("✅ Abri Contas & Cartões para você.", "bot");
-    return true;
-  }
-  if(t.includes("benef") || t.includes("vr") || t.includes("va") || t.includes("combust")){
-    addMessage(`🎫 Benefícios: VR ${brl(state.saldos.vr)} • VA ${brl(state.saldos.va)} • Combustível ${brl(state.saldos.combustivel)}`, "bot");
-    return true;
-  }
-  if(t.includes("reserva")){
-    addMessage(`🏦 Reserva: ${brl(state.saldos.reserva)} (meta ${brl(state.metaReserva||10000)}).`, "bot");
-    return true;
-  }
-  return false;
-}
-function buildMovementSummary(raw){
-  const t = norm(raw);
-  const amount = parseMoney(raw);
-  if(!amount) return null;
-  const mm = raw.match(/(\d+)\s*x/i);
-  const parcelas = mm ? Number(mm[1]) : 1;
-  const isCard = (t.includes("cartao")||t.includes("cartão"));
-  const card = isCard ? inferCard(raw) : null;
-  const grp = inferGroupAndAccount(raw);
-  const cat = inferCategoria(raw);
-  let lines=[];
-  lines.push(`<b>${raw.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</b>`);
-  lines.push(`Valor: <b>${brl(amount)}</b>`);
-  lines.push(`Categoria: ${cat}`);
-  if(t.includes("reserva")) lines.push("Ação: Reserva (transferência)");
-  if(card) lines.push(`Cartão: ${card.toUpperCase()} • ${parcelas}x`);
-  else if(grp && grp.conta) lines.push(`Conta: ${grp.conta}`);
-  return lines.join("<br>");
-}
-function applyMovement(raw){
-  window.__silentBot = true;
-  try{ handleMovement(raw); }
-  finally{ window.__silentBot=false; }
-}
-
-function sendChat(){
-  const text = ($("input").value||"").trim();
-  if(!text) return;
-  if(draft){ toast("Finalize ou exclua o rascunho primeiro."); return; }
-  addMessage(text,"user");
-  $("input").value="";
-
-  if(text.endsWith("?") || /saldo|fatura|cart[aã]o|indo bem|benef|reserva/i.test(text)){
-    if(answerQuestion(text)) return;
-  }
-
-  const summary = buildMovementSummary(text);
-  if(!summary){
-    addMessage("Se for um lançamento, informe também o valor (ex: “Gastei 100 mercado pix Nubank”).", "bot");
-    return;
-  }
-  draft = {raw:text, summary};
-  showConfirm(summary + "<br><span class='small'>Confirma?</span>");
-  addMessage("✅ Rascunho pronto. Finalize para salvar.", "bot");
-}
-document.getElementById("btnSend").addEventListener("click", sendChat);
-document.getElementById("input").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); sendChat(); }});
-
-document.getElementById("btnConfirm").addEventListener("click", ()=>{
-  if(!draft) return;
-  applyMovement(draft.raw);
-  hideConfirm();
-  autoBackup("confirm");
-  addMessage("✅ Salvo.", "bot");
-});
-document.getElementById("btnCancel").addEventListener("click", ()=>{
-  if(!draft) return;
-  hideConfirm();
-  addMessage("🗑️ Rascunho excluído.", "bot");
-});
-document.getElementById("btnEdit").addEventListener("click", ()=>{
-  if(!draft) return;
-  $("input").value = draft.raw;
-  hideConfirm();
-  $("input").focus();
-  addMessage("✏️ Edite e envie novamente.", "bot");
 });
 
 /* boot */
