@@ -554,7 +554,7 @@ font-weight:bold;
             <div class="chatBox" id="chatBox"></div>
 
             <div class="chatComposer">
-              <input id="chatInput" placeholder='Ex: "300 roupa nubank 3x" | "300 roupa parcelado 3" | "300 roupa em 3 parcelas"' />
+              <input id="chatInput" placeholder='Ex: "300 roupa nubank 3x" | "parcelado roupa 200 3x" | "300 roupa em 3 parcelas"' />
               <button class="btn" id="btnSend">Enviar</button>
             </div>
 <div class="divider"></div>
@@ -679,29 +679,7 @@ font-weight:bold;
         </div>
       </section>
 
-      <!-- BENEFÍCIOS -->
-      <section id="tab-beneficios" class="hidden">
-        <div class="panelbox">
-          <div class="title">Benefícios (menu separado)</div>
-          <div class="row">
-            <div><label>Ativar Benefícios</label>
-              <select id="benAtivo"><option value="sim">Sim</option><option value="nao">Não</option></select>
-            </div>
-            <div><label>&nbsp;</label><button class="btn" id="btnSalvarBen" type="button">Salvar</button></div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="row">
-            <div><label for="novoBen">Nome do benefício</label><input id="novoBen" placeholder="Ex: VR, VA, Combustível" /></div>
-            <div><label for="apelidoBen">Apelidos (vírgula)</label><input id="apelidoBen" placeholder="Ex: vale refeição, vale alimentação" /></div>
-          </div>
-          <button class="btn" id="btnAddBen" type="button" style="margin-top:10px">Adicionar benefício</button>
-          <div class="divider"></div>
-          <div style="overflow:auto"><table><thead><tr><th>Benefício</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyBen"></tbody></table></div>
-        </div>
-      </section>
-
+   
       <!-- RELATÓRIOS -->
       <section id="tab-relatorios" class="hidden">
         <div class="panelbox">
@@ -925,7 +903,6 @@ function setTab(t){
     t==="painel" ? "Painel" :
     t==="transacoes" ? "Transações" :
     t==="contas" ? "Contas e Cartões" :
-    t==="beneficios" ? "Benefícios" :
     t==="relatorios" ? "Relatórios" : "Configurações";
   closeDrawer();
   if(t==="relatorios") renderCharts();
@@ -1884,4 +1861,5 @@ function renderAll(){
 
 </body>
 </html>
+
 
