@@ -1,940 +1,1547 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>FinancePlay • Chat</title>
-  <meta name="theme-color" content="#f5f7fb"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style>
-    :root{
-      --bg:#f5f7fb; --card:#ffffff; --text:#0f172a; --muted:#6b7280; --line:#e5e7eb; --soft:#eef2ff;
-      --shadow:0 10px 26px rgba(15,23,42,.08);
-      --r:18px; --tap:48px; --sidebarW:320px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;font-weight:500}
-    header{position:sticky;top:0;z-index:40;background:rgba(245,247,251,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
-      padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .h-left,.h-mid,.h-right{display:flex;align-items:center;gap:10px}
-    .h-mid{flex:1;justify-content:center}
-    .title{font-size:16px;font-weight:650;line-height:1.1}
-    .title small{display:block;color:var(--muted);font-size:12px;font-weight:520;margin-top:2px}
-    .chip{border-radius:999px;padding:8px 12px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
-    .dot{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.15)}
-    .btn{min-height:var(--tap);border-radius:14px;border:1px solid var(--line);background:var(--card);padding:10px 14px;cursor:pointer;color:var(--text);font-weight:560;user-select:none}
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:#e9f7ee;border-color:#c8ead5;color:#0b6b2a}
-    .btn.danger{background:#fff1f2;border-color:#fecdd3;color:#9f1239}
-    .btn.small{min-height:40px;padding:8px 12px;border-radius:12px;font-size:13px}
-    .btn.icon{padding:10px 12px}
-    .scrim{position:fixed;inset:0;background:rgba(2,6,23,.25);display:none;z-index:45}
-    .scrim.open{display:block}
-    aside{position:fixed;top:0;left:0;bottom:0;width:min(var(--sidebarW),86vw);background:var(--card);border-right:1px solid var(--line);
-      box-shadow:0 20px 40px rgba(2,6,23,.18);transform:translateX(-105%);transition:transform .22s ease;z-index:50;padding:14px;display:flex;flex-direction:column;gap:10px}
-    aside.open{transform:translateX(0)}
-    .menu-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-    .brand{font-size:14px;font-weight:700}
-    .brand small{display:block;color:var(--muted);font-size:12px;font-weight:520;margin-top:2px}
-    .menu-item{width:100%;text-align:left;min-height:46px;border-radius:14px;border:1px solid transparent;background:transparent;padding:10px 12px;font-weight:560;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px}
-    .menu-item:hover{background:#f3f4f6}
-    .menu-item.active{background:var(--soft);border-color:#e0e7ff}
-    .tiny{font-size:12px;color:var(--muted);line-height:1.35}
-    .menu-foot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted);background:#fff}
-    .app{max-width:980px;margin:0 auto;padding:14px 14px 90px}
-    .section{display:none}
-    .section.active{display:block}
-    .divider{height:1px;background:var(--line);margin:14px 0}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
-    .card h2{margin:0 0 10px;font-size:15px;font-weight:700}
-    .muted{color:var(--muted);font-size:12px;line-height:1.4}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:520px){.row{grid-template-columns:1fr}}
-    label{display:block;margin:10px 0 6px;font-size:12px;color:var(--muted)}
-    input,select,textarea{width:100%;min-height:var(--tap);border-radius:14px;border:1px solid var(--line);background:#fff;padding:12px 12px;font-weight:540;outline:none;font-size:14px}
-    input:focus,select:focus,textarea:focus{border-color:#c7d2fe;box-shadow:0 0 0 4px rgba(99,102,241,.10)}
-    .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (min-width:820px){.cards{grid-template-columns:repeat(4,1fr)}}
-    .kpi{border-radius:18px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);padding:14px;min-height:92px}
-    .kpi .k{color:var(--muted);font-size:12px;margin:0}
-    .kpi .v{font-size:22px;margin:10px 0 0;font-weight:750}
-    .kpi .s{margin-top:6px;color:var(--muted);font-size:12px}
-    .pos{color:#0b6b2a}
-    .neg{color:#9f1239}
-    .line-kpi{margin-top:12px;padding:14px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#fafbff);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .line-kpi .lbl{color:var(--muted);font-size:12px}
-    .line-kpi .val{font-size:20px;font-weight:750}
-    .chat-box{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:12px;min-height:56vh;display:flex;flex-direction:column;gap:10px}
-    .msgs{flex:1;overflow:auto;padding:4px}
-    .msg{max-width:88%;border:1px solid var(--line);border-radius:18px;padding:10px 12px;background:#fff;margin:8px 0;font-size:14px;line-height:1.35}
-    .msg.bot{background:#f8fafc}
-    .msg.you{margin-left:auto;background:#e9f7ee;border-color:#c8ead5}
-    .msg .meta{display:block;font-size:11px;color:var(--muted);margin-top:6px}
-    .pillrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .composer{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px}
-    .composer .send{min-width:110px;background:#e9f7ee;border-color:#c8ead5;color:#0b6b2a}
-    .subactions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-    .hint{font-size:12px;color:var(--muted);margin:8px 2px 0}
-    table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
-    th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px}
-    th{color:var(--muted);font-weight:650;background:#fafafa}
-    tr:last-child td{border-bottom:none}
-    .right{text-align:right}
-    #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(15,23,42,.92);color:#fff;padding:10px 12px;border-radius:14px;font-size:12px;display:none;z-index:90;max-width:92vw;text-align:center}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Finance</title>
+<meta name="theme-color" content="#f4f6f8" />
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#fff; --text:#0f172a; --muted:#6b7280; --line:#e5e7eb;
+    --okbg:#d9f2e6; --okbtn:#cfe8da; --danger:#9f1239; --dangerbg:#fff1f2;
+    --shadow:0 10px 26px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+  header{position:sticky;top:0;z-index:10;background:rgba(244,246,248,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+    padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  header .t{font-weight:800;font-size:28px;letter-spacing:-.02em}
+  header .s{font-size:12px;color:var(--muted);margin-top:-4px}
+  .wrap{max-width:560px;margin:0 auto;padding:16px 14px 26px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:14px;}
+  .muted{color:var(--muted);font-size:12px;line-height:1.35}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > *{flex:1}
+  input{width:100%;padding:12px;border-radius:14px;border:1px solid #d1d5db;outline:none;font-size:14px;background:#fff;}
+  input:focus{border-color:#b7c2ff;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+  button{padding:12px 18px;border-radius:14px;border:1px solid var(--line);background:var(--okbtn);font-weight:700;cursor:pointer;}
+  button:active{transform:translateY(1px)}
+  .btn-secondary{background:#fff}
+  .btn-danger{background:var(--dangerbg);border-color:#fecdd3;color:var(--danger)}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px}
+  .chatbox{display:flex;flex-direction:column;gap:10px}
+  .messages{display:flex;flex-direction:column;gap:10px;max-height:42vh;overflow:auto;padding:2px 2px 10px;}
+  .msg{padding:12px 14px;border-radius:18px;max-width:88%;border:1px solid var(--line);background:#fff;line-height:1.35}
+  .bot{background:#fff}
+  .user{background:var(--okbg);align-self:flex-end;border-color:#c8ead5}
+  .input-area{display:flex;gap:10px;align-items:center}
+  .input-area input{flex:1}
+  .kpi{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center}
+  .kpi .h{font-weight:800;font-size:22px;letter-spacing:-.02em}
+  .kpi .v{font-weight:900;font-size:22px;letter-spacing:-.02em}
+  .kpi .l{color:var(--muted);font-size:14px}
+  .sep{height:1px;background:var(--line);margin:10px 0}
+  .small{font-size:12px;color:var(--muted)}
+  .tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted);background:#fff}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .item{border:1px solid var(--line);border-radius:18px;padding:12px;background:#fff}
+  .item .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .item .desc{font-weight:800}
+  .item .amt{font-weight:900}
+  .item .meta{margin-top:4px;color:var(--muted);font-size:12px}
+  #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(15,23,42,.92);color:#fff;
+    padding:10px 12px;border-radius:14px;font-size:12px;display:none;z-index:999;max-width:92vw;text-align:center}
+  details{border:1px solid var(--line);border-radius:18px;padding:10px;background:#fff}
+  summary{cursor:pointer;font-weight:800}
+  .pos{color:#065f46}
+  .neg{color:#9f1239}
+
+  /* Layout with sidebar */
+  .app{display:flex;min-height:100vh}
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;width:260px;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+    border-right:1px solid var(--line);
+    padding:14px 12px;
+    display:flex;flex-direction:column;gap:10px;
+    z-index:30;
+    transform:translateX(-102%);
+    transition:transform .22s ease;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .side-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .side-sub{font-size:12px;color:var(--muted);margin-top:-2px}
+  .side-btn{
+    width:100%;
+    display:flex;align-items:center;gap:10px;
+    padding:12px 12px;border-radius:14px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .side-btn.active{background:var(--okbg);border-color:#c8ead5}
+  .side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+  .content{flex:1;margin-left:0}
+  @media (min-width: 980px){
+    .sidebar{transform:none;position:sticky;top:0;height:100vh}
+    .content{margin-left:260px}
+    .hamb{display:none}
+    .overlay{display:none}
+  }
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,23,42,.22);
+    z-index:25;display:none;
+  }
+  .overlay.show{display:block}
+  header{position:sticky;top:0;z-index:20}
+  .hamb{
+    border:1px solid var(--line);background:#fff;border-radius:14px;
+    padding:10px 12px;font-weight:800;cursor:pointer;
+  }
+  .view{display:none}
+  .view.active{display:block}
+
+  /* Chat confirm bar */
+  .confirmbar{
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    padding:10px;border-radius:16px;border:1px solid var(--line);
+    background:#fff;margin-top:8px;
+  }
+  .confirmbar .info{flex:1;color:var(--muted);font-size:12px;line-height:1.25}
+  .confirmbar button{padding:10px 12px}
+
+</style>
 </head>
 <body>
-  <div class="scrim" id="scrim"></div>
-  <aside id="sidebar" aria-label="Menu">
-    <div class="menu-head">
-      <div class="brand">FinancePlay <small>chat + painel • build <span id="buildTag">—</span></small></div>
-      <button class="btn" id="btnCloseMenu" type="button">Fechar</button>
+<header>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="hamb" id="btnMenu" type="button">☰</button>
+    <div>
+      <div class="t">Finance</div>
+      <div class="s" id="hdrSub">chat • motor A</div>
     </div>
-    <button class="menu-item active" data-view="chat">💬 Chat</button>
-    <button class="menu-item" data-view="painel">📌 Painel</button>
-    <button class="menu-item" data-view="transacoes">📒 Transações</button>
-    <button class="menu-item" data-view="contas">🏦 Contas e Cartões</button>
-    <button class="menu-item" data-view="relatorios">📊 Relatórios</button>
-    <button class="menu-item" data-view="config">⚙️ Configurações</button>
-    <button class="menu-item" data-view="login">🔐 Login (futuro)</button>
-    <div class="menu-foot tiny">
-      <div class="badge">Auto-save • backup local</div>
-      <div style="margin-top:8px">Ex: <span class="badge">gastei 100 mercado pix nubank</span></div>
-      <div style="margin-top:6px">Cartão: <span class="badge">gastei 200 roupa cartão nubank 2x</span></div>
-    </div>
-  </aside>
-
-  <div class="app">
-    <header>
-      <div class="h-left"><button class="btn icon" id="btnMenu" type="button">☰</button></div>
-      <div class="h-mid"><div class="title" id="headerTitle">Chat<small>salva automático + resumo</small></div></div>
-      <div class="h-right"><div class="chip"><span class="dot"></span><span id="statusTxt">Pronto</span></div></div>
-    </header>
-
-    <section class="section active" id="view-chat">
-      <div class="chat-box">
-        <div class="msgs" id="msgs"></div>
-        <div class="composer">
-          <input id="chatInput" placeholder='Ex: "Gastei 100 mercado pix nubank"  |  "Recebi salário 2000 nubank"' />
-          <button class="btn send" id="btnSend" type="button">Enviar</button>
-        </div>
-<div class="hint" id="chatHint">Se faltar algo, eu pergunto. Se estiver completo, eu salvo e te mostro o resumo.</div>
-      </div>
-    </section>
-
-    <section class="section" id="view-painel">
-      <div class="cards">
-        <div class="kpi"><div class="k">Receitas (mês)</div><div class="v pos" id="kpiReceitas">R$ 0,00</div><div class="s">entradas no mês</div></div>
-        <div class="kpi"><div class="k">Despesas (mês)</div><div class="v neg" id="kpiDespesas">R$ 0,00</div><div class="s">pix/débito/dinheiro</div></div>
-        <div class="kpi"><div class="k">Cartões (mês)</div><div class="v neg" id="kpiCartao">R$ 0,00</div><div class="s">crédito</div></div>
-        <div class="kpi"><div class="k">Saldo atual (mês)</div><div class="v" id="kpiSaldo">R$ 0,00</div><div class="s">receitas - despesas</div></div>
-      </div>
-      <div class="line-kpi"><div><div class="lbl">Saldo projetado</div><div class="muted">receitas - despesas - cartão</div></div><div class="val" id="kpiProj">R$ 0,00</div></div>
-      <div class="divider"></div>
-      <div class="card">
-        <h2>Despesas por categoria (mês)</h2>
-        <div class="muted">ordem do maior para o menor • com percentual</div>
-        <div id="catsList" style="margin-top:12px;display:flex;flex-direction:column;gap:10px"></div>
-      </div>
-    </section>
-
-    <section class="section" id="view-transacoes">
-      <div class="card">
-        <h2>Histórico</h2>
-        <div class="muted">Você registra pelo Chat. Aqui você vê e pode excluir.</div>
-        <div class="divider"></div>
-        <div class="row">
-          <div><label for="filterMonth">Mês</label><input id="filterMonth" type="month"/></div>
-          <div><label for="filterType">Tipo</label>
-            <select id="filterType"><option value="">Todos</option><option value="receita">Receita</option><option value="despesa">Despesa</option></select>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Conta/Cartão</th><th>Pagamento</th><th class="right">Valor</th><th class="right"></th></tr></thead>
-            <tbody id="tbodyTx"></tbody>
-          </table>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-          <button class="btn danger" id="btnApagarTx" type="button">Apagar lançamentos</button>
-          <button class="btn" id="btnExportBackup" type="button">Baixar backup (JSON)</button>
-          <label class="btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
-            Restaurar backup
-            <input id="inputRestore" type="file" accept="application/json" style="display:none"/>
-          </label>
-        </div>
-        <div class="hint">Backup automático acontece ao salvar e ao sair da página.</div>
-      </div>
-    </section>
-
-    <section class="section" id="view-contas">
-      <div class="card">
-        <h2>Contas e Cartões</h2>
-        <div class="muted">Cadastre para o chat reconhecer automaticamente.</div>
-        <div class="divider"></div>
-        <div class="row">
-          <div class="card" style="box-shadow:none">
-            <h2 style="margin-bottom:6px">Adicionar conta</h2>
-            <label>Nome</label><input id="accName" placeholder="Ex: Nubank, Mercado Pago, Dinheiro"/>
-            <label>Tipo</label>
-            <select id="accKind"><option value="conta">Conta (pix/débito)</option><option value="beneficio">Benefício (VR/VA/Combustível)</option></select>
-            <button class="btn primary" id="btnAddAcc" type="button" style="margin-top:10px">Salvar conta</button>
-          </div>
-          <div class="card" style="box-shadow:none">
-            <h2 style="margin-bottom:6px">Adicionar cartão</h2>
-            <label>Nome</label><input id="cardName" placeholder="Ex: Nubank, Mercado Pago"/>
-            <div class="row">
-              <div><label>Fechamento (dia)</label><input id="cardClose" inputmode="numeric" placeholder="Ex: 20"/></div>
-              <div><label>Pagamento (dia)</label><input id="cardPay" inputmode="numeric" placeholder="Ex: 28"/></div>
-            </div>
-            <button class="btn primary" id="btnAddCard" type="button" style="margin-top:10px">Salvar cartão</button>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="row">
-          <div><h2 style="margin:0 0 10px;font-size:14px;font-weight:700">Contas</h2><div id="accList" style="display:flex;flex-direction:column;gap:10px"></div></div>
-          <div><h2 style="margin:0 0 10px;font-size:14px;font-weight:700">Cartões</h2><div id="cardList" style="display:flex;flex-direction:column;gap:10px"></div></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="view-relatorios">
-      <div class="card">
-        <h2>Relatórios</h2>
-        <div class="muted">Base pronta para evoluir. Hoje: ranking por categoria do mês.</div>
-        <div class="divider"></div>
-        <div id="relCats"></div>
-      </div>
-    </section>
-
-    <section class="section" id="view-config">
-      <div class="card">
-        <h2>Configurações</h2>
-        <div class="muted">Categorias + lembrete de contas a vencer (fase 2).</div>
-        <div class="divider"></div>
-        <h2 style="margin:0 0 10px;font-size:14px;font-weight:700">Categorias (despesas)</h2>
-        <textarea id="cfgCatsOut" rows="3"></textarea>
-        <h2 style="margin:14px 0 10px;font-size:14px;font-weight:700">Categorias (receitas)</h2>
-        <textarea id="cfgCatsIn" rows="2"></textarea>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-          <button class="btn primary" id="btnSaveCfg" type="button">Salvar configurações</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="view-login">
-      <div class="card">
-        <h2>Login (futuro)</h2>
-        <div class="muted">Nesta versão é tudo local. Depois dá para adicionar login + banco.</div>
-      </div>
-    </section>
   </div>
+  <div class="row" style="flex:0;gap:8px">
+    <span class="pill" id="pillUser">👤 Padrão</span>
+    <button class="btn-secondary" id="btnRestoreLast" type="button">Restaurar</button>
+    <button class="btn-secondary" id="btnExport" type="button">Exportar</button>
+  </div>
+</header>
 
-  <div id="toast"></div>
+<div class="wrap">
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div>
+        <div class="brand">Finance</div>
+        <div class="side-sub">menu</div>
+      </div>
+      <button class="btn-secondary" id="btnCloseMenu" type="button" style="padding:10px 12px">✕</button>
+    </div>
+
+    <button class="side-btn active" data-view="chat">💬 Chat</button>
+    <button class="side-btn" data-view="painel">📊 Painel</button>
+    <button class="side-btn" data-view="contas">💳 Contas & Cartões</button>
+    <button class="side-btn" data-view="fixas">📌 Contas Fixas</button>
+    <button class="side-btn" data-view="rel">📈 Relatórios</button>
+    <button class="side-btn" data-view="cfg">⚙️ Config</button>
+    <button class="side-btn" data-view="seg">🔐 Segurança/Backup</button>
+
+    <div class="side-foot">
+      <div class="small">Abre no Chat. Registros pedem confirmação.</div>
+    </div>
+  </div>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="content">
+    <div class="wrap">
+      <section class="view active" id="view-chat"><section class="card chatbox">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input id="input" placeholder="Informe seus movimentos..." autocomplete="off" />
+      <button id="btnSend" type="button">Enviar</button>
+    </div>
+    <div class="confirmbar hidden" id="confirmBar">
+      <div class="info" id="confirmInfo">—</div>
+      <button id="btnConfirm" type="button">Finalizar</button>
+      <button class="btn-secondary" id="btnEdit" type="button">Editar</button>
+      <button class="btn-danger" id="btnCancel" type="button">Excluir</button>
+    </div>
+    <div class="muted">Ex: “Recebi 1000 salário Nubank” • “Paguei energia 200 pix Mercado Pago” • “Gastei 300 mercado Dinheiro” • “Gastei 1200 celular cartão MP 6x” • “Paguei cartão Nubank”</div>
+  </section></section>
+      <section class="view" id="view-painel"><section class="card" style="margin-top:14px">
+    <div class="kpi">
+      <div class="h">Saldo Total</div>
+      <div class="v" id="saldoTotal">R$ 0,00</div>
+      <div class="l" style="grid-column:1 / -1;margin-top:-2px" id="insight">—</div>
+
+      <div class="l">Contas + Dinheiro</div>
+      <div class="l" style="text-align:right" id="saldoContas">R$ 0,00</div>
+
+      <div class="l">Cartões (fatura atual)</div>
+      <div class="l" style="text-align:right" id="saldoCartoes">R$ 0,00</div>
+
+      <div class="l">Parcelas futuras</div>
+      <div class="l" style="text-align:right" id="saldoFuturas">R$ 0,00</div>
+
+      <div class="l">Benefícios (VR+VA+Comb.)</div>
+      <div class="l" style="text-align:right" id="saldoBenef">R$ 0,00</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="kpi" style="grid-template-columns:1fr auto">
+      <div class="h">Reserva <span class="small">(meta 10k)</span></div>
+      <div class="v" id="saldoReserva">R$ 0,00</div>
+      <div class="small">Progresso</div>
+      <div class="small" style="text-align:right" id="progReserva">0,0%</div>
+    </div>
+    <div style="height:10px"></div>
+    <div style="height:10px;border-radius:999px;background:#eef2f7;overflow:hidden">
+      <div id="barReserva" style="height:10px;width:0%;background:#cfe8da"></div>
+    </div>
+
+    <div class="sep"></div>
+</details>
+  </section></section>
+      <section class="view" id="view-contas">
+<section class="card">
+  <div style="font-weight:900;font-size:20px;letter-spacing:-.02em">💳 Contas & Cartões</div>
+  <div class="muted" style="margin-top:6px">Fatura atual e parcelas futuras (separadas).</div>
+  <div class="sep"></div>
+  <div class="list" id="cardDetail2"></div>
+</section>
+</section>
+      <section class="view" id="view-fixas">
+<section class="card">
+  <div style="font-weight:900;font-size:20px;letter-spacing:-.02em">📌 Contas Fixas</div>
+  <div class="muted" style="margin-top:6px">Em seguida: cadastro + projeção automática no saldo projetado.</div>
+</section>
+</section>
+      <section class="view" id="view-rel">
+<section class="card">
+  <div style="font-weight:900;font-size:20px;letter-spacing:-.02em">📈 Relatórios</div>
+  <div class="muted" style="margin-top:6px">Em seguida: gráficos por categoria, contas e cartões (opcional).</div>
+</section>
+</section>
+      <section class="view" id="view-cfg"><section class="card"><details>
+      <summary>⚙️ Saldos iniciais (opcional) + regras de cartões</summary>
+      <div class="small" style="margin:6px 0 10px">Fica salvo no aparelho. Nesta versão, o cartão mostra <b>só a fatura atual</b> e separa <b>parcelas futuras</b>.</div>
+
+      <div class="row">
+        <div>
+          <div class="small">Conta Nubank</div>
+          <input id="iniContaNu" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Conta Mercado Pago</div>
+          <input id="iniContaMP" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Dinheiro</div>
+          <input id="iniDin" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Reserva</div>
+          <input id="iniRes" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">Cartão Nubank (fatura atual)</div>
+          <input id="iniCartNu" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Cartão Mercado Pago (fatura atual)</div>
+          <input id="iniCartMP" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">VR</div>
+          <input id="iniVR" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">VA</div>
+          <input id="iniVA" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Combustível</div>
+          <input id="iniComb" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Meta Reserva</div>
+          <input id="metaRes" inputmode="decimal" placeholder="10000" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">Fechamento Nubank (dia)</div>
+          <input id="fechNu" inputmode="numeric" placeholder="6" />
+        </div>
+        <div>
+          <div class="small">Fechamento MP (dia)</div>
+          <input id="fechMP" inputmode="numeric" placeholder="2" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Vencimento Nubank (dia)</div>
+          <input id="vencNu" inputmode="numeric" placeholder="7" />
+        </div>
+        <div>
+          <div class="small">Vencimento MP (dia)</div>
+          <input id="vencMP" inputmode="numeric" placeholder="7" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="btnSaveIni" type="button">Salvar</button>
+        <button class="btn-secondary" id="btnLoadExample" type="button">Carregar seus saldos (exemplo)</button>
+        <button class="btn-danger" id="btnReset" type="button">Zerar tudo</button>
+      </div>
+    </details></section></section>
+      <section class="view" id="view-seg"><section class="card"><details>
+      <summary>⚙️ Saldos iniciais (opcional) + regras de cartões</summary>
+      <div class="small" style="margin:6px 0 10px">Fica salvo no aparelho. Nesta versão, o cartão mostra <b>só a fatura atual</b> e separa <b>parcelas futuras</b>.</div>
+
+      <div class="row">
+        <div>
+          <div class="small">Conta Nubank</div>
+          <input id="iniContaNu" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Conta Mercado Pago</div>
+          <input id="iniContaMP" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Dinheiro</div>
+          <input id="iniDin" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Reserva</div>
+          <input id="iniRes" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">Cartão Nubank (fatura atual)</div>
+          <input id="iniCartNu" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Cartão Mercado Pago (fatura atual)</div>
+          <input id="iniCartMP" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">VR</div>
+          <input id="iniVR" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">VA</div>
+          <input id="iniVA" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Combustível</div>
+          <input id="iniComb" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Meta Reserva</div>
+          <input id="metaRes" inputmode="decimal" placeholder="10000" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">Fechamento Nubank (dia)</div>
+          <input id="fechNu" inputmode="numeric" placeholder="6" />
+        </div>
+        <div>
+          <div class="small">Fechamento MP (dia)</div>
+          <input id="fechMP" inputmode="numeric" placeholder="2" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Vencimento Nubank (dia)</div>
+          <input id="vencNu" inputmode="numeric" placeholder="7" />
+        </div>
+        <div>
+          <div class="small">Vencimento MP (dia)</div>
+          <input id="vencMP" inputmode="numeric" placeholder="7" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="btnSaveIni" type="button">Salvar</button>
+        <button class="btn-secondary" id="btnLoadExample" type="button">Carregar seus saldos (exemplo)</button>
+        <button class="btn-danger" id="btnReset" type="button">Zerar tudo</button>
+      </div>
+    </details>
+
+    <div class="sep"></div>
+
+    <details>
+      <summary>📌 Detalhe cartões (por fatura)</summary>
+      <div class="small" style="margin:6px 0 10px">Aqui aparece o que vence agora (fatura atual) e o que já está comprometido para os próximos meses.</div>
+      <div class="list" id="cardDetail"></div>
+    
+    <div class="sep"></div>
+    <details>
+      <summary>🧯 Backup automático (15)</summary>
+      <div class="small" style="margin:6px 0 10px">
+        O app salva um backup automaticamente quando você sai/fecha ou troca de app. Mantém os <b>15 últimos</b> e depois substitui os mais antigos.
+      </div>
+      <div class="row">
+        <button id="btnRestoreLast2" type="button">Restaurar último backup</button>
+        <button class="btn-secondary" id="btnShowBackups" type="button">Ver backups</button>
+      </div>
+      <div id="backupList" class="list" style="margin-top:10px"></div>
+      
+      <div class="sep"></div>
+      <div class="small" style="margin:6px 0 8px">🔐 PIN (4 números) para Restaurar/Apagar</div>
+      <div class="row">
+        <input id="pinNew" inputmode="numeric" placeholder="Definir novo PIN (4 dígitos)" />
+        <button class="btn-secondary" id="btnSetPin" type="button">Definir/Alterar PIN</button>
+      </div>
+
+      <div class="small" style="margin:6px 0 8px">Importar arquivo JSON (manual):</div>
+      <input id="fileImport" type="file" accept="application/json" />
+      <div class="row" style="margin-top:10px">
+        <button class="btn-secondary" id="btnImportFile" type="button">Importar arquivo</button>
+        <button class="btn-danger" id="btnClearBackups" type="button">Apagar backups</button>
+      </div>
+      <div class="small" style="margin-top:10px">Dica: “Exportar” baixa um arquivo para você guardar fora do celular.</div>
+    </details></section></section>
+      <section class="card" style="margin-top:14px">
+    <div class="kpi">
+      <div class="h">Saldo Total</div>
+      <div class="v" id="saldoTotal">R$ 0,00</div>
+      <div class="l" style="grid-column:1 / -1;margin-top:-2px" id="insight">—</div>
+
+      <div class="l">Contas + Dinheiro</div>
+      <div class="l" style="text-align:right" id="saldoContas">R$ 0,00</div>
+
+      <div class="l">Cartões (fatura atual)</div>
+      <div class="l" style="text-align:right" id="saldoCartoes">R$ 0,00</div>
+
+      <div class="l">Parcelas futuras</div>
+      <div class="l" style="text-align:right" id="saldoFuturas">R$ 0,00</div>
+
+      <div class="l">Benefícios (VR+VA+Comb.)</div>
+      <div class="l" style="text-align:right" id="saldoBenef">R$ 0,00</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="kpi" style="grid-template-columns:1fr auto">
+      <div class="h">Reserva <span class="small">(meta 10k)</span></div>
+      <div class="v" id="saldoReserva">R$ 0,00</div>
+      <div class="small">Progresso</div>
+      <div class="small" style="text-align:right" id="progReserva">0,0%</div>
+    </div>
+    <div style="height:10px"></div>
+    <div style="height:10px;border-radius:999px;background:#eef2f7;overflow:hidden">
+      <div id="barReserva" style="height:10px;width:0%;background:#cfe8da"></div>
+    </div>
+
+    <div class="sep"></div>
+
+    <details>
+      <summary>⚙️ Saldos iniciais (opcional) + regras de cartões</summary>
+      <div class="small" style="margin:6px 0 10px">Fica salvo no aparelho. Nesta versão, o cartão mostra <b>só a fatura atual</b> e separa <b>parcelas futuras</b>.</div>
+
+      <div class="row">
+        <div>
+          <div class="small">Conta Nubank</div>
+          <input id="iniContaNu" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Conta Mercado Pago</div>
+          <input id="iniContaMP" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Dinheiro</div>
+          <input id="iniDin" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Reserva</div>
+          <input id="iniRes" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">Cartão Nubank (fatura atual)</div>
+          <input id="iniCartNu" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Cartão Mercado Pago (fatura atual)</div>
+          <input id="iniCartMP" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">VR</div>
+          <input id="iniVR" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">VA</div>
+          <input id="iniVA" inputmode="decimal" placeholder="0,00" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Combustível</div>
+          <input id="iniComb" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div>
+          <div class="small">Meta Reserva</div>
+          <input id="metaRes" inputmode="decimal" placeholder="10000" />
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div>
+          <div class="small">Fechamento Nubank (dia)</div>
+          <input id="fechNu" inputmode="numeric" placeholder="6" />
+        </div>
+        <div>
+          <div class="small">Fechamento MP (dia)</div>
+          <input id="fechMP" inputmode="numeric" placeholder="2" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <div class="small">Vencimento Nubank (dia)</div>
+          <input id="vencNu" inputmode="numeric" placeholder="7" />
+        </div>
+        <div>
+          <div class="small">Vencimento MP (dia)</div>
+          <input id="vencMP" inputmode="numeric" placeholder="7" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="btnSaveIni" type="button">Salvar</button>
+        <button class="btn-secondary" id="btnLoadExample" type="button">Carregar seus saldos (exemplo)</button>
+        <button class="btn-danger" id="btnReset" type="button">Zerar tudo</button>
+      </div>
+    </details>
+
+    <div class="sep"></div>
+
+    <details>
+      <summary>📌 Detalhe cartões (por fatura)</summary>
+      <div class="small" style="margin:6px 0 10px">Aqui aparece o que vence agora (fatura atual) e o que já está comprometido para os próximos meses.</div>
+      <div class="list" id="cardDetail"></div>
+    
+    <div class="sep"></div>
+    <details>
+      <summary>🧯 Backup automático (15)</summary>
+      <div class="small" style="margin:6px 0 10px">
+        O app salva um backup automaticamente quando você sai/fecha ou troca de app. Mantém os <b>15 últimos</b> e depois substitui os mais antigos.
+      </div>
+      <div class="row">
+        <button id="btnRestoreLast2" type="button">Restaurar último backup</button>
+        <button class="btn-secondary" id="btnShowBackups" type="button">Ver backups</button>
+      </div>
+      <div id="backupList" class="list" style="margin-top:10px"></div>
+      
+      <div class="sep"></div>
+      <div class="small" style="margin:6px 0 8px">🔐 PIN (4 números) para Restaurar/Apagar</div>
+      <div class="row">
+        <input id="pinNew" inputmode="numeric" placeholder="Definir novo PIN (4 dígitos)" />
+        <button class="btn-secondary" id="btnSetPin" type="button">Definir/Alterar PIN</button>
+      </div>
+
+      <div class="small" style="margin:6px 0 8px">Importar arquivo JSON (manual):</div>
+      <input id="fileImport" type="file" accept="application/json" />
+      <div class="row" style="margin-top:10px">
+        <button class="btn-secondary" id="btnImportFile" type="button">Importar arquivo</button>
+        <button class="btn-danger" id="btnClearBackups" type="button">Apagar backups</button>
+      </div>
+      <div class="small" style="margin-top:10px">Dica: “Exportar” baixa um arquivo para você guardar fora do celular.</div>
+    </details>
+</details>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="font-weight:900;font-size:22px;letter-spacing:-.02em">Lançamentos</div>
+      <span class="tag" id="tagCount">0</span>
+    </div>
+    <div class="sep"></div>
+    <div class="list" id="list"></div>
+  </section>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-const BUILD = "v1.0.0";
-document.getElementById("buildTag").textContent = BUILD;
-
-const KEY = { TX:"fp_tx_v1", ACC:"fp_acc_v1", CARD:"fp_cards_v1", CFG:"fp_cfg_v1", LAST:"fp_backup_last_v1" };
 const $ = (id)=>document.getElementById(id);
-const scrim = $("scrim");
-const sidebar = $("sidebar");
-
-function toast(msg){ const t=$("toast"); t.textContent=msg; t.style.display="block"; clearTimeout(toast._tm); toast._tm=setTimeout(()=>t.style.display="none",2300);}
-function setStatus(msg){ $("statusTxt").textContent = msg; }
-function safeParse(s,f){ try{return JSON.parse(s);}catch(_){return f;} }
-function saveKey(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-function loadKey(k,f){ return safeParse(localStorage.getItem(k)||JSON.stringify(f), f); }
-function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim(); }
-function cap(s){ const t=String(s||"").trim(); return t ? t[0].toUpperCase()+t.slice(1) : t; }
-function fmtBRL(n){ const v=Number(n); if(!Number.isFinite(v)) return "R$ 0,00"; return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
-function parseMoney(text){ const m=String(text||"").match(/(\d{1,3}(?:\.\d{3})*|\d+)(?:,(\d{1,2}))?/); if(!m) return null; const whole=m[1].replace(/\./g,""); const dec=m[2]?("."+m[2].padEnd(2,"0")):""; const n=Number(whole+dec); return Number.isFinite(n)?n:null; }
-function todayISO(){ const d=new Date(); const off=d.getTimezoneOffset(); const d2=new Date(d.getTime()-off*60000); return d2.toISOString().slice(0,10); }
-function monthKey(iso){ const [y,m]=String(iso||"").split("-"); return (y&&m)?`${y}-${m}`:null; }
-function sameMonth(a,b){ return monthKey(a)===monthKey(b); }
-function uid(){ return (crypto?.randomUUID?crypto.randomUUID():String(Date.now())+"_"+Math.random().toString(16).slice(2)); }
-function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-let tx = loadKey(KEY.TX, []);
-let accounts = loadKey(KEY.ACC, []);
-let cards = loadKey(KEY.CARD, []);
-let cfg = loadKey(KEY.CFG, { expenseCats:"Mercado, Transporte, Casa, Saúde, Lazer, Educação, Combustível, Outros", incomeCats:"Salário, Extra, Reembolso, Outros" });
-
-function ensureDefaults(){
-  if(!Array.isArray(accounts) || accounts.length===0){
-    accounts=[ {id:uid(),name:"Mercado Pago",kind:"conta"}, {id:uid(),name:"Nubank",kind:"conta"}, {id:uid(),name:"Dinheiro",kind:"conta"}, {id:uid(),name:"VR",kind:"beneficio"}, {id:uid(),name:"VA",kind:"beneficio"}, {id:uid(),name:"Combustível",kind:"beneficio"} ];
-    saveKey(KEY.ACC, accounts);
-  }
-  if(!Array.isArray(cards) || cards.length===0){
-    cards=[ {id:uid(),name:"Nubank",closeDay:20,payDay:28}, {id:uid(),name:"Mercado Pago",closeDay:10,payDay:18} ];
-    saveKey(KEY.CARD, cards);
-  }
-  if(!Array.isArray(tx)) tx=[];
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.style.display="block";
+  clearTimeout(toast._tm); toast._tm=setTimeout(()=>t.style.display="none",2200);
 }
-ensureDefaults();
+function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim(); }
+function brl(n){ return (Number(n)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function parseMoney(txt){
+  const s = String(txt||"").replace(/\./g,"").replace(",",".").match(/-?\d+(\.\d+)?/);
+  return s ? Number(s[0]) : 0;
+}
+function nowYMD(){
+  const d=new Date(); const y=d.getFullYear(), m=d.getMonth()+1, day=d.getDate();
+  return `${y}-${String(m).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+}
+function ymdToBR(ymd){
+  if(!ymd) return ""; const [y,m,d]=ymd.split("-"); return `${d}/${m}/${y}`;
+}
+function monthKeyFromDate(ymd){ const [y,m]=ymd.split("-").map(Number); return `${y}-${String(m).padStart(2,"0")}`; }
+function addMonthsToKey(key, add){
+  const [y0,m0]=key.split("-").map(Number); let y=y0, m=m0+add;
+  while(m>12){m-=12;y++} while(m<1){m+=12;y--}
+  return `${y}-${String(m).padStart(2,"0")}`;
+}
+function dayOfMonthKey(key, day){
+  const [y,m]=key.split("-").map(Number); const dt=new Date(y, m-1, 1); dt.setDate(day);
+  const yy=dt.getFullYear(), mm=dt.getMonth()+1, dd=dt.getDate();
+  return `${yy}-${String(mm).padStart(2,"0")}-${String(dd).padStart(2,"0")}`;
+}
 
+const KEY="finance_v4_state";
+const BACKUP_KEY="finance_v4_backups_v1";
+const BACKUP_MAX=15;
+const PIN_HASH_KEY="finance_v4_pin_hash";
 
-  // ===== Confirmação estilo WhatsApp (antes de salvar) =====
-  function draftToLines(d) {
-    const parts = [];
-    const tipo = (d.kind === "income") ? "Receita" : "Despesa";
-    parts.push(`{{ICON}} Tipo: ${tipo}`);
-    if (d.category) parts.push(`{{ICON}} Categoria: ${d.category}`);
-    if (d.amount != null) parts.push(`{{ICON}} Valor: ${brl(d.amount)}`);
-    if (d.payType) {
-      if (d.payType === "card") parts.push(`{{ICON}} Pagamento: Cartão (${d.cardName || "—"})`);
-      else if (d.payType === "pix") parts.push("{{ICON}} Pagamento: Pix");
-      else if (d.payType === "debit") parts.push("{{ICON}} Pagamento: Débito");
-      else if (d.payType === "cash") parts.push("{{ICON}} Pagamento: Dinheiro");
-      else parts.push(`{{ICON}} Pagamento: ${d.payType}`);
-    }
-    if (d.account) parts.push(`{{ICON}} Conta: ${d.account}`);
-    if (d.installments && d.installments > 1) parts.push(`{{ICON}} Parcelas: ${d.installments}x`);
-    if (d.dateISO) parts.push(`{{ICON}} Data: ${d.dateISO}`);
-    return parts;
+const DEFAULT_STATE={
+  metaReserva:10000,
+  saldos:{conta_nubank:0,conta_mp:0,dinheiro:0,reserva:0,vr:0,va:0,combustivel:0},
+  // cartões agora são calculados a partir dos lançamentos (por faturaKey)
+  // (guardamos só regras + lançamentos)
+  regras:{nubank:{fechamentoDia:6,vencimentoDia:7},mp:{fechamentoDia:2,vencimentoDia:7}},
+  lancamentos:[]
+};
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY)||"null");
+    if(!s) return structuredClone(DEFAULT_STATE);
+    return {
+      ...structuredClone(DEFAULT_STATE),
+      ...s,
+      saldos:{...structuredClone(DEFAULT_STATE.saldos),...(s.saldos||{})},
+      regras:{
+        nubank:{...structuredClone(DEFAULT_STATE.regras.nubank),...((s.regras||{}).nubank||{})},
+        mp:{...structuredClone(DEFAULT_STATE.regras.mp),...((s.regras||{}).mp||{})},
+      },
+      lancamentos:Array.isArray(s.lancamentos)?s.lancamentos:[]
+    };
+  }catch(_){ return structuredClone(DEFAULT_STATE); }
+}
+
+function saveState(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+/* ===== Auto-backup (15 últimos) =====
+   - Salva snapshot quando você sai/fecha/troca de app
+   - Mantém 15 e substitui os mais antigos (FIFO)
+*/
+function loadBackups(){
+  try{ return JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]"); }catch(_){ return []; }
+}
+function saveBackups(list){
+  localStorage.setItem(BACKUP_KEY, JSON.stringify(list));
+}
+function makeSnapshot(reason){
+  return {
+    ts: Date.now(),
+    reason: reason || "auto",
+    state: state
+  };
+}
+function autoBackup(reason){
+  try{
+    const list = loadBackups();
+    list.push(makeSnapshot(reason));
+    while(list.length > BACKUP_MAX) list.shift(); // sobrepõe o mais antigo
+    saveBackups(list);
+  }catch(_){}
+}
+function restoreSnapshot(snap){
+  if(!snap || !snap.state) return false;
+  state = snap.state;
+  saveState();
+  renderAll();
+  toast("Backup restaurado ✅");
+  return true;
+}
+function restoreLastBackup(){
+  const list = loadBackups();
+  if(!list.length){ toast("Sem backup ainda."); return; }
+  const last = list[list.length-1];
+  if(confirm("Restaurar o último backup? Isso substitui seus dados atuais no aparelho.")){
+    restoreSnapshot(last);
   }
+}
+function formatDT(ts){
+  try{
+    const d = new Date(ts);
+    const dd = String(d.getDate()).padStart(2,"0");
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const yy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+  }catch(_){ return ""; }
 
-  function addConfirmBubble(draft) {
-    const lines = draftToLines(draft).map(l => l.replaceAll("{ICON}","✅")).join("<br>");
-    const html = `
-      <div class="txn-card" style="margin-top:10px;">
-        <div style="display:flex; gap:10px; align-items:flex-start;">
-          <div style="width:34px;height:34px;border-radius:50%;background:#e9f7f2;display:flex;align-items:center;justify-content:center;">✅</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:14px;line-height:1.35;color:#1f2937;">
-              Tudo certo! Confirma este lançamento?
-            </div>
-            <div style="margin-top:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.75);border:1px solid rgba(15,23,42,.08);font-size:13px;line-height:1.45;color:#111827;">
-              ${lines}
-            </div>
-            <div class="btn-row" style="margin-top:10px;gap:10px;">
-              <button class="btn btn-primary" data-confirm="finalize" type="button">Finalizar</button>
-              <button class="btn" data-confirm="edit" type="button">Editar</button>
-              <button class="btn btn-danger" data-confirm="cancel" type="button">Excluir</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    addMsg(html, "bot");
-    scrollToEnd();
+/* ===== PIN (4 dígitos) =====
+   - Protege ações sensíveis (Restaurar/Apagar/Zerar)
+   - PIN é guardado como hash (SHA-256) no aparelho
+*/
+async function sha256(txt){
+  const enc = new TextEncoder().encode(txt);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function isValidPin(pin){
+  return /^\d{4}$/.test(String(pin||"").trim());
+}
+async function getPinHash(pin){ return await sha256(String(pin)); }
+function hasPin(){ return !!localStorage.getItem(PIN_HASH_KEY); }
+
+async function setPinFlow(){
+  const pin = String($("pinNew")?.value || "").trim();
+  if(!isValidPin(pin)){
+    toast("PIN deve ter 4 números.");
+    return false;
   }
+  const hash = await getPinHash(pin);
+  localStorage.setItem(PIN_HASH_KEY, hash);
+  $("pinNew").value = "";
+  toast("PIN definido ✅");
+  return true;
+}
 
-  function isDraftComplete(d) {
-    if (!d) return false;
-    if (!d.kind) return false;
-    if (d.amount == null || isNaN(d.amount)) return false;
-    if (!d.category) return false;
-    if (!d.payType) return false;
-    if (d.payType === "card" && !d.cardName) return false;
-    if (!d.account) return false;
-    if (!d.dateISO) return false;
+async function requirePin(){
+  // se não existir, pede para definir
+  if(!hasPin()){
+    const p1 = prompt("Defina um PIN de 4 números (para proteger Restaurar/Apagar):");
+    if(p1 === null) return false;
+    if(!isValidPin(p1)){ toast("PIN inválido."); return false; }
+    const p2 = prompt("Confirme o PIN:");
+    if(p2 === null) return false;
+    if(String(p2).trim() !== String(p1).trim()){ toast("PIN não confere."); return false; }
+    localStorage.setItem(PIN_HASH_KEY, await getPinHash(p1.trim()));
+    toast("PIN definido ✅");
     return true;
   }
 
-  function goConfirm(draft) {
-    pending = { step: "confirm", draft };
-    savePending();
-    addConfirmBubble(draft);
+  const pin = prompt("Digite seu PIN (4 números):");
+  if(pin === null) return false;
+  if(!isValidPin(pin)){ toast("PIN inválido."); return false; }
+  const hash = await getPinHash(pin.trim());
+  const stored = localStorage.getItem(PIN_HASH_KEY);
+  if(hash !== stored){
+    toast("PIN incorreto.");
+    return false;
   }
-
-  
-  function applyConfirmEditToDraft(text){
-    if(!pending || pending.step!=="confirm_edit" || !pending.draft) return false;
-    const d = pending.draft;
-    const t = (text||"").trim();
-
-    // valor
-    let m = t.match(/\bvalor\s+(\d+[\d.,]*)/i);
-    if(m){ d.amount = parseMoney(m[1]); }
-
-    // categoria
-    m = t.match(/\bcategoria\s+(.+)/i);
-    if(m){ d.category = m[1].trim(); }
-
-    // conta
-    m = t.match(/\bconta\s+(.+)/i);
-    if(m){ d.account = m[1].trim(); }
-
-    // pagamento
-    m = t.match(/\bpagamento\s+(pix|debito|d[eé]bito|dinheiro|cart[aã]o)/i);
-    if(m){
-      const p = m[1].toLowerCase();
-      if(p.startsWith("pix")) d.payType="pix";
-      else if(p.startsWith("deb") || p.startsWith("déb")) d.payType="debit";
-      else if(p.startsWith("din")) d.payType="cash";
-      else d.payType="card";
-    }
-
-    // cartão
-    m = t.match(/\bcart[aã]o\s+(.+)/i);
-    if(m){ d.payType="card"; d.cardName = m[1].trim(); }
-
-    // parcelas
-    m = t.match(/\bparcelas?\s+(\d+)\s*x/i);
-    if(m){ d.installments = Math.max(1, parseInt(m[1],10)||1); }
-
-    // data
-    m = t.match(/\bdata\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
-    if(m){ d.dateISO = toISO(m[1]); }
-
-    pending.draft = d;
-    pending.step = "confirm";
-    savePending();
-    addMsg(`Atualizado ✅", "bot`);
-    goConfirm(d);
-    return true;
-  }
-
-// ===== Cliques em botões do chat =====
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-
-    // confirmação (pré-salvar)
-    if (btn.dataset && btn.dataset.confirm) {
-      const act = btn.dataset.confirm;
-      if (!pending || pending.step !== "confirm" || !pending.draft) {
-        toast("Nada para confirmar.");
-        return;
-      }
-      if (act === "finalize") {
-        goConfirm(pending.draft);
-        toast("Salvo ✅");
-        return;
-      }
-      if (act === "cancel") {
-        pending = null;
-        savePending();
-        addMsg(`Ok — lançamento descartado.", "bot`);
-        toast("Excluído");
-        return;
-      }
-      if (act === "edit") {
-        pending.step = "confirm_edit";
-        savePending();
-        addMsg(`O que você quer editar? Ex: <b>valor 250</b> | <b>categoria Farmácia</b> | <b>conta Mercado Pago</b> | <b>pagamento pix</b> | <b>cartão Nubank</b> | <b>parcelas 3x</b> | <b>data 01/03/2026</b>", "bot`);
-        scrollToEnd();
-        return;
-      }
-    }
-
-    // editar/deletar registros já salvos (cards do histórico)
-    if (btn.dataset && btn.dataset.edit) {
-      const id = btn.dataset.edit;
-      const tx = txns.find(t => t.id === id);
-      if (!tx) return;
-      const d = {
-        kind: tx.kind,
-        amount: tx.amount,
-        category: tx.category,
-        payType: tx.payType,
-        account: tx.account,
-        cardName: tx.cardName || "",
-        installments: tx.installments || 1,
-        dateISO: tx.dateISO
-      };
-      txns = txns.filter(t => t.id !== id);
-      saveAll();
-      addMsg(`Beleza — vamos editar. Ajuste o que quiser e confirme.", "bot`);
-      goConfirm(d);
-      return;
-    }
-    if (btn.dataset && btn.dataset.del) {
-      const id = btn.dataset.del;
-      txns = txns.filter(t => t.id !== id);
-      saveAll();
-      renderAll();
-      toast("Apagado");
-      return;
-    }
-  });
-function makeBackup(reason="auto"){
-  const payload={backedUpAt:new Date().toISOString(),reason,tx,accounts,cards,cfg,build:BUILD};
-  localStorage.setItem(KEY.LAST, JSON.stringify(payload));
+  return true;
 }
-function persist(reason="save"){ saveKey(KEY.TX,tx); saveKey(KEY.ACC,accounts); saveKey(KEY.CARD,cards); saveKey(KEY.CFG,cfg); makeBackup(reason); }
-document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") makeBackup("exit"); });
 
-function openMenu(){ sidebar.classList.add("open"); scrim.classList.add("open"); }
-function closeMenu(){ sidebar.classList.remove("open"); scrim.classList.remove("open"); }
-$("btnMenu").addEventListener("click", openMenu);
-$("btnCloseMenu").addEventListener("click", closeMenu);
-scrim.addEventListener("click", closeMenu);
-
-const viewTitles={chat:["Chat","salva automático + resumo"],painel:["Painel","visão rápida do mês"],transacoes:["Transações","histórico completo"],contas:["Contas e Cartões","cadastro e regras"],relatorios:["Relatórios","resumo por categorias"],config:["Configurações","categorias"],login:["Login","futuro"]};
-function setView(name){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  $("view-"+name).classList.add("active");
-  document.querySelectorAll(".menu-item").forEach(b=>b.classList.toggle("active", b.dataset.view===name));
-  const t=viewTitles[name]||[cap(name),"—"];
-  $("headerTitle").innerHTML = `${t[0]}<small>${t[1]}</small>`;
-  closeMenu();
-  if(name==="painel") renderPainel();
-  if(name==="transacoes") renderTransacoes();
-  if(name==="contas") renderContas();
-  if(name==="relatorios") renderRelatorios();
-  if(name==="config") renderConfig();
+async function withPin(fn){
+  const ok = await requirePin();
+  if(!ok) return;
+  await fn();
 }
-document.querySelectorAll(".menu-item").forEach(b=>b.addEventListener("click", ()=>setView(b.dataset.view)));
-
-/* Chat */
-const msgs=$("msgs");
-function addMsg(text, who="bot"){
-  const el=document.createElement("div");
-  el.className="msg "+(who==="you"?"you":"bot");
-  el.innerHTML=String(text||"").replace(/\n/g,"<br>");
-  msgs.appendChild(el);
-  msgs.scrollTop=msgs.scrollHeight;
-  return el;
 }
-function prettyPayment(p){ return ({pix:"Pix",debito:"Débito",dinheiro:"Dinheiro",cartao:"Cartão",beneficio:"Benefício"}[p]||cap(p||"—")); }
-function addSummaryBubble(it){
-  const isIncome = it.type==="receita";
-  const ok = isIncome ? "✅ Receita registrada!" : "✅ Gasto registrado!";
-  const sign = isIncome ? "+" : "-";
-  const valClass = isIncome ? "pos" : "neg";
-  const refLabel = (it.payment==="cartao") ? "Cartão" : (it.payment==="beneficio" ? "Benefício" : "Conta");
-  const refName = it.ref || "—";
-  const dateBR = it.date.split("-").reverse().join("/");
-  const inst = (it.payment==="cartao" && it.installments && it.installments>1) ? `<span class="meta">📦 Parcelas: ${it.installments}x</span>` : "";
-  const bubble=document.createElement("div");
-  bubble.className="msg bot";
-  bubble.innerHTML = `${ok}
-    <span class="meta">📂 Categoria: ${escapeHtml(it.category||"Outros")}</span>
-    <span class="meta">💰 Valor: <span class="${valClass}" style="font-weight:750">${sign} ${fmtBRL(it.amount)}</span></span>
-    <span class="meta">💳 Pagamento: ${prettyPayment(it.payment)}</span>
-    <span class="meta">🏦 ${refLabel}: ${escapeHtml(refName)}</span>
-    <span class="meta">📅 Data: ${dateBR}</span>
-    ${inst}
-    <div class="pillrow">
-      <button class="btn small" data-edit="${it.id}" type="button">Editar</button>
-      <button class="btn small danger" data-del="${it.id}" type="button">Excluir</button>
-    </div>`;
-  msgs.appendChild(bubble);
-  msgs.scrollTop=msgs.scrollHeight;
+
+let state=loadState();
+
+/* ======= Backward import (se você tiver export do v3) =======
+   Se o usuário colar/importar JSON, mantém compatibilidade (não automático aqui).
+============================================================= */
+
+/* chat */
+function addMessage(text,who){
+  if(window.__silentBot && who==='bot') return;
+  const div=document.createElement("div");
+  div.className="msg "+(who==="user"?"user":"bot");
+  div.innerHTML=String(text||"").replace(/\n/g,"<br>");
+  $("messages").appendChild(div);
+  $("messages").scrollTop=$("messages").scrollHeight;
 }
 function greeting(){
   const h=new Date().getHours();
   const g=h<12?"Bom dia":(h<18?"Boa tarde":"Boa noite");
-  addMsg(`${g} 😊<br>Seja bem-vindo(a) ao FinancePlay.<br><br>Exemplos:<br>• Gastei 100 mercado pix nubank<br>• Gastei 200 roupa cartão nubank 2x<br>• Paguei energia 200 pix mercado pago<br>• Recebi salário 2000 Nubank`);
+  addMessage(`${g} 😊<br>Seja bem-vindo(a) ao Finance.<br><br><b>Informe seus movimentos.</b>`,"bot");
 }
+if($("messages").children.length===0) greeting();
 
-function detectType(text){
-  const t=norm(text);
-  if(t.includes("recebi")||t.includes("salario")||t.includes("salário")||t.includes("entrou")) return "receita";
-  if(t.includes("gastei")||t.includes("paguei")||t.includes("comprei")) return "despesa";
+/* cards */
+function inferCard(txt){
+  const t=norm(txt);
+  if(t.includes("nubank")||t.includes(" nu ")) return "nubank";
+  if(t.includes("mercado pago")||t.includes("mercadopago")||t.includes(" mp")) return "mp";
   return null;
 }
-function detectPayment(text){
+function statementKeyForPurchase(card, ymd){
+  const regra=card==="nubank"?state.regras.nubank:state.regras.mp;
+  const fechamento=Number(regra.fechamentoDia)||1;
+  const key=monthKeyFromDate(ymd);
+  const d=Number(ymd.split("-")[2]);
+  return (d>fechamento) ? addMonthsToKey(key,1) : key;
+}
+function dueDateForStatement(card, stmtKey){
+  const regra=card==="nubank"?state.regras.nubank:state.regras.mp;
+  const venc=Number(regra.vencimentoDia)||7;
+  const dueKey=addMonthsToKey(stmtKey,1);
+  return dayOfMonthKey(dueKey, venc);
+}
+function currentStatementKey(card){
+  // "fatura atual" = a fatura que está aberta AGORA (pelo fechamento)
+  const today = nowYMD();
+  return statementKeyForPurchase(card, today);
+}
+
+/* parsing */
+const CATEGORIAS=[
+  {k:"salario",w:["salario","salário"]},
+  {k:"energia",w:["energia","luz","eletrica","elétrica"]},
+  {k:"agua",w:["agua","água"]},
+  {k:"internet",w:["internet","fibra"]},
+  {k:"celular",w:["celular","tim","vivo","claro"]},
+  {k:"mercado",w:["mercado","supermercado"]},
+  {k:"farmacia",w:["farmacia","farmácia"]},
+  {k:"combustivel",w:["combustivel","combustível","gasolina","etanol"]},
+  {k:"reserva",w:["reserva","poupanca","poupança"]},
+];
+function inferCategoria(desc){
+  const t=norm(desc);
+  for(const c of CATEGORIAS){ if(c.w.some(w=>t.includes(norm(w)))) return c.k; }
+  return "outros";
+}
+function inferGroupAndAccount(text){
+  const t=norm(text);
+  if(t.includes("vr")) return {grupo:"benef",conta:"vr"};
+  if(t.includes("va")) return {grupo:"benef",conta:"va"};
+  if(t.includes("combustivel")||t.includes("combustível")) return {grupo:"benef",conta:"combustivel"};
+  if(t.includes("reserva")||t.includes("poupanca")||t.includes("poupança")) return {grupo:"reserva",conta:"reserva"};
+  if(t.includes("dinheiro")) return {grupo:"contas",conta:"dinheiro"};
+  if(t.includes("conta nubank")||(t.includes("nubank")&&!t.includes("cartao")&&!t.includes("cartão"))) return {grupo:"contas",conta:"conta_nubank"};
+  if(t.includes("conta mercado")||t.includes("conta mp")||(t.includes("mercado pago")&&!t.includes("cartao")&&!t.includes("cartão"))) return {grupo:"contas",conta:"conta_mp"};
+  if(t.includes("cartao")||t.includes("cartão")){
+    const c=inferCard(t)||"nubank";
+    return {grupo:"cartoes",cartao:c};
+  }
+  if(t.includes("nubank")||t.includes(" nu")) return {grupo:"contas",conta:"conta_nubank"};
+  if(t.includes("mercado pago")||t.includes(" mp")) return {grupo:"contas",conta:"conta_mp"};
+  return {grupo:"contas",conta:"conta_mp"};
+}
+function parseInstallments(text){
+  const t=norm(text);
+  const m=t.match(/(\d+)\s*x\b/);
+  if(!m) return null;
+  return {n:Math.max(2,Math.min(60,Number(m[1])))};
+}
+function parseAction(text){
+  const t=norm(text);
+  if((t.startsWith("paguei")||t.includes("pagar"))&&(t.includes("cartao")||t.includes("cartão"))){
+    return {kind:"pay_card_full",card:inferCard(t)||"nubank"};
+  }
+  if(t.startsWith("recebi")) return {kind:"income"};
+  if(t.startsWith("gastei")||t.startsWith("comprei")||t.startsWith("paguei")) return {kind:"expense"};
+  return {kind:"movement"};
+}
+function parsePaymentMethod(text){
   const t=norm(text);
   if(t.includes("pix")) return "pix";
   if(t.includes("debito")||t.includes("débito")) return "debito";
-  if(t.includes("dinheiro")||t.includes("cash")||t.includes("especie")||t.includes("espécie")) return "dinheiro";
-  if(t.includes("cartao")||t.includes("cartão")||t.includes("credito")||t.includes("crédito")) return "cartao";
-  const ben=accounts.filter(a=>a.kind==="beneficio").find(a=>t.includes(norm(a.name)));
-  if(ben) return "beneficio";
-  return null;
-}
-function detectInstallments(text){
-  const t=norm(text);
-  const m=t.match(/(\d{1,2})\s*x\b/);
-  if(m){ const n=Number(m[1]); if(Number.isFinite(n)&&n>=1&&n<=24) return n; }
-  return 1;
-}
-function listCats(kind){
-  const raw=(kind==="receita"?cfg.incomeCats:cfg.expenseCats)||"";
-  return raw.split(",").map(s=>cap(s.trim())).filter(Boolean);
-}
-function guessCategory(text,type){
-  const t=norm(text);
-  const cats=listCats(type);
-  const hit=cats.find(c=>t.includes(norm(c)));
-  if(hit) return hit;
-  if(type==="receita"){ if(t.includes("salario")||t.includes("salário")) return "Salário"; return cats[0]||"Outros"; }
-  if(t.includes("mercado")) return "Mercado";
-  if(t.includes("combust")||t.includes("gasolina")||t.includes("etanol")) return "Combustível";
-  if(t.includes("energia")||t.includes("luz")||t.includes("agua")||t.includes("água")||t.includes("internet")||t.includes("aluguel")) return "Casa";
-  return cats[0]||"Outros";
-}
-function findAccountOrBenefit(text){
-  const t=norm(text);
-  const hit=accounts.find(a=>t.includes(norm(a.name)));
-  return hit?hit.name:null;
-}
-function findCard(text){
-  const t=norm(text);
-  const hit=cards.find(c=>t.includes(norm(c.name)));
-  return hit?hit.name:null;
-}
-function applyCardClosingRule(cardName,dateISO){
-  const card=cards.find(c=>norm(c.name)===norm(cardName));
-  if(!card) return dateISO;
-  const closeDay=Number(card.closeDay||0);
-  const [y,m,d]=dateISO.split("-").map(Number);
-  if(!(y&&m&&d&&closeDay>0)) return dateISO;
-  if(d<=closeDay) return dateISO;
-  const dt=new Date(Date.UTC(y,m-1,1));
-  dt.setUTCMonth(dt.getUTCMonth()+1);
-  const yy=dt.getUTCFullYear();
-  const mm=String(dt.getUTCMonth()+1).padStart(2,"0");
-  const dd=String(Math.min(d,28)).padStart(2,"0");
-  return `${yy}-${mm}-${dd}`;
+  if(t.includes("credito")||t.includes("crédito")) return "credito";
+  if(t.includes("cartao")||t.includes("cartão")) return "cartao";
+  return "";
 }
 
-let pending=null; // {draft, step:"need_amount|need_payment|need_ref|edit", lastTxId}
-function clearPending(){ pending=null; setStatus("Pronto"); }
+/* apply */
+function uuid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16); }
+function applyToBalance(conta, delta){ state.saldos[conta]=(Number(state.saldos[conta])||0)+delta; }
+function addLanc(l){ state.lancamentos.unshift(l); }
 
-function saveFromDraft(draft, announce=true){
-  let dateToSave=draft.date;
-  if(draft.payment==="cartao" && draft.ref) dateToSave = applyCardClosingRule(draft.ref, dateToSave);
-  const it={ id:uid(), createdAt:new Date().toISOString(), date:dateToSave, type:draft.type, category:draft.category||"Outros",
-    amount:Number(draft.amount||0), payment:draft.payment, ref:draft.ref || (draft.payment==="dinheiro"?"Dinheiro":null), installments:(draft.payment==="cartao"?(draft.installments||1):1) };
-  tx.unshift(it);
-  persist("save_tx");
-  if(announce){ addSummaryBubble(it); toast("Salvo ✅"); }
-  renderAllLight();
-  return it.id;
+function cardSums(){
+  // soma por cartão separando fatura atual vs futuras
+  const today = nowYMD();
+  const curNu = currentStatementKey("nubank");
+  const curMP = currentStatementKey("mp");
+
+  const sum = {
+    nubank:{current:0,future:0, byKey:{}},
+    mp:{current:0,future:0, byKey:{}},
+  };
+
+  for(const it of state.lancamentos){
+    if(it.grupo !== "cartoes") continue;
+    const c = it.cartao==="mp" ? "mp" : "nubank";
+    const key = it.faturaKey || (c==="nubank"?curNu:curMP);
+    if(!sum[c].byKey[key]) sum[c].byKey[key]={total:0, vencimento: it.vencimento || dueDateForStatement(c,key)};
+    // it.valor é negativo para compra; usamos abs pra somar fatura
+    const amt = Math.abs(Number(it.valor)||0);
+    sum[c].byKey[key].total += amt;
+
+    const curKey = (c==="nubank") ? curNu : curMP;
+    if(key === curKey) sum[c].current += amt;
+    else if(key > curKey) sum[c].future += amt;
+    else {
+      // faturas antigas (já pagas) — ignorar no KPI
+    }
+  }
+
+  return {curNu, curMP, sum};
 }
 
-function startDraft(text){
-  const amount=parseMoney(text);
-  const type=detectType(text) || "despesa";
-  const payment=detectPayment(text);
-  const installments=detectInstallments(text);
-  const category=guessCategory(text,type);
-  let ref=null;
-  if(payment==="cartao") ref=findCard(text);
-  else ref=findAccountOrBenefit(text);
-
-  const draft={type,amount,payment,ref,date:todayISO(),category,installments,raw:text};
-  if(draft.amount==null){ pending={draft,step:"need_amount"}; askStep(); return; }
-  if(!draft.payment){ pending={draft,step:"need_payment"}; askStep(); return; }
-  if(draft.payment==="cartao" && !draft.ref){ pending={draft,step:"need_ref"}; askStep(); return; }
-  if(draft.payment!=="cartao" && !draft.ref && draft.payment!=="dinheiro"){ pending={draft,step:"need_ref"}; askStep(); return; }
-  saveFromDraft(draft,true);
-  clearPending();
+function currentCardTotal(card){
+  const {sum} = cardSums();
+  return card==="nubank" ? sum.nubank.current : sum.mp.current;
 }
-function askStep(){
-  if(!pending) return;
-  if(pending.step==="need_amount"){ addMsg(`Qual o valor? (ex: 120,50)`); setStatus("Valor"); }
-  else if(pending.step==="need_payment"){ addMsg(`Qual forma de pagamento? (pix, débito, dinheiro, cartão)`); setStatus("Pagamento"); }
-  else if(pending.step==="need_ref"){
-    if(pending.draft.payment==="cartao") addMsg(`Qual cartão? (ex: Nubank, Mercado Pago)`);
-    else if(pending.draft.payment==="beneficio") addMsg(`Qual benefício? (ex: VR, VA, Combustível)`);
-    else addMsg(`Qual conta? (ex: Nubank, Mercado Pago)`);
-    setStatus("Conta/Cartão");
+
+function handlePayCardFull(card, ymd){
+  // pagar apenas a FATURA ATUAL (modo A)
+  const curKey = currentStatementKey(card);
+  const valorAtual = currentCardTotal(card);
+
+  if(valorAtual <= 0){
+    addMessage("Sua fatura atual está zerada (ou já paga). ✅","bot");
+    return;
+  }
+
+  const contaPagamento = card==="nubank" ? "conta_nubank" : "conta_mp";
+  applyToBalance(contaPagamento, -valorAtual);
+
+  // registra pagamento (em contas) e marca como "pago" removendo itens da fatura atual:
+  addLanc({
+    id:uuid(), ymd,
+    desc:`Pagamento fatura atual ${card==="nubank"?"Nubank":"Mercado Pago"} (${curKey})`,
+    valor:-valorAtual, grupo:"contas", conta:contaPagamento,
+    forma:"pagamento_cartao", tipo:"pagamento_fatura_atual", cartao:card, faturaKey:curKey
+  });
+
+  // “quitar” a fatura atual: removemos os lançamentos do cartão dessa faturaKey
+  state.lancamentos = state.lancamentos.filter(it => !(it.grupo==="cartoes" && it.cartao===card && (it.faturaKey||curKey)===curKey));
+  // mantém o pagamento registrado (já está no início), então recoloca ele no início
+  // (como filtramos tudo, inclusive o pagamento? não, pq pagamento é grupo contas)
+  saveState(); renderAll();
+  addMessage(`✅ Fatura atual paga: ${brl(valorAtual)} (${card==="nubank"?"Nubank":"Mercado Pago"})`,"bot");
+}
+
+function handleMovement(raw){
+  const text=String(raw||"").trim();
+  if(!text) return;
+  const ymd=nowYMD();
+  const action=parseAction(text);
+
+  if(action.kind==="pay_card_full"){ handlePayCardFull(action.card, ymd); return; }
+
+  const val=parseMoney(text);
+  const method=parsePaymentMethod(text);
+  const {grupo,conta,cartao}=inferGroupAndAccount(text);
+  const cat=inferCategoria(text);
+  const t=norm(text);
+
+  let delta = (action.kind==="income") ? Math.abs(val) : -Math.abs(val);
+
+  const inst=parseInstallments(text);
+  const isCard = (grupo==="cartoes")||method==="cartao"||t.includes("cartao")||t.includes("cartão");
+  const cardName = cartao || (isCard ? (inferCard(text)||"nubank") : null);
+
+  if(inst && isCard && cardName){
+    const n=inst.n;
+    const parcela=Math.round((Math.abs(val)/n)*100)/100;
+    const baseStmt=statementKeyForPurchase(cardName, ymd);
+
+    for(let i=1;i<=n;i++){
+      const stmtForParc=addMonthsToKey(baseStmt,i-1);
+      addLanc({
+        id:uuid(), ymd,
+        desc:`${cat} (parcela ${i}/${n})`,
+        valor:-parcela, grupo:"cartoes", cartao:cardName,
+        forma:"cartao", tipo:"parcela",
+        faturaKey:stmtForParc,
+        vencimento:dueDateForStatement(cardName,stmtForParc),
+        parcela:{n,i}
+      });
+    }
+    saveState(); renderAll();
+    addMessage(`✅ Parcelado em ${n}x: ${brl(val)} no cartão ${cardName==="nubank"?"Nubank":"Mercado Pago"}. (faturas separadas)`,"bot");
+    return;
+  }
+
+  if(isCard && cardName){
+    const stmtKey=statementKeyForPurchase(cardName, ymd);
+    const amt=Math.abs(val);
+    addLanc({
+      id:uuid(), ymd,
+      desc:cat==="outros"?text.replace(/^(recebi|gastei|paguei|comprei)\s+/i,""):cat,
+      valor:-amt, grupo:"cartoes", cartao:cardName,
+      forma:"cartao", tipo:"compra_cartao",
+      faturaKey:stmtKey,
+      vencimento:dueDateForStatement(cardName,stmtKey)
+    });
+    saveState(); renderAll();
+    addMessage(`✅ Registrado no cartão ${cardName==="nubank"?"Nubank":"Mercado Pago"} (fatura ${stmtKey}).`,"bot");
+    return;
+  }
+
+
+  // reserva (transferência)
+  if(grupo==="reserva"){
+    const amt = Math.abs(val);
+    const origin = (t.includes("nubank")||t.includes(" nu")) ? "conta_nubank"
+                 : (t.includes("dinheiro")) ? "dinheiro"
+                 : "conta_mp";
+    const isWithdraw = t.startsWith("tirei") || t.startsWith("saquei") || t.includes("da reserva") || t.includes("tirar reserva");
+    if(isWithdraw){
+      applyToBalance("reserva", -amt);
+      applyToBalance(origin, +amt);
+      addLanc({ id:uuid(), ymd, desc:`Retirada da reserva`, valor:+amt, grupo:"contas", conta:origin, forma:"transferencia", tipo:"entrada" });
+      addLanc({ id:uuid(), ymd, desc:`Retirada da reserva`, valor:-amt, grupo:"reserva", conta:"reserva", forma:"transferencia", tipo:"saida" });
+      saveState(); renderAll();
+      addMessage(`✅ Retirado ${brl(amt)} da reserva para ${origin.replace("conta_","").toUpperCase()}.`, "bot");
+      return;
+    }
+    // Aporte
+    applyToBalance(origin, -amt);
+    applyToBalance("reserva", +amt);
+    addLanc({ id:uuid(), ymd, desc:`Reserva (aporte)`, valor:-amt, grupo:"contas", conta:origin, forma:"transferencia", tipo:"saida" });
+    addLanc({ id:uuid(), ymd, desc:`Reserva (aporte)`, valor:+amt, grupo:"reserva", conta:"reserva", forma:"transferencia", tipo:"entrada" });
+    saveState(); renderAll();
+    addMessage(`✅ Reserva +${brl(amt)} (saindo de ${origin.replace("conta_","").toUpperCase()}).`, "bot");
+    return;
+  }
+
+  // normal (contas/benef)
+  if(grupo==="benef"){ applyToBalance(conta, delta); }
+  else { applyToBalance(conta, delta); }
+
+  addLanc({
+    id:uuid(), ymd,
+    desc:cat==="outros"?text.replace(/^(recebi|gastei|paguei|comprei)\s+/i,""):cat,
+    valor:delta, grupo, conta,
+    forma:method||(grupo==="benef"?"beneficio":""), tipo:(action.kind==="income"?"entrada":"saida")
+  });
+
+  saveState(); renderAll();
+  addMessage("✅ Movimento registrado!","bot");
+}
+
+/* render */
+function computeTotals(){
+  const s=state.saldos;
+  const contas=(s.conta_nubank||0)+(s.conta_mp||0)+(s.dinheiro||0);
+  const benef=(s.vr||0)+(s.va||0)+(s.combustivel||0);
+  const reserva=(s.reserva||0);
+
+  const {sum} = cardSums();
+  const cartoesAtual = sum.nubank.current + sum.mp.current;
+  const futuras = sum.nubank.future + sum.mp.future;
+
+  // Saldo Total: contas - fatura atual + benefícios + reserva
+  const total=contas - cartoesAtual; // saldo real (sem benefícios e sem reserva)
+  return {contas, cartoesAtual, futuras, benef, reserva, total};
+}
+function renderKPIs(){
+  const {contas,cartoesAtual,futuras,benef,reserva,total}=computeTotals();
+  $("saldoContas").textContent=brl(contas);
+  $("saldoCartoes").textContent=brl(cartoesAtual);
+  $("saldoFuturas").textContent=brl(futuras);
+  $("saldoBenef").textContent=brl(benef);
+  $("saldoReserva").textContent=brl(reserva);
+  $("saldoTotal").textContent=brl(total);
+
+  const st = $("saldoTotal");
+  st.classList.remove("pos","neg");
+  st.classList.add(total >= 0 ? "pos" : "neg");
+
+  const insight = $("insight");
+  if(total >= 0){
+    insight.textContent = "✅ Você está no positivo. Boa!";
+  }else{
+    const need = Math.abs(total);
+    insight.textContent = `⚠️ Atenção: faltam ${brl(need)} para cobrir a fatura atual.`;
+  }
+
+  const meta=Number(state.metaReserva)||10000;
+  const pct=meta>0?Math.max(0,Math.min(1,reserva/meta)):0;
+  $("progReserva").textContent=(pct*100).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"%";
+  $("barReserva").style.width=(pct*100)+"%";
+}
+function esc(s){ return String(s||"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function renderList(){
+  const box=$("list"); box.innerHTML="";
+  const items=state.lancamentos.slice(0,50);
+  $("tagCount").textContent=String(state.lancamentos.length);
+  for(const it of items){
+    const div=document.createElement("div"); div.className="item";
+    const amt=Number(it.valor)||0;
+    const right = (amt<0) ? `<span class="amt" style="color:#9f1239">${brl(amt)}</span>` : `<span class="amt" style="color:#065f46">${brl(amt)}</span>`;
+    const line1=`<div class="top"><div class="desc">${esc(it.desc||"")}</div>${right}</div>`;
+    let meta=`${ymdToBR(it.ymd)} • `;
+    if(it.grupo==="cartoes"){
+      meta += `Cartão ${it.cartao==="mp"?"Mercado Pago":"Nubank"} • Fatura ${it.faturaKey||""}`;
+      if(it.vencimento) meta += ` • Vence ${ymdToBR(it.vencimento)}`;
+    }else if(it.grupo==="benef"){
+      meta += `Benefício • ${it.conta}`;
+    }else{
+      meta += `Conta • ${it.conta}`;
+    }
+    div.innerHTML=line1+`<div class="meta">${esc(meta)}</div>`;
+    box.appendChild(div);
+  }
+}
+function __renderCardDetail_original(){
+  const box = $("cardDetail"); box.innerHTML="";
+  const {curNu, curMP, sum} = cardSums();
+
+  function renderCard(name, curKey, data){
+    const cur = data.byKey[curKey]?.total || 0;
+    const venc = data.byKey[curKey]?.vencimento || dueDateForStatement(name, curKey);
+
+    const wrap = document.createElement("div");
+    wrap.className="item";
+    wrap.innerHTML = `
+      <div class="top">
+        <div class="desc">Cartão ${name==="nubank"?"Nubank":"Mercado Pago"}</div>
+        <span class="amt">${brl(cur)}</span>
+      </div>
+      <div class="meta">Fatura atual: ${curKey} • Vence ${ymdToBR(venc)} • Futuras: ${brl(data.future)}</div>
+    `;
+    box.appendChild(wrap);
+
+    // list next 4 future statements (if exist)
+    const keys = Object.keys(data.byKey).filter(k => k > curKey).sort().slice(0,4);
+    for(const k of keys){
+      const it = document.createElement("div");
+      it.className="item";
+      it.style.opacity="0.9";
+      it.innerHTML = `
+        <div class="top">
+          <div class="desc">Parcela / Próxima fatura ${k}</div>
+          <span class="amt">${brl(data.byKey[k].total||0)}</span>
+        </div>
+        <div class="meta">Vence ${ymdToBR(data.byKey[k].vencimento || dueDateForStatement(name,k))}</div>
+      `;
+      box.appendChild(it);
+    }
+  }
+
+  renderCard("nubank", curNu, sum.nubank);
+  renderCard("mp", curMP, sum.mp);
+}
+function renderCardDetail(mirror){
+  try{ __renderCardDetail_original(); }catch(_){ }
+  const src=document.getElementById('cardDetail');
+  const dst=document.getElementById('cardDetail2');
+  if(mirror && src && dst){ dst.innerHTML = src.innerHTML; }
+}
+
+
+/* config form */
+function setInput(id,val){ $(id).value=(Number(val)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function getInputNum(id){ return parseMoney($(id).value||"0"); }
+function fillIniFormFromState(){
+  setInput("iniContaNu",state.saldos.conta_nubank);
+  setInput("iniContaMP",state.saldos.conta_mp);
+  setInput("iniDin",state.saldos.dinheiro);
+  setInput("iniRes",state.saldos.reserva);
+  setInput("iniVR",state.saldos.vr);
+  setInput("iniVA",state.saldos.va);
+  setInput("iniComb",state.saldos.combustivel);
+  $("metaRes").value=String(Number(state.metaReserva)||10000);
+
+  $("fechNu").value=String(Number(state.regras.nubank.fechamentoDia)||6);
+  $("fechMP").value=String(Number(state.regras.mp.fechamentoDia)||2);
+  $("vencNu").value=String(Number(state.regras.nubank.vencimentoDia)||7);
+  $("vencMP").value=String(Number(state.regras.mp.vencimentoDia)||7);
+
+  // valores iniciais de cartão (fatura atual) = soma atual
+  setInput("iniCartNu", currentCardTotal("nubank"));
+  setInput("iniCartMP", currentCardTotal("mp"));
+}
+function saveIniFromForm(){
+  state.saldos.conta_nubank=getInputNum("iniContaNu");
+  state.saldos.conta_mp=getInputNum("iniContaMP");
+  state.saldos.dinheiro=getInputNum("iniDin");
+  state.saldos.reserva=getInputNum("iniRes");
+  state.saldos.vr=getInputNum("iniVR");
+  state.saldos.va=getInputNum("iniVA");
+  state.saldos.combustivel=getInputNum("iniComb");
+  state.metaReserva=Math.max(0,getInputNum("metaRes")||10000);
+
+  state.regras.nubank.fechamentoDia=Math.max(1,Math.min(28,parseInt($("fechNu").value||"6",10)));
+  state.regras.mp.fechamentoDia=Math.max(1,Math.min(28,parseInt($("fechMP").value||"2",10)));
+  state.regras.nubank.vencimentoDia=Math.max(1,Math.min(28,parseInt($("vencNu").value||"7",10)));
+  state.regras.mp.vencimentoDia=Math.max(1,Math.min(28,parseInt($("vencMP").value||"7",10)));
+
+  // Se o usuário preencher fatura atual manualmente, criamos/atualizamos um "saldo inicial da fatura" como lançamento de cartão (na fatura atual)
+  const nuVal = getInputNum("iniCartNu");
+  const mpVal = getInputNum("iniCartMP");
+  seedCurrentStatement("nubank", nuVal);
+  seedCurrentStatement("mp", mpVal);
+
+  saveState(); renderAll(); toast("Salvo ✅");
+}
+
+function seedCurrentStatement(card, amount){
+  // remove antigos seeds dessa fatura atual
+  const curKey = currentStatementKey(card);
+  state.lancamentos = state.lancamentos.filter(it => !(it.grupo==="cartoes" && it.tipo==="seed_fatura" && it.cartao===card && (it.faturaKey||"")===curKey));
+  if(amount > 0){
+    state.lancamentos.unshift({
+      id: uuid(),
+      ymd: nowYMD(),
+      desc: "Saldo inicial da fatura",
+      valor: -Math.abs(amount),
+      grupo:"cartoes",
+      cartao: card,
+      forma:"cartao",
+      tipo:"seed_fatura",
+      faturaKey: curKey,
+      vencimento: dueDateForStatement(card, curKey)
+    });
   }
 }
 
-function deleteTx(id){
-  const idx=tx.findIndex(t=>t.id===id);
-  if(idx<0) return;
-  const it=tx[idx];
-  tx.splice(idx,1);
-  persist("delete_tx");
-  addMsg(`🗑️ Excluído: ${cap(it.type)} • ${it.category} • ${fmtBRL(it.amount)}`);
-  toast("Excluído");
-  renderAllLight();
-}
-function beginEditTx(id){
-  const it=tx.find(t=>t.id===id);
-  if(!it) return;
-  pending={step:"edit", lastTxId:id, draft:{...it}};
-  addMsg(`✏️ Editar lançamento:
-Exemplos:
-• valor 150
-• categoria farmácia
-• pagamento pix
-• conta nubank
-• cartão mercado pago
-• data 25/02/2026`);
-  setStatus("Editando");
-}
-function applyEditMessage(text){
-  if(!pending || pending.step!=="edit") return;
-  const d=pending.draft;
-  const t=norm(text);
+function loadExample(){
+  // Seus saldos:
+  state.saldos.conta_nubank=40.00;
+  state.saldos.conta_mp=121.81;
+  state.saldos.dinheiro=79.05;
+  state.saldos.reserva=0.00;
+  state.saldos.vr=0.31;
+  state.saldos.va=0.00;
+  state.saldos.combustivel=323.73;
+  state.metaReserva=10000;
 
-  if(t.startsWith("valor")){
-    const v=parseMoney(text); if(v==null){ addMsg(`Não entendi o valor. Ex: valor 120,50`); return; } d.amount=v;
-  } else if(t.startsWith("categoria")){
-    const name=text.split(/categoria/i)[1]?.trim(); if(name) d.category=cap(name);
-  } else if(t.startsWith("pagamento")){
-    const p=detectPayment(text); if(p) d.payment=p;
-  } else if(t.startsWith("conta")){
-    const name=text.split(/conta/i)[1]?.trim(); if(name) d.ref=cap(name);
-  } else if(t.startsWith("cartao")||t.startsWith("cartão")){
-    const name=text.split(/cartao|cartão/i)[1]?.trim(); if(name){ d.ref=cap(name); d.payment="cartao"; }
-  } else if(t.startsWith("data")){
-    const m=text.match(/(\d{2})\/(\d{2})\/(\d{4})/); if(!m){ addMsg(`Use data dd/mm/aaaa`); return; } d.date=`${m[3]}-${m[2]}-${m[1]}`;
-  } else {
-    // tentativa geral
-    const p=detectPayment(text); if(p) d.payment=p;
-    const v=parseMoney(text); if(v!=null) d.amount=v;
+  state.regras.nubank.fechamentoDia=6;
+  state.regras.mp.fechamentoDia=2;
+  state.regras.nubank.vencimentoDia=7;
+  state.regras.mp.vencimentoDia=7;
+
+  // seeds da fatura atual:
+  seedCurrentStatement("nubank", 683.31);
+  seedCurrentStatement("mp", 1249.49);
+
+  saveState(); renderAll(); toast("Carregado ✅");
+}
+
+function resetAll(){
+  if(!confirm("Zerar tudo? Isso apaga lançamentos e saldos do aparelho.")) return;
+  state=structuredClone(DEFAULT_STATE);
+  saveState();
+  $("messages").innerHTML="";
+  greeting();
+  renderAll();
+  toast("Zerado ✅");
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`finance_export_${nowYMD()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+function renderAll(){
+  renderKPIs();
+  renderCardDetail();
+  renderList();
+  fillIniFormFromState();
+}
+
+/* events */
+$("btnSend").addEventListener("click",()=>{
+  const text=($("input").value||"").trim();
+  if(!text) return;
+  addMessage(text,"user");
+  $("input").value="";
+  handleMovement(text);
+});
+$("input").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ e.preventDefault(); $("btnSend").click(); }});
+$("btnSaveIni").addEventListener("click",saveIniFromForm);
+$("btnLoadExample").addEventListener("click",loadExample);
+$("btnReset").addEventListener("click",resetAll);
+$("btnExport").addEventListener("click",exportJSON);
+
+/* ===== Auto-backup triggers ===== */
+window.addEventListener("beforeunload", ()=>autoBackup("beforeunload"));
+window.addEventListener("pagehide", ()=>autoBackup("pagehide"));
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState === "hidden") autoBackup("hidden");
+});
+
+/* Backup UI */
+$("btnRestoreLast").addEventListener("click", ()=>withPin(()=>restoreLastBackup()));
+$("btnRestoreLast2").addEventListener("click", ()=>withPin(()=>restoreLastBackup()));
+
+$("btnShowBackups").addEventListener("click", ()=>{
+  const box = $("backupList");
+  const list = loadBackups().slice().reverse(); // newest first
+  box.innerHTML = "";
+  if(!list.length){
+    box.innerHTML = `<div class="item"><div class="meta">Sem backups ainda.</div></div>`;
+    return;
   }
+  for(const snap of list){
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="top">
+        <div class="desc">${formatDT(snap.ts)}</div>
+        <span class="tag">${snap.reason || "auto"}</span>
+      </div>
+      <div class="meta">Toque para restaurar este backup.</div>
+    `;
+    div.addEventListener("click", ()=>{
+      if(confirm("Restaurar este backup? Isso substitui seus dados atuais no aparelho.")){
+        withPin(()=>restoreSnapshot(snap));
+      }
+    });
+    box.appendChild(div);
+  }
+});
 
-  // salvar
-  const idx=tx.findIndex(x=>x.id===pending.lastTxId);
-  if(idx<0){ clearPending(); addMsg(`Não achei esse lançamento.`); return; }
-  let dateToSave=d.date;
-  if(d.payment==="cartao" && d.ref) dateToSave=applyCardClosingRule(d.ref, d.date);
-  tx[idx]={...tx[idx], amount:Number(d.amount||0), category:d.category||"Outros", payment:d.payment, ref:d.ref || (d.payment==="dinheiro"?"Dinheiro":null), date:dateToSave};
-  persist("edit_tx");
-  addMsg(`✅ Atualizado!`);
-  addSummaryBubble(tx[idx]);
-  toast("Atualizado");
-  clearPending();
-  renderAllLight();
+$("btnClearBackups").addEventListener("click", ()=>withPin(async ()=>{
+  if(!confirm("Apagar todos os backups automáticos?")) return;
+  localStorage.removeItem(BACKUP_KEY);
+  $("backupList").innerHTML = "";
+  toast("Backups apagados.");
+}));
+
+$("btnSetPin").addEventListener("click", async ()=>{ await setPinFlow(); });
+
+$("btnImportFile").addEventListener("click", async ()=>{
+  const f = $("fileImport").files && $("fileImport").files[0];
+  if(!f){ toast("Selecione um arquivo .json"); return; }
+  try{
+    const txt = await f.text();
+    const obj = JSON.parse(txt);
+    if(!obj || typeof obj !== "object"){ throw new Error("JSON inválido"); }
+    // tentativa de aceitar export do v4 (state direto) ou snapshot {state:...}
+    const st = obj.state ? obj.state : obj;
+    state = st;
+    saveState();
+    renderAll();
+    autoBackup("import");
+    toast("Importado ✅");
+  }catch(e){
+    toast("Falha ao importar: " + (e.message||e));
+  }
+});
+
+
+/* ===== Sidebar Navigation ===== */
+function setView(name){
+  const views = ["chat","painel","contas","fixas","rel","cfg","seg"];
+  for(const v of views){
+    const el = document.getElementById("view-"+v);
+    if(!el) continue;
+    el.classList.toggle("active", v===name);
+  }
+  document.querySelectorAll(".side-btn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.view===name);
+  });
+  const titles = {
+    chat:"chat • motor A",
+    painel:"painel • saldos",
+    contas:"contas & cartões",
+    fixas:"contas fixas",
+    rel:"relatórios",
+    cfg:"configurações",
+    seg:"segurança & backup"
+  };
+  document.getElementById("hdrSub").textContent = titles[name] || "Finance";
+  closeMenu();
+  if(name==="contas"){ renderCardDetail(true); }
+}
+function openMenu(){
+  document.getElementById("sidebar").classList.add("open");
+  document.getElementById("overlay").classList.add("show");
+}
+function closeMenu(){
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+}
+document.getElementById("btnMenu").addEventListener("click", openMenu);
+document.getElementById("btnCloseMenu").addEventListener("click", closeMenu);
+document.getElementById("overlay").addEventListener("click", closeMenu);
+document.querySelectorAll(".side-btn").forEach(b=>{
+  b.addEventListener("click", ()=> setView(b.dataset.view));
+});
+
+/* ===== Chat Inteligente (v1) ===== */
+let draft=null; // {raw, summary}
+function showConfirm(html){
+  const bar=document.getElementById("confirmBar");
+  document.getElementById("confirmInfo").innerHTML = html;
+  bar.classList.remove("hidden");
+}
+function hideConfirm(){
+  const bar=document.getElementById("confirmBar");
+  bar.classList.add("hidden");
+  document.getElementById("confirmInfo").textContent="—";
+  draft=null;
+}
+function snapshotText(){
+  const totals = computeTotals();
+  return `📌 Saldo real agora: <b>${brl(totals.total)}</b><br>`+
+         `Contas+Dinheiro: ${brl(totals.contas)}<br>`+
+         `Cartões (fatura atual): ${brl(totals.cartoesAtual)}<br>`+
+         `Parcelas futuras: ${brl(totals.futuras)}<br>`+
+         `Benefícios: ${brl(totals.benef)}<br>`+
+         `Reserva: ${brl(state.saldos.reserva)}`;
+}
+function answerQuestion(raw){
+  const t = norm(raw);
+  if(t.includes("saldo") && (t.includes("atual") || t.includes("agora") || t.includes("geral") || t==="saldo")){
+    addMessage(snapshotText(),"bot"); return true;
+  }
+  if(t.includes("indo bem") || t.includes("estou bem") || t.includes("como estou")){
+    const totals = computeTotals();
+    addMessage(totals.total>=0 ? `✅ Você está indo bem: saldo real positivo em ${brl(totals.total)}.` : `⚠️ Atenção: faltam ${brl(Math.abs(totals.total))} para cobrir a fatura atual.`, "bot");
+    return true;
+  }
+  if(t.includes("cartao") || t.includes("cartão") || t.includes("fatura")){
+    setView("contas");
+    addMessage("✅ Abri Contas & Cartões para você.", "bot");
+    return true;
+  }
+  if(t.includes("benef") || t.includes("vr") || t.includes("va") || t.includes("combust")){
+    addMessage(`🎫 Benefícios: VR ${brl(state.saldos.vr)} • VA ${brl(state.saldos.va)} • Combustível ${brl(state.saldos.combustivel)}`, "bot");
+    return true;
+  }
+  if(t.includes("reserva")){
+    addMessage(`🏦 Reserva: ${brl(state.saldos.reserva)} (meta ${brl(state.metaReserva||10000)}).`, "bot");
+    return true;
+  }
+  return false;
+}
+function buildMovementSummary(raw){
+  const t = norm(raw);
+  const amount = parseMoney(raw);
+  if(!amount) return null;
+  const mm = raw.match(/(\d+)\s*x/i);
+  const parcelas = mm ? Number(mm[1]) : 1;
+  const isCard = (t.includes("cartao")||t.includes("cartão"));
+  const card = isCard ? inferCard(raw) : null;
+  const grp = inferGroupAndAccount(raw);
+  const cat = inferCategoria(raw);
+  let lines=[];
+  lines.push(`<b>${raw.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</b>`);
+  lines.push(`Valor: <b>${brl(amount)}</b>`);
+  lines.push(`Categoria: ${cat}`);
+  if(t.includes("reserva")) lines.push("Ação: Reserva (transferência)");
+  if(card) lines.push(`Cartão: ${card.toUpperCase()} • ${parcelas}x`);
+  else if(grp && grp.conta) lines.push(`Conta: ${grp.conta}`);
+  return lines.join("<br>");
+}
+function applyMovement(raw){
+  window.__silentBot = true;
+  try{ handleMovement(raw); }
+  finally{ window.__silentBot=false; }
 }
 
 function sendChat(){
-  const text=($("chatInput").value||"").trim();
+  const text = ($("input").value||"").trim();
   if(!text) return;
-  $("chatInput").value="";
-  addMsg(escapeHtml(text),"you");
+  if(draft){ toast("Finalize ou exclua o rascunho primeiro."); return; }
+  addMessage(text,"user");
+  $("input").value="";
 
-  if(pending && pending.step==="confirm_edit"){
-    if(applyConfirmEditToDraft(text)) return;
+  if(text.endsWith("?") || /saldo|fatura|cart[aã]o|indo bem|benef|reserva/i.test(text)){
+    if(answerQuestion(text)) return;
   }
 
-  if(pending){
-    if(pending.step==="edit"){ applyEditMessage(text); return; }
-    if(pending.step==="need_amount"){
-      const v=parseMoney(text); if(v==null){ addMsg(`Não entendi o valor. Ex: 120,50`); return; }
-      pending.draft.amount=v;
-      if(!pending.draft.payment){ pending.step="need_payment"; askStep(); return; }
-      if(pending.draft.payment==="cartao" && !pending.draft.ref){ pending.step="need_ref"; askStep(); return; }
-      if(pending.draft.payment!=="cartao" && !pending.draft.ref && pending.draft.payment!=="dinheiro"){ pending.step="need_ref"; askStep(); return; }
-      goConfirm(pending.draft); return;
-    }
-    if(pending.step==="need_payment"){
-      const p=detectPayment(text); if(!p){ addMsg(`Responda: pix, débito, dinheiro ou cartão.`); return; }
-      pending.draft.payment=p;
-      if(p==="cartao" && !pending.draft.ref){ pending.step="need_ref"; askStep(); return; }
-      if(p!=="cartao" && !pending.draft.ref && p!=="dinheiro"){ pending.step="need_ref"; askStep(); return; }
-      goConfirm(pending.draft); return;
-    }
-    if(pending.step==="need_ref"){
-      if(pending.draft.payment==="cartao") pending.draft.ref = findCard(text) || cap(text);
-      else pending.draft.ref = findAccountOrBenefit(text) || cap(text);
-      goConfirm(pending.draft); return;
-    }
+  const summary = buildMovementSummary(text);
+  if(!summary){
+    addMessage("Se for um lançamento, informe também o valor (ex: “Gastei 100 mercado pix Nubank”).", "bot");
+    return;
   }
-  startDraft(text);
+  draft = {raw:text, summary};
+  showConfirm(summary + "<br><span class='small'>Confirma?</span>");
+  addMessage("✅ Rascunho pronto. Finalize para salvar.", "bot");
 }
-$("btnSend").addEventListener("click", sendChat);
-$("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); sendChat(); }});
-// Saudação inicial (só uma vez)
-(function(){
-  try{
-    const key="fp_chat_greeted_v1";
-    if(localStorage.getItem(key)) return;
-    const h=new Date().getHours();
-    const sal=(h<12)?"Bom dia":(h<18)?"Boa tarde":"Boa noite";
-    addMsg(`${sal} 😊\nSeja bem-vindo(a) ao seu controle financeiro.\n\nMe diga algo como:\n• Gastei 100 mercado pix\n• Gastei 200 roupa cartão nubank 2x\n• Paguei energia 200 pix\n• Recebi salário 4400 Nubank`);
-    localStorage.setItem(key,"1");
-  }catch(_){}
-})();
+document.getElementById("btnSend").addEventListener("click", sendChat);
+document.getElementById("input").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); sendChat(); }});
 
-document.addEventListener("click", (e)=>{
-  const del=e.target.closest("[data-del]"); if(del){ deleteTx(del.getAttribute("data-del")); return; }
-  const edit=e.target.closest("[data-edit]"); if(edit){ beginEditTx(edit.getAttribute("data-edit")); return; }
+document.getElementById("btnConfirm").addEventListener("click", ()=>{
+  if(!draft) return;
+  applyMovement(draft.raw);
+  hideConfirm();
+  autoBackup("confirm");
+  addMessage("✅ Salvo.", "bot");
+});
+document.getElementById("btnCancel").addEventListener("click", ()=>{
+  if(!draft) return;
+  hideConfirm();
+  addMessage("🗑️ Rascunho excluído.", "bot");
+});
+document.getElementById("btnEdit").addEventListener("click", ()=>{
+  if(!draft) return;
+  $("input").value = draft.raw;
+  hideConfirm();
+  $("input").focus();
+  addMessage("✏️ Edite e envie novamente.", "bot");
 });
 
-
-/* Painel/Relatórios */
-function sumsForMonth(ym){
-  let receitas=0, despesas=0, cartao=0;
-  tx.forEach(t=>{
-    if(monthKey(t.date)!==ym) return;
-    if(t.type==="receita") receitas += Number(t.amount)||0;
-    else { if(t.payment==="cartao") cartao += Number(t.amount)||0; else despesas += Number(t.amount)||0; }
-  });
-  const saldo=receitas-despesas;
-  const proj=saldo-cartao;
-  return {receitas,despesas,cartao,saldo,proj};
-}
-function renderPainel(){
-  const ym=monthKey(todayISO());
-  const s=sumsForMonth(ym);
-  $("kpiReceitas").textContent=fmtBRL(s.receitas);
-  $("kpiDespesas").textContent=fmtBRL(s.despesas);
-  $("kpiCartao").textContent=fmtBRL(s.cartao);
-  const saldoEl=$("kpiSaldo"); saldoEl.textContent=fmtBRL(s.saldo); saldoEl.classList.toggle("pos",s.saldo>=0); saldoEl.classList.toggle("neg",s.saldo<0);
-  const projEl=$("kpiProj"); projEl.textContent=fmtBRL(s.proj); projEl.classList.toggle("pos",s.proj>=0); projEl.classList.toggle("neg",s.proj<0);
-
-  const list=tx.filter(t=>monthKey(t.date)===ym && t.type==="despesa");
-  const map=new Map();
-  list.forEach(t=>{ const k=t.category||"Outros"; map.set(k,(map.get(k)||0)+(Number(t.amount)||0)); });
-  const entries=[...map.entries()].sort((a,b)=>b[1]-a[1]);
-  const total=entries.reduce((a,[,v])=>a+v,0)||0;
-  const host=$("catsList"); host.innerHTML="";
-  if(total<=0){ host.innerHTML=`<div class="badge">Sem despesas neste mês.</div>`; return; }
-  entries.forEach(([k,v])=>{
-    const pct=Math.round((v/total)*100);
-    const div=document.createElement("div");
-    div.className="badge";
-    div.style.display="flex"; div.style.justifyContent="space-between"; div.style.gap="10px";
-    div.innerHTML=`<span>${escapeHtml(k)}</span><span>${pct}% • ${fmtBRL(v)}</span>`;
-    host.appendChild(div);
-  });
-}
-function renderRelatorios(){
-  const ym=monthKey(todayISO());
-  const list=tx.filter(t=>monthKey(t.date)===ym && t.type==="despesa");
-  const map=new Map();
-  list.forEach(t=>{ const k=t.category||"Outros"; map.set(k,(map.get(k)||0)+(Number(t.amount)||0)); });
-  const entries=[...map.entries()].sort((a,b)=>b[1]-a[1]);
-  const total=entries.reduce((a,[,v])=>a+v,0)||0;
-  const host=$("relCats"); host.innerHTML="";
-  if(total<=0){ host.innerHTML=`<div class="badge">Sem dados para este mês.</div>`; return; }
-  entries.forEach(([k,v])=>{
-    const pct=Math.round((v/total)*100);
-    const div=document.createElement("div");
-    div.className="badge"; div.style.display="flex"; div.style.justifyContent="space-between"; div.style.gap="10px"; div.style.margin="8px 0";
-    div.innerHTML=`<span>${escapeHtml(k)}</span><span>${pct}% • ${fmtBRL(v)}</span>`;
-    host.appendChild(div);
-  });
-}
-
-/* Transações */
-function renderTransacoes(){
-  if(!$("filterMonth").value) $("filterMonth").value = monthKey(todayISO());
-  const ym=$("filterMonth").value || monthKey(todayISO());
-  const typ=$("filterType").value || "";
-  const list=tx.filter(t=>monthKey(t.date)===ym).filter(t=>!typ || t.type===typ).sort((a,b)=>a.date<b.date?1:-1);
-  const tb=$("tbodyTx"); tb.innerHTML="";
-  if(list.length===0){ tb.innerHTML=`<tr><td colspan="7" style="color:var(--muted)">Sem lançamentos.</td></tr>`; return; }
-  list.forEach(t=>{
-    const valClass=t.type==="receita"?"pos":"neg";
-    const ref = t.ref || "—";
-    const refShown = (t.payment==="cartao") ? `Cartão: ${ref}` : (t.payment==="beneficio" ? `Benefício: ${ref}` : `Conta: ${ref}`);
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${t.date.split("-").reverse().join("/")}</td>
-      <td>${t.type==="receita"?"Receita":"Despesa"}</td>
-      <td>${escapeHtml(t.category||"Outros")}</td>
-      <td>${escapeHtml(refShown)}</td>
-      <td>${prettyPayment(t.payment)}</td>
-      <td class="right ${valClass}" style="font-weight:750">${(t.type==="receita"?"+":"-")} ${fmtBRL(t.amount)}</td>
-      <td class="right"><button class="btn small danger" data-del="${t.id}" type="button">Excluir</button></td>`;
-    tb.appendChild(tr);
-  });
-}
-$("filterMonth").addEventListener("input", ()=>{ renderTransacoes(); renderPainel(); renderRelatorios(); });
-$("filterType").addEventListener("input", renderTransacoes);
-
-/* Contas/Cartões */
-function renderContas(){
-  const accHost=$("accList"); const cardHost=$("cardList");
-  accHost.innerHTML=""; cardHost.innerHTML="";
-  accounts.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(a=>{
-    const div=document.createElement("div");
-    div.className="badge"; div.style.display="flex"; div.style.justifyContent="space-between"; div.style.gap="10px";
-    div.innerHTML=`<span>${escapeHtml(a.name)} <span class="badge" style="margin-left:8px">${a.kind==="beneficio"?"benefício":"conta"}</span></span>
-      <button class="btn small danger" data-del-acc="${a.id}" type="button">Remover</button>`;
-    accHost.appendChild(div);
-  });
-  cards.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{
-    const div=document.createElement("div");
-    div.className="badge"; div.style.display="flex"; div.style.justifyContent="space-between"; div.style.gap="10px";
-    div.innerHTML=`<span>${escapeHtml(c.name)} <span class="badge" style="margin-left:8px">fech ${c.closeDay}</span> <span class="badge">pgto ${c.payDay}</span></span>
-      <button class="btn small danger" data-del-card="${c.id}" type="button">Remover</button>`;
-    cardHost.appendChild(div);
-  });
-}
-$("btnAddAcc").addEventListener("click", ()=>{
-  const name=($("accName").value||"").trim();
-  const kind=$("accKind").value;
-  if(!name){ toast("Digite o nome"); return; }
-  if(accounts.some(a=>norm(a.name)===norm(name))){ toast("Já existe"); return; }
-  accounts.unshift({id:uid(),name:cap(name),kind});
-  $("accName").value="";
-  persist("add_acc");
-  toast("Conta salva");
-  renderContas();
-});
-$("btnAddCard").addEventListener("click", ()=>{
-  const name=($("cardName").value||"").trim();
-  const closeDay=Number(($("cardClose").value||"").trim());
-  const payDay=Number(($("cardPay").value||"").trim());
-  if(!name){ toast("Digite o nome"); return; }
-  if(!Number.isFinite(closeDay)||closeDay<1||closeDay>31){ toast("Fechamento inválido"); return; }
-  if(!Number.isFinite(payDay)||payDay<1||payDay>31){ toast("Pagamento inválido"); return; }
-  if(cards.some(c=>norm(c.name)===norm(name))){ toast("Já existe"); return; }
-  cards.unshift({id:uid(),name:cap(name),closeDay:Math.round(closeDay),payDay:Math.round(payDay)});
-  $("cardName").value=""; $("cardClose").value=""; $("cardPay").value="";
-  persist("add_card");
-  toast("Cartão salvo");
-  renderContas();
-});
-document.addEventListener("click", (e)=>{
-  const a=e.target.closest("[data-del-acc]");
-  if(a){ const id=a.getAttribute("data-del-acc"); const it=accounts.find(x=>x.id===id); if(it && confirm(`Remover "${it.name}"?`)){ accounts=accounts.filter(x=>x.id!==id); persist("del_acc"); renderContas(); toast("Removido"); } return; }
-  const c=e.target.closest("[data-del-card]");
-  if(c){ const id=c.getAttribute("data-del-card"); const it=cards.find(x=>x.id===id); if(it && confirm(`Remover cartão "${it.name}"?`)){ cards=cards.filter(x=>x.id!==id); persist("del_card"); renderContas(); toast("Removido"); } return; }
-});
-
-/* Config */
-function renderConfig(){
-  $("cfgCatsOut").value = cfg.expenseCats || "";
-  $("cfgCatsIn").value = cfg.incomeCats || "";
-}
-$("btnSaveCfg").addEventListener("click", ()=>{
-  cfg.expenseCats = ($("cfgCatsOut").value||"").trim();
-  cfg.incomeCats = ($("cfgCatsIn").value||"").trim();
-  persist("cfg");
-  toast("Configurações salvas");
-  renderPainel();
-  renderRelatorios();
-});
-
-/* Backup + clear */
-$("btnExportBackup").addEventListener("click", ()=>{
-  const payload = safeParse(localStorage.getItem(KEY.LAST) || "null", null) || {tx,accounts,cards,cfg,backedUpAt:new Date().toISOString(),reason:"manual",build:BUILD};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a"); a.href=url; a.download=`financeplay_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1200);
-  toast("Backup baixado");
-});
-$("inputRestore").addEventListener("change", async (e)=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  try{
-    const txt=await f.text();
-    const p=JSON.parse(txt);
-    if(!p || !p.tx || !p.accounts || !p.cards) throw new Error("Formato inválido");
-    tx=p.tx; accounts=p.accounts; cards=p.cards; cfg=p.cfg||cfg;
-    persist("restore");
-    toast("Backup restaurado ✅");
-    renderAll();
-  }catch(_){ toast("Falha ao restaurar"); }
-  finally{ e.target.value=""; }
-});
-$("btnApagarTx").addEventListener("click", ()=>{
-  if(!confirm("Apagar TODOS os lançamentos?")) return;
-  tx=[]; persist("clear_tx"); toast("Lançamentos apagados"); renderAll();
-});
-
-function renderAllLight(){
-  renderPainel();
-  renderRelatorios();
-  if($("view-transacoes").classList.contains("active")) renderTransacoes();
-}
-function renderAll(){
-  renderPainel(); renderTransacoes(); renderContas(); renderRelatorios(); renderConfig();
-}
-function init(){
-  $("filterMonth").value = monthKey(todayISO());
-  greeting();
-  renderAll();
-  setStatus("Pronto");
-}
-init();
+/* boot */
+renderAll();
+autoBackup("boot"); // salva um backup inicial também
 </script>
 </body>
 </html>
