@@ -10,10 +10,11 @@
             --bg: #121212;
             --card: #1e1e1e;
             --text: #e0e0e0;
-            --primary: #00e676; /* Verde Receita */
-            --secondary: #ff5252; /* Vermelho Despesa */
-            --accent: #2979ff; /* Azul Saldo */
-            --warning: #ffb74d; /* Laranja Parcelas */
+            --primary: #00e676; 
+            --secondary: #ff5252;
+            --accent: #2979ff; 
+            --warning: #ffb74d; 
+            --recurring: #ba68c8; /* Roxo para recorrentes */
         }
 
         body {
@@ -27,7 +28,6 @@
             overflow: hidden;
         }
 
-        /* Topo Navegação */
         header {
             padding: 15px 20px;
             display: flex;
@@ -35,29 +35,11 @@
             align-items: center;
             background: var(--card);
             border-bottom: 1px solid #333;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        .month-selector {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-weight: bold;
-        }
+        .month-selector { display: flex; align-items: center; gap: 15px; font-weight: bold; }
+        .btn-nav { background: #333; border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 
-        .btn-nav {
-            background: #333;
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .btn-nav:hover { background: #444; }
-
-        /* Área de Mensagens */
         #chat-container {
             flex: 1;
             overflow-y: auto;
@@ -68,7 +50,6 @@
             padding-bottom: 100px;
         }
 
-        /* Estilo do Card Detalhado */
         .card-mov {
             background: var(--card);
             border-radius: 15px;
@@ -76,7 +57,6 @@
             position: relative;
             width: 90%;
             max-width: 400px;
-            align-self: flex-start;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border-left: 6px solid var(--accent);
             animation: slideIn 0.3s ease-out;
@@ -85,6 +65,7 @@
         .card-mov.receita { border-left-color: var(--primary); }
         .card-mov.despesa { border-left-color: var(--secondary); }
         .card-mov.parcelado { border-left-color: var(--warning); }
+        .card-mov.recorrente { border-left-color: var(--recurring); }
 
         .timer-bar {
             position: absolute;
@@ -93,7 +74,6 @@
             background: var(--accent);
             width: 100%;
             border-radius: 15px 15px 0 0;
-            transition: width 0.1s linear;
         }
 
         .card-header {
@@ -103,18 +83,11 @@
             font-size: 0.85rem;
             color: #aaa;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .card-body p { margin: 5px 0; font-size: 1rem; }
-        .val-destaque { font-size: 1.2rem; font-weight: bold; color: #fff; }
+        .val-destaque { font-size: 1.3rem; font-weight: bold; color: #fff; margin: 10px 0; }
 
-        .actions {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
+        .actions { margin-top: 15px; display: flex; gap: 10px; }
         .btn-action {
             flex: 1;
             padding: 10px;
@@ -122,138 +95,74 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
-
         .btn-edit { background: #333; color: white; }
-        .btn-del { background: rgba(255, 82, 82, 0.2); color: var(--secondary); }
+        .btn-del { background: rgba(255, 82, 82, 0.15); color: var(--secondary); }
+        .btn-recorrente { background: rgba(186, 104, 200, 0.2); color: var(--recurring); border: 1px solid var(--recurring); }
 
-        /* Input fixo na base */
-        .input-wrapper {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(transparent, var(--bg) 30%);
-            box-sizing: border-box;
-        }
+        .input-wrapper { position: fixed; bottom: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, var(--bg) 40%); box-sizing: border-box; }
+        .input-area { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #252525; padding: 8px 15px; border-radius: 30px; border: 1px solid #333; }
+        input { flex: 1; padding: 10px; border: none; background: transparent; color: white; outline: none; }
+        .btn-send { background: var(--primary); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; }
 
-        .input-area {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            gap: 10px;
-            background: #252525;
-            padding: 8px 15px;
-            border-radius: 30px;
-            align-items: center;
-            border: 1px solid #333;
-        }
-
-        input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: white;
-            outline: none;
-            font-size: 1rem;
-        }
-
-        .btn-send {
-            background: var(--primary);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            color: #000;
-            font-weight: bold;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } }
     </style>
 </head>
 <body>
 
 <header>
     <div class="month-selector">
-        <button class="btn-nav" onclick="alert('Mês Anterior')">❮</button>
-        <span id="current-month">MARÇO 2026</span>
-        <button class="btn-nav" onclick="alert('Próximo Mês')">❯</button>
+        <button class="btn-nav">❮</button>
+        <span>MARÇO 2026</span>
+        <button class="btn-nav">❯</button>
     </div>
-    <div id="main-balance" style="color: var(--primary); font-size: 1.1rem; font-weight: bold;">R$ 5.200,00</div>
+    <div style="color: var(--primary); font-weight: bold;">R$ 5.200,00</div>
 </header>
 
 <div id="chat-container">
     <div class="card-mov" style="border-left-color: #555;">
-        <p>👋 <strong>Olá! Como posso ajudar?</strong></p>
-        <p style="font-size: 0.9rem; color: #aaa;">Diga algo como: "Gastei 150 no mercado no nubank" ou "Comprei celular de 2000 em 10x no Inter".</p>
+        <p>👋 <strong>Dica de hoje:</strong></p>
+        <p style="font-size: 0.9rem; color: #aaa;">Para contas fixas, diga: "Paguei internet 100 reais <b>todo mês</b>". Eu já agendo para os próximos meses!</p>
     </div>
 </div>
 
 <div class="input-wrapper">
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Fale sua movimentação..." onkeypress="handleEnter(event)">
+        <input type="text" id="user-input" placeholder="Fale sua movimentação..." onkeypress="if(event.key==='Enter') processInput()">
         <button class="btn-send" onclick="processInput()">➔</button>
     </div>
 </div>
 
 <script>
-    function handleEnter(e) { if(e.key === 'Enter') processInput(); }
-
     function processInput() {
         const input = document.getElementById('user-input');
-        const text = input.value.trim();
-        if(!text) return;
-
-        createCard(text);
+        if(!input.value.trim()) return;
+        createCard(input.value.trim());
         input.value = '';
     }
 
     function createCard(text) {
         const container = document.getElementById('chat-container');
         const cardId = 'card-' + Date.now();
-        
-        // --- INTELIGÊNCIA DE EXTRAÇÃO ---
         const textoLimpo = text.toLowerCase();
         
-        // 1. Valor
+        // Extração de dados
         const valorMatch = text.match(/(\d+[\d,.]*)/);
         let valorTotal = valorMatch ? parseFloat(valorMatch[0].replace(',', '.')) : 0;
-        
-        // 2. Parcelas
         const parcelasMatch = textoLimpo.match(/(\d+)\s*(x|vezes)/);
         const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
-        const valorParcela = (valorTotal / numParcelas).toFixed(2);
         
-        // 3. Conta
-        let conta = "Carteira";
-        if(textoLimpo.includes("inter")) conta = "Banco Inter";
-        if(textoLimpo.includes("nubank")) conta = "Nubank";
-        if(textoLimpo.includes("itau") || textoLimpo.includes("itaú")) conta = "Itaú";
-
-        // 4. Categoria
+        // Lógica de Recorrência
+        const ehRecorrente = textoLimpo.includes("todo mês") || textoLimpo.includes("mensal") || textoLimpo.includes("fixa");
+        
+        let conta = textoLimpo.includes("inter") ? "Banco Inter" : (textoLimpo.includes("nubank") ? "Nubank" : "Carteira");
         let categoria = "Geral";
-        if(textoLimpo.includes("uber") || textoLimpo.includes("gasolina")) categoria = "Transporte";
-        if(textoLimpo.includes("comida") || textoLimpo.includes("almoço") || textoLimpo.includes("mercado")) categoria = "Alimentação";
-        if(textoLimpo.includes("tv") || textoLimpo.includes("celular") || textoLimpo.includes("geladeira")) categoria = "Eletrônicos";
-
-        // 5. Tipo (Receita ou Despesa)
-        let tipo = "despesa";
-        if(textoLimpo.includes("recebi") || textoLimpo.includes("ganhei") || textoLimpo.includes("salário")) tipo = "receita";
-        if(numParcelas > 1) tipo = "parcelado";
+        if(textoLimpo.includes("internet") || textoLimpo.includes("net")) categoria = "Contas Fixas";
+        if(textoLimpo.includes("aluguel")) categoria = "Moradia";
+        if(textoLimpo.includes("academia")) categoria = "Saúde";
 
         const card = document.createElement('div');
-        card.className = `card-mov ${tipo}`;
+        card.className = `card-mov ${ehRecorrente ? 'recorrente' : (numParcelas > 1 ? 'parcelado' : 'despesa')}`;
         card.id = cardId;
         
         card.innerHTML = `
@@ -263,55 +172,43 @@
                 <span>💳 ${conta}</span>
             </div>
             <div class="card-body">
-                <p class="val-destaque">R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                ${numParcelas > 1 ? `<p>🔹 Parcelado em <strong>${numParcelas}x de R$ ${valorParcela.replace('.', ',')}</strong></p>` : `<p>🔹 Pagamento à vista</p>`}
+                <div class="val-destaque">R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                ${ehRecorrente ? `<p style="color: var(--recurring)">🔄 <b>Conta Recorrente:</b> Lançada para todos os meses.</p>` : 
+                  (numParcelas > 1 ? `<p>🔹 ${numParcelas}x de R$ ${(valorTotal/numParcelas).toFixed(2).replace('.',',')}</p>` : `<p>🔹 Pagamento à vista</p>`)}
+                
                 <p style="font-size: 0.8rem; color: #888;">📅 Registro: ${new Date().toLocaleDateString('pt-BR')}</p>
             </div>
             <div class="actions" id="actions-${cardId}">
-                <button class="btn-action btn-edit" onclick="editCard('${cardId}')">✏️ Editar</button>
-                <button class="btn-action btn-del" onclick="deleteCard('${cardId}')">🗑️ Excluir</button>
+                ${(!ehRecorrente && categoria === "Geral") ? `<button class="btn-action btn-recorrente" onclick="setRecorrente('${cardId}')">Tornar Fixo? 🔄</button>` : ''}
+                <button class="btn-action btn-edit" onclick="document.getElementById('${cardId}').remove()">✏️ Editar</button>
+                <button class="btn-action btn-del" onclick="document.getElementById('${cardId}').remove()">🗑️ Excluir</button>
             </div>
         `;
         
         container.appendChild(card);
         container.scrollTop = container.scrollHeight;
 
-        // --- LÓGICA DO TIMER DE 8 SEGUNDOS ---
         let timeLeft = 100;
         const bar = document.getElementById(`bar-${cardId}`);
         const interval = setInterval(() => {
-            timeLeft -= 1.25; // 100 / (8s * 10) aproximadamente
+            timeLeft -= 1.25;
             bar.style.width = timeLeft + '%';
-            
             if (timeLeft <= 0) {
                 clearInterval(interval);
-                finalizeCard(cardId);
+                bar.style.display = 'none';
+                document.getElementById(`actions-${cardId}`).innerHTML = "<span style='color: var(--primary); font-size: 0.85rem;'>✅ Confirmado</span>";
             }
         }, 100);
-
         card.dataset.interval = interval;
     }
 
-    function finalizeCard(id) {
-        const bar = document.getElementById(`bar-${id}`);
-        const actions = document.getElementById(`actions-${id}`);
-        if(bar) bar.style.display = 'none';
-        if(actions) actions.innerHTML = "<span style='color: var(--primary); font-size: 0.85rem;'>✅ Confirmado e salvo no saldo</span>";
-    }
-
-    function deleteCard(id) {
+    function setRecorrente(id) {
         const card = document.getElementById(id);
-        clearInterval(card.dataset.interval);
-        card.style.transform = "scale(0.8)";
-        card.style.opacity = "0";
-        setTimeout(() => card.remove(), 300);
-    }
-
-    function editCard(id) {
-        alert("Função de edição abriria um formulário com os dados do card " + id);
-        deleteCard(id); // Para simular que o usuário vai digitar de novo
+        clearInterval(card.dataset.interval); // Para o timer para o usuário ver a mudança
+        card.className = "card-mov recorrente";
+        card.querySelector('.card-body').innerHTML += `<p style="color: var(--recurring)">🔄 Alterado para recorrente!</p>`;
+        document.getElementById(`actions-${id}`).innerHTML = "<span style='color: var(--primary); font-size: 0.85rem;'>✅ Salvo como Conta Fixa</span>";
     }
 </script>
-
 </body>
 </html>
