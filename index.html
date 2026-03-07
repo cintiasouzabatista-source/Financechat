@@ -7,23 +7,95 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; color: #1a1a1a; margin: 0; padding-bottom: 50px; }
-        .input-finance { background-color: #f4f4f4; border: none; border-radius: 1.2rem; padding: 1.2rem; width: 100%; outline: none; }
-        .card-revisao { background: white; border-radius: 2.5rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); padding: 2.5rem; border: 1px solid #f0f0f0; max-width: 600px; margin: 1rem auto; position: relative; overflow: hidden; }
-        .btn-cat { background: #f4f4f4; border-radius: 2rem; padding: 0.6rem 1.2rem; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: all 0.2s; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; }
-        .btn-cat:hover { border-color: #1d3b91; color: #1d3b91; background: white; }
-        .movimentacao-card { background: white; border-radius: 1.5rem; padding: 1.5rem; border: 1px solid #f8f8f8; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-        .progress-bar { height: 6px; background-color: #1d3b91; width: 100%; position: absolute; bottom: 0; left: 0; transition: width 8s linear; }
-        .modal-overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #fcfcfc; 
+            color: #1a1a1a; 
+            margin: 0; 
+            padding-bottom: 40px;
+        }
+
+        /* Estilo dos Inputs */
+        .input-finance { 
+            background-color: #f4f4f4; 
+            border: none; 
+            border-radius: 1.2rem; 
+            padding: 1.2rem; 
+            width: 100%; 
+            outline: none; 
+            font-weight: 600;
+        }
+
+        /* Cards Arredondados estilo Premium */
+        .card-revisao { 
+            background: white; 
+            border-radius: 2.5rem; 
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); 
+            padding: 2.5rem; 
+            border: 1px solid #f0f0f0; 
+            max-width: 600px; 
+            margin: 1rem auto; 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        /* Botões de Categoria */
+        .btn-cat { 
+            background: #f4f4f4; 
+            border-radius: 2rem; 
+            padding: 0.6rem 1.2rem; 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            transition: all 0.2s; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            border: 1px solid transparent;
+        }
+
+        .btn-cat:hover { 
+            border-color: #1d3b91; 
+            color: #1d3b91; 
+            background: white; 
+        }
+
+        /* Barra de Progresso de 8 Segundos */
+        .progress-bar { 
+            height: 6px; 
+            background-color: #1d3b91; 
+            width: 100%; 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            transition: width 8s linear; 
+        }
+
+        .movimentacao-card { 
+            background: white; 
+            border-radius: 1.5rem; 
+            padding: 1.2rem 1.5rem; 
+            border: 1px solid #f8f8f8; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 0.75rem; 
+        }
+
+        .modal-overlay { 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(5px); 
+        }
     </style>
 </head>
 <body class="p-6">
 
-    <header class="max-w-3xl mx-auto flex justify-between items-center mb-8">
+    <header class="max-w-3xl mx-auto flex justify-between items-center mb-10">
         <h1 class="font-bold text-2xl tracking-tighter uppercase">Finance</h1>
         <div class="text-right">
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Balanço do Mês</p>
-            <p id="saldo-topo" class="text-red-500 font-bold text-2xl leading-none">R$ 0,00</p>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Saldo Atual</p>
+            <p id="saldo-topo" class="text-red-500 font-bold text-2xl">R$ 0,00</p>
         </div>
     </header>
 
@@ -31,95 +103,104 @@
         
         <div class="flex flex-wrap gap-3 mb-8">
             <button onclick="comandoRapido('Uber 20')" class="btn-cat">🚗 Uber</button>
-            <button onclick="comandoRapido('iFood 50')" class="btn-cat">🍕 iFood</button>
-            <button onclick="comandoRapido('Mercado 150')" class="btn-cat">🛒 Mercado</button>
-            <button onclick="comandoRapido('Internet 99')" class="btn-cat">🌐 Internet</button>
-            <button onclick="comandoRapido('Aluguel 1200')" class="btn-cat">🏠 Aluguel</button>
+            <button onclick="comandoRapido('iFood 55')" class="btn-cat">🍕 iFood</button>
+            <button onclick="comandoRapido('Mercado 200')" class="btn-cat">🛒 Mercado</button>
+            <button onclick="comandoRapido('Internet 100')" class="btn-cat">🌐 Internet</button>
+            <button onclick="comandoRapido('Aluguel 1500')" class="btn-cat">🏠 Aluguel</button>
         </div>
 
         <div id="container-entrada" class="mb-10">
-            <input type="text" id="chat-input" class="input-finance shadow-sm text-lg" placeholder="Ex: paguei pix 300 mercado">
+            <p class="text-[10px] font-bold text-gray-300 uppercase mb-3 ml-2 tracking-widest">O que você gastou agora?</p>
+            <input type="text" id="chat-input" class="input-finance shadow-sm text-lg" placeholder="Ex: paguei 300 pix mercado">
         </div>
 
         <div id="card-revisao" class="hidden card-revisao animate-in fade-in zoom-in duration-300">
             <div class="flex justify-between items-center mb-8">
                 <div class="flex flex-col">
                     <h3 class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">Revisar Lançamento</h3>
-                    <p id="timer-status" class="text-[10px] text-blue-600 font-bold uppercase mt-1">Efetivando em 8s...</p>
+                    <p id="timer-status" class="text-[10px] text-blue-600 font-bold uppercase mt-1">Processando em 8s...</p>
                 </div>
-                <span id="label-parcelas" class="text-gray-400 text-[11px] font-bold uppercase">1X DE R$ 0,00</span>
+                <span id="label-parcelas" class="text-gray-400 text-[11px] font-bold uppercase tracking-tighter">1X DE R$ 0,00</span>
             </div>
             
             <div class="space-y-6">
                 <input id="rev-desc" type="text" class="input-finance font-bold uppercase text-xl" onfocus="pausarParaEditar()">
+                
                 <div class="flex gap-4">
                     <div class="flex-1">
                         <label class="text-[10px] font-bold text-gray-300 uppercase ml-1">Valor</label>
-                        <input id="rev-valor" type="text" class="input-finance font-bold text-blue-900 text-lg" onfocus="pausarParaEditar()">
+                        <input id="rev-valor" type="text" class="input-finance font-bold text-blue-900 text-lg" onfocus="pausarParaEditar()" oninput="recalcularLabel()">
                     </div>
                     <div class="w-24">
                         <label class="text-[10px] font-bold text-gray-300 uppercase ml-1 text-center block">Parc.</label>
-                        <input id="rev-parcelas" type="text" class="input-finance text-center font-bold text-lg" onfocus="pausarParaEditar()">
+                        <input id="rev-parcelas" type="text" class="input-finance text-center font-bold text-lg" onfocus="pausarParaEditar()" oninput="recalcularLabel()">
                     </div>
                 </div>
+
                 <div class="flex gap-4">
                     <div class="flex-1">
                         <label class="text-[10px] font-bold text-gray-300 uppercase ml-1">Categoria</label>
                         <input id="rev-cat" type="text" class="input-finance font-bold uppercase text-sm" readonly>
                     </div>
                     <div id="box-fixa" class="flex-1 hidden">
-                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Conta Fixa?</label>
+                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">É Conta Fixa?</label>
                         <select id="rev-fixa" class="input-finance font-bold text-sm text-blue-600 border border-blue-100 appearance-none" onchange="pausarParaEditar()">
                             <option value="nao">NÃO</option>
                             <option value="sim">LANÇAR 12 MESES</option>
                         </select>
                     </div>
                 </div>
+
                 <div class="flex justify-between gap-6 py-4 border-t border-gray-50 mt-6">
-                    <button onclick="excluirCard()" class="text-red-500 font-bold text-[11px] uppercase tracking-widest hover:underline">Excluir</button>
-                    <button onclick="salvarImediato()" class="bg-[#1a1a1a] text-white px-8 py-4 rounded-2xl text-[11px] font-bold uppercase shadow-lg">Confirmar Agora</button>
+                    <button onclick="excluirCard()" class="text-red-500 font-bold text-[11px] uppercase tracking-widest hover:underline">Cancelar</button>
+                    <button onclick="salvarImediato()" class="bg-[#1a1a1a] text-white px-8 py-4 rounded-2xl text-[11px] font-bold uppercase shadow-lg hover:bg-black transition-all">Confirmar Agora</button>
                 </div>
             </div>
             <div id="progress-bar" class="progress-bar"></div>
         </div>
 
-        <section id="secao-saldos" class="mt-12">
+        <section id="secao-saldos" class="mt-16">
             <div class="flex items-center justify-between mb-8 bg-white p-5 rounded-[2rem] shadow-sm border border-gray-50">
-                <button onclick="navegarMes(-1)" class="p-2 text-gray-300 hover:text-black">❮</button>
+                <button onclick="navegarMes(-1)" class="p-2 text-gray-300">❮</button>
                 <span id="label-mes" class="font-bold text-xs uppercase tracking-[0.2em] text-[#1d3b91]">Março 2026</span>
-                <button onclick="navegarMes(1)" class="p-2 text-gray-300 hover:text-black">❯</button>
+                <button onclick="navegarMes(1)" class="p-2 text-gray-300">❯</button>
             </div>
 
-            <div class="bg-white p-8 rounded-[3rem] border border-gray-50 shadow-sm mb-10">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-10 text-center">Distribuição de Gastos</h3>
-                <div id="container-grafico" class="space-y-8"></div>
+            <div class="bg-white p-10 rounded-[3rem] border border-gray-50 shadow-sm mb-12">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] mb-10 text-center">Gasto por Categoria (%)</h3>
+                <div id="container-grafico" class="space-y-8">
+                    </div>
             </div>
 
-            <h2 class="font-bold text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-6">Movimentações Recentes</h2>
-            <div id="lista-movimentacoes" class="space-y-4"></div>
+            <h2 class="font-bold text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-6 ml-2">Histórico Recente</h2>
+            <div id="lista-movimentacoes" class="space-y-4">
+                </div>
         </section>
     </main>
 
     <div id="modal-lote" class="hidden fixed inset-0 modal-overlay z-50 flex items-center justify-center p-6">
-        <div class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl">
+        <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl animate-in zoom-in duration-300">
             <h4 class="font-bold text-sm uppercase mb-4 text-center">Conta Recorrente</h4>
-            <p class="text-xs text-gray-500 text-center mb-8">Deseja excluir apenas esta parcela ou todas as 12 parcelas futuras?</p>
+            <p class="text-[11px] text-gray-400 text-center leading-relaxed mb-8">Esta conta foi marcada como fixa. Deseja excluir apenas este mês ou todas as parcelas futuras?</p>
             <div class="space-y-3">
                 <button onclick="confirmarExclusaoLote('unica')" class="w-full py-4 bg-[#f4f4f4] rounded-2xl text-[10px] font-bold uppercase">Apenas esta</button>
-                <button onclick="confirmarExclusaoLote('todas')" class="w-full py-4 bg-[#1d3b91] text-white rounded-2xl text-[10px] font-bold uppercase shadow-lg">Todas as parcelas</button>
-                <button onclick="fecharModalLote()" class="w-full py-2 text-[9px] font-bold text-gray-300 uppercase">Cancelar</button>
+                <button onclick="confirmarExclusaoLote('todas')" class="w-full py-4 bg-[#1d3b91] text-white rounded-2xl text-[10px] font-bold uppercase shadow-lg shadow-blue-100">Excluir todas (12m)</button>
+                <button onclick="fecharModalLote()" class="w-full py-2 text-[9px] font-bold text-gray-300 uppercase mt-2">Voltar</button>
             </div>
         </div>
     </div>
 
     <script>
-        let transacoes = JSON.parse(localStorage.getItem('transacoes')) || [];
+        let transacoes = JSON.parse(localStorage.getItem('finance_data')) || [];
         let autoSaveTimer = null;
-        const categoriasFixas = ['ALUGUEL', 'INTERNET', 'CONDOMINIO', 'ACADEMIA'];
+        const categoriasFixas = ['ALUGUEL', 'INTERNET', 'CONDOMINIO', 'ACADEMIA', 'ASSINATURA'];
 
         window.onload = () => { renderizarTudo(); };
 
-        function comandoRapido(texto) { processar(texto); document.getElementById('container-entrada').classList.add('hidden'); }
+        function comandoRapido(texto) { 
+            processar(texto); 
+            document.getElementById('container-entrada').classList.add('hidden'); 
+        }
 
         document.getElementById('chat-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value) {
@@ -139,6 +220,8 @@
             document.getElementById('rev-valor').value = valor.toFixed(2).replace('.', ',');
             document.getElementById('rev-parcelas').value = 1;
             document.getElementById('rev-cat').value = desc;
+            
+            // Ativa box fixa se estiver na lista de fixas
             document.getElementById('box-fixa').classList.toggle('hidden', !categoriasFixas.includes(desc));
 
             recalcularLabel();
@@ -150,7 +233,10 @@
             const bar = document.getElementById('progress-bar');
             clearTimeout(autoSaveTimer);
             bar.style.transition = 'none'; bar.style.width = '100%';
-            setTimeout(() => { bar.style.transition = 'width 8s linear'; bar.style.width = '0%'; }, 50);
+            setTimeout(() => { 
+                bar.style.transition = 'width 8s linear'; 
+                bar.style.width = '0%'; 
+            }, 50);
             autoSaveTimer = setTimeout(salvarImediato, 8000);
         }
 
@@ -171,8 +257,8 @@
                 data: new Date().toISOString()
             };
             transacoes.push(novaTransacao);
-            localStorage.setItem('transacoes', JSON.stringify(transacoes));
-            fechar();
+            localStorage.setItem('finance_data', JSON.stringify(transacoes));
+            fecharCard();
             renderizarTudo();
         }
 
@@ -187,11 +273,17 @@
                 saldo -= t.valor;
                 totalGasto += t.valor;
                 cats[t.cat] = (cats[t.cat] || 0) + t.valor;
+                
                 lista.innerHTML += `
-                    <div class="movimentacao-card">
-                        <div><p class="font-bold text-xs uppercase">${t.desc} ${t.fixa ? '🔄' : ''}</p><p class="text-[10px] text-gray-300 font-bold uppercase">Hoje</p></div>
-                        <div class="text-right"><p class="font-bold text-red-500 text-sm">- R$ ${t.valor.toFixed(2).replace('.', ',')}</p>
-                        <button onclick="abrirExclusao(${t.id}, ${t.fixa})" class="text-[9px] text-gray-200 font-bold uppercase">Excluir</button></div>
+                    <div class="movimentacao-card animate-in slide-in-from-right duration-500">
+                        <div>
+                            <p class="font-bold text-xs uppercase tracking-tight">${t.desc} ${t.fixa ? '🔄' : ''}</p>
+                            <p class="text-[10px] text-gray-300 font-bold uppercase">Hoje</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-red-500 text-sm">- R$ ${t.valor.toFixed(2).replace('.', ',')}</p>
+                            <button onclick="abrirExclusao(${t.id}, ${t.fixa})" class="text-[9px] text-gray-200 font-bold uppercase hover:text-red-400">Excluir</button>
+                        </div>
                     </div>`;
             });
 
@@ -203,8 +295,9 @@
             for(let c in cats) {
                 const percRelativo = (cats[c]/max)*100;
                 const percAbsoluto = totalGasto > 0 ? ((cats[c]/totalGasto)*100).toFixed(1) : 0;
-                graf.innerHTML += `<div class="space-y-2">
-                    <div class="flex justify-between text-[10px] font-bold uppercase tracking-tighter">
+                graf.innerHTML += `
+                <div class="space-y-2">
+                    <div class="flex justify-between text-[10px] font-bold uppercase">
                         <span>${c} <span class="text-gray-300 ml-2">${percAbsoluto}%</span></span>
                         <span class="text-[#1d3b91]">R$ ${cats[c].toFixed(2).replace('.', ',')}</span>
                     </div>
@@ -219,23 +312,34 @@
         function abrirExclusao(id, fixa) {
             itemParaExcluir = id;
             if(fixa) document.getElementById('modal-lote').classList.remove('hidden');
-            else { if(confirm("Excluir?")) confirmarExclusaoLote('unica'); }
+            else { if(confirm("Deseja excluir este lançamento?")) confirmarExclusaoLote('unica'); }
         }
 
         function confirmarExclusaoLote(tipo) {
             transacoes = transacoes.filter(t => t.id !== itemParaExcluir);
-            localStorage.setItem('transacoes', JSON.stringify(transacoes));
+            localStorage.setItem('finance_data', JSON.stringify(transacoes));
             fecharModalLote(); renderizarTudo();
         }
 
         function fecharModalLote() { document.getElementById('modal-lote').classList.add('hidden'); }
-        function fechar() { document.getElementById('card-revisao').classList.add('hidden'); document.getElementById('container-entrada').classList.remove('hidden'); document.getElementById('progress-bar').style.display = 'block'; }
-        function excluirCard() { clearTimeout(autoSaveTimer); fechar(); }
+        
+        function fecharCard() { 
+            document.getElementById('card-revisao').classList.add('hidden'); 
+            document.getElementById('container-entrada').classList.remove('hidden'); 
+            document.getElementById('progress-bar').style.display = 'block'; 
+            document.getElementById('timer-status').innerText = "Efetivando em 8s...";
+            document.getElementById('timer-status').className = "text-[10px] text-blue-600 font-bold uppercase mt-1";
+        }
+
+        function excluirCard() { clearTimeout(autoSaveTimer); fecharCard(); }
+
         function recalcularLabel() { 
             const v = parseFloat(document.getElementById('rev-valor').value.replace(',', '.')) || 0;
             const p = parseInt(document.getElementById('rev-parcelas').value) || 1;
             document.getElementById('label-parcelas').innerText = `${p}X DE R$ ${(v/p).toFixed(2).replace('.', ',')}`;
         }
+
+        function navegarMes(delta) { alert("Navegando entre meses... (Funcionalidade de Banco de Dados necessária para filtros reais)"); }
     </script>
 </body>
 </html>
