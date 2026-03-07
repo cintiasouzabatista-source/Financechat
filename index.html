@@ -53,8 +53,6 @@
     padding:10px 12px;border-radius:14px;font-size:12px;display:none;z-index:999;max-width:92vw;text-align:center}
   details{border:1px solid var(--line);border-radius:18px;padding:10px;background:#fff}
   summary{cursor:pointer;font-weight:800}
-  .pos{color:#065f46}
-  .neg{color:#9f1239}
 </style>
 </head>
 <body>
@@ -85,7 +83,6 @@
     <div class="kpi">
       <div class="h">Saldo Total</div>
       <div class="v" id="saldoTotal">R$ 0,00</div>
-      <div class="l" style="grid-column:1 / -1;margin-top:-2px" id="insight">—</div>
 
       <div class="l">Contas + Dinheiro</div>
       <div class="l" style="text-align:right" id="saldoContas">R$ 0,00</div>
@@ -227,14 +224,7 @@
         <button class="btn-secondary" id="btnShowBackups" type="button">Ver backups</button>
       </div>
       <div id="backupList" class="list" style="margin-top:10px"></div>
-      
       <div class="sep"></div>
-      <div class="small" style="margin:6px 0 8px">🔐 PIN (4 números) para Restaurar/Apagar</div>
-      <div class="row">
-        <input id="pinNew" inputmode="numeric" placeholder="Definir novo PIN (4 dígitos)" />
-        <button class="btn-secondary" id="btnSetPin" type="button">Definir/Alterar PIN</button>
-      </div>
-
       <div class="small" style="margin:6px 0 8px">Importar arquivo JSON (manual):</div>
       <input id="fileImport" type="file" accept="application/json" />
       <div class="row" style="margin-top:10px">
@@ -293,7 +283,6 @@ function dayOfMonthKey(key, day){
 const KEY="finance_v4_state";
 const BACKUP_KEY="finance_v4_backups_v1";
 const BACKUP_MAX=15;
-const PIN_HASH_KEY="finance_v4_pin_hash";
 
 const DEFAULT_STATE={
   metaReserva:10000,
@@ -373,66 +362,6 @@ function formatDT(ts){
     const mi = String(d.getMinutes()).padStart(2,"0");
     return `${dd}/${mm}/${yy} ${hh}:${mi}`;
   }catch(_){ return ""; }
-
-/* ===== PIN (4 dígitos) =====
-   - Protege ações sensíveis (Restaurar/Apagar/Zerar)
-   - PIN é guardado como hash (SHA-256) no aparelho
-*/
-async function sha256(txt){
-  const enc = new TextEncoder().encode(txt);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-function isValidPin(pin){
-  return /^\d{4}$/.test(String(pin||"").trim());
-}
-async function getPinHash(pin){ return await sha256(String(pin)); }
-function hasPin(){ return !!localStorage.getItem(PIN_HASH_KEY); }
-
-async function setPinFlow(){
-  const pin = String($("pinNew")?.value || "").trim();
-  if(!isValidPin(pin)){
-    toast("PIN deve ter 4 números.");
-    return false;
-  }
-  const hash = await getPinHash(pin);
-  localStorage.setItem(PIN_HASH_KEY, hash);
-  $("pinNew").value = "";
-  toast("PIN definido ✅");
-  return true;
-}
-
-async function requirePin(){
-  // se não existir, pede para definir
-  if(!hasPin()){
-    const p1 = prompt("Defina um PIN de 4 números (para proteger Restaurar/Apagar):");
-    if(p1 === null) return false;
-    if(!isValidPin(p1)){ toast("PIN inválido."); return false; }
-    const p2 = prompt("Confirme o PIN:");
-    if(p2 === null) return false;
-    if(String(p2).trim() !== String(p1).trim()){ toast("PIN não confere."); return false; }
-    localStorage.setItem(PIN_HASH_KEY, await getPinHash(p1.trim()));
-    toast("PIN definido ✅");
-    return true;
-  }
-
-  const pin = prompt("Digite seu PIN (4 números):");
-  if(pin === null) return false;
-  if(!isValidPin(pin)){ toast("PIN inválido."); return false; }
-  const hash = await getPinHash(pin.trim());
-  const stored = localStorage.getItem(PIN_HASH_KEY);
-  if(hash !== stored){
-    toast("PIN incorreto.");
-    return false;
-  }
-  return true;
-}
-
-async function withPin(fn){
-  const ok = await requirePin();
-  if(!ok) return;
-  await fn();
-}
 }
 
 let state=loadState();
@@ -694,7 +623,7 @@ function computeTotals(){
   const futuras = sum.nubank.future + sum.mp.future;
 
   // Saldo Total: contas - fatura atual + benefícios + reserva
-  const total=contas - cartoesAtual; // saldo real (sem benefícios e sem reserva)
+  const total=contas - cartoesAtual + benef + reserva;
   return {contas, cartoesAtual, futuras, benef, reserva, total};
 }
 function renderKPIs(){
@@ -705,18 +634,6 @@ function renderKPIs(){
   $("saldoBenef").textContent=brl(benef);
   $("saldoReserva").textContent=brl(reserva);
   $("saldoTotal").textContent=brl(total);
-
-  const st = $("saldoTotal");
-  st.classList.remove("pos","neg");
-  st.classList.add(total >= 0 ? "pos" : "neg");
-
-  const insight = $("insight");
-  if(total >= 0){
-    insight.textContent = "✅ Você está no positivo. Boa!";
-  }else{
-    const need = Math.abs(total);
-    insight.textContent = `⚠️ Atenção: faltam ${brl(need)} para cobrir a fatura atual.`;
-  }
 
   const meta=Number(state.metaReserva)||10000;
   const pct=meta>0?Math.max(0,Math.min(1,reserva/meta)):0;
@@ -922,8 +839,8 @@ document.addEventListener("visibilitychange", ()=>{
 });
 
 /* Backup UI */
-$("btnRestoreLast").addEventListener("click", ()=>withPin(()=>restoreLastBackup()));
-$("btnRestoreLast2").addEventListener("click", ()=>withPin(()=>restoreLastBackup()));
+$("btnRestoreLast").addEventListener("click", restoreLastBackup);
+$("btnRestoreLast2").addEventListener("click", restoreLastBackup);
 
 $("btnShowBackups").addEventListener("click", ()=>{
   const box = $("backupList");
@@ -945,21 +862,19 @@ $("btnShowBackups").addEventListener("click", ()=>{
     `;
     div.addEventListener("click", ()=>{
       if(confirm("Restaurar este backup? Isso substitui seus dados atuais no aparelho.")){
-        withPin(()=>restoreSnapshot(snap));
+        restoreSnapshot(snap);
       }
     });
     box.appendChild(div);
   }
 });
 
-$("btnClearBackups").addEventListener("click", ()=>withPin(async ()=>{
+$("btnClearBackups").addEventListener("click", ()=>{
   if(!confirm("Apagar todos os backups automáticos?")) return;
   localStorage.removeItem(BACKUP_KEY);
   $("backupList").innerHTML = "";
   toast("Backups apagados.");
-}));
-
-$("btnSetPin").addEventListener("click", async ()=>{ await setPinFlow(); });
+});
 
 $("btnImportFile").addEventListener("click", async ()=>{
   const f = $("fileImport").files && $("fileImport").files[0];
