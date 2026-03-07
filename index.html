@@ -28,7 +28,6 @@
         .val-saldo { color: var(--primary); }
         .val-fatura { color: var(--warning); }
 
-        /* Estilo do Seletor de Meses */
         .month-nav { display: flex; align-items: center; gap: 10px; background: #252525; padding: 5px 12px; border-radius: 8px; border: 1px solid #444; }
         .btn-month { background: none; border: none; color: white; cursor: pointer; font-weight: bold; padding: 5px; }
 
@@ -48,6 +47,7 @@
         .card-nome { font-size: 1.2rem; font-weight: bold; color: #fff; display: block; }
         .card-cat { font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; display: block; }
         .card-valor { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
+        .card-data { font-size: 0.75rem; color: #888; margin-bottom: 10px; font-weight: 500; }
         .card-parcela-info { background: rgba(255, 183, 77, 0.1); color: var(--warning); padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; }
 
         #input-wrapper { position: fixed; bottom: 80px; width: 100%; padding: 0 20px; box-sizing: border-box; }
@@ -85,7 +85,7 @@
     <div id="chat-messages"></div>
     <div id="input-wrapper">
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Ex: TV 2000 3x" onkeypress="if(event.key==='Enter') processInput()">
+            <input type="text" id="user-input" placeholder="Ex: internet 100" onkeypress="if(event.key==='Enter') processInput()">
             <button onclick="processInput()" style="background:var(--primary); border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">➔</button>
         </div>
     </div>
@@ -103,13 +103,16 @@
 </nav>
 
 <script>
-    // Banco de Dados fictício para armazenar as transações
     let transacoes = [];
     let saldoBase = 5200;
     let meses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-    let mesAtualIndex = 4; // Começa em Maio
+    let mesAtualIndex = 4; // Maio
 
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
     function changeMonth(delta) {
         mesAtualIndex = (mesAtualIndex + delta + 12) % 12;
@@ -121,11 +124,9 @@
         document.getElementById('display-month').innerText = `${nomeMes} 2026`;
         document.getElementById('label-mes-fatura').innerText = nomeMes;
 
-        // Calcular Fatura do Mês Selecionado
         let totalFaturaMes = 0;
         transacoes.forEach(t => {
-            if (t.parcelas > 1) {
-                // Verifica se o mês selecionado está dentro do range das parcelas
+            if (t.parcelas > 1 && t.confirmada) {
                 let mesFinal = t.mesInicio + t.parcelas - 1;
                 if (mesAtualIndex >= t.mesInicio && mesAtualIndex <= mesFinal) {
                     totalFaturaMes += (t.valor / t.parcelas);
@@ -135,8 +136,6 @@
 
         document.getElementById('header-total').innerText = format(saldoBase);
         document.getElementById('header-fatura').innerText = format(totalFaturaMes);
-        
-        // Filtrar cards do chat pelo mês (opcional, para visualização rápida)
         renderizarCards();
     }
 
@@ -151,21 +150,28 @@
         const numParcelas = parcelasMatch ? parseInt(parcelasMatch[1]) : 1;
         
         let tipo = text.toLowerCase().includes('recebi') ? 'receita' : 'despesa';
-        let nome = text.replace(valorMatch ? valorMatch[0] : '', '').replace(/\d+\s*(x|vezes)/gi, '').replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
+        
+        // Extração do nome com Capitalização Automática
+        let nomeRaw = text.replace(valorMatch ? valorMatch[0] : '', '')
+                          .replace(/\d+\s*(x|vezes)/gi, '')
+                          .replace(/(paguei|recebi|gastei|no|na)/gi, '').trim();
+        
+        let nomeFinal = nomeRaw ? capitalizeFirstLetter(nomeRaw) : "Lançamento";
 
         const novaTransacao = {
             id: Date.now(),
-            nome: nome || "Lançamento",
+            nome: nomeFinal,
             valor: valorTotal,
             tipo: tipo,
             parcelas: numParcelas,
             mesInicio: mesAtualIndex,
+            dataRegistro: new Date().toLocaleDateString('pt-BR'), // Data importante para relatórios
             confirmada: false,
             categoria: text.toLowerCase().includes("tv") ? "ELETRÔNICOS" : "GERAL"
         };
 
         transacoes.push(novaTransacao);
-        renderizarCards();
+        updateUI();
         input.value = '';
     }
 
@@ -176,25 +182,26 @@
         transacoes.forEach(t => {
             const card = document.createElement('div');
             card.className = `card-mov ${t.parcelas > 1 ? 'parcelado' : t.tipo}`;
-            
-            const valorExibido = t.parcelas > 1 ? (t.valor / t.parcelas) : t.valor;
-            const statusLabel = t.confirmada ? "✅ Registro Processado" : "⏳ Aguardando Confirmação";
+            const valorParcela = t.valor / t.parcelas;
 
             card.innerHTML = `
                 <div class="card-tipo">${t.tipo === 'receita' ? '💰 Receita' : '🛒 Despesa'}</div>
                 <span class="card-nome">${t.nome}</span>
                 <span class="card-cat">📂 ${t.categoria}</span>
                 <div class="card-valor">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                <div class="card-data">📅 Registro: ${t.dataRegistro}</div>
                 
                 ${t.parcelas > 1 ? `
                     <div class="card-parcela-info">
-                        💳 Parcela neste mês: R$ ${valorExibido.toLocaleString('pt-BR', {minimumFractionDigits: 2})} 
-                        (${t.parcelas}x)
+                        💳 Parcela: R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2})} (${t.parcelas}x)
                     </div>
                 ` : ''}
 
-                <div style="margin-top:15px; display:flex; gap:10px;">
-                    ${!t.confirmada ? `<button onclick="confirmar(${t.id})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; flex:1;">Confirmar</button>` : `<span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">${statusLabel}</span>`}
+                <div style="margin-top:15px;">
+                    ${!t.confirmada ? 
+                        `<button onclick="confirmar(${t.id})" style="background:var(--primary); border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; width:100%;">Confirmar</button>` : 
+                        `<span style="color:var(--primary); font-size:0.85rem; font-weight:bold;">✅ Confirmado e Salvo</span>`
+                    }
                 </div>
             `;
             container.appendChild(card);
@@ -205,14 +212,13 @@
     function confirmar(id) {
         let t = transacoes.find(x => x.id === id);
         if(!t || t.confirmada) return;
-
         t.confirmada = true;
+
         if(t.tipo === 'receita') {
             saldoBase += t.valor;
         } else if (t.parcelas === 1) {
             saldoBase -= t.valor;
         }
-        // Se for parcelado, a lógica de somar na fatura já está no updateUI()
         updateUI();
     }
 
@@ -221,6 +227,7 @@
         document.getElementById('view-' + viewId).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        document.getElementById('input-wrapper').style.display = (viewId === 'chat') ? 'block' : 'none';
     }
 
     updateUI();
