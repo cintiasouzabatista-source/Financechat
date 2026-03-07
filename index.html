@@ -457,32 +457,6 @@ body.dark .msg.me{
   }
 }
 
-
-.contaCell{
-display:flex;
-align-items:center;
-gap:8px;
-font-weight:500;
-}
-.bankIcon{
-font-size:18px;
-}
-.actionIcons{
-display:flex;
-gap:6px;
-justify-content:flex-end;
-}
-.iconBtn{
-border:none;
-background:transparent;
-cursor:pointer;
-font-size:16px;
-}
-.deleteConta{
-color:#ef4444;
-font-weight:bold;
-}
-
 </style>
 </head>
 
@@ -554,7 +528,7 @@ font-weight:bold;
             <div class="chatBox" id="chatBox"></div>
 
             <div class="chatComposer">
-              <input id="chatInput" placeholder='Ex: "300 roupa nubank 3x" | "parcelado roupa 200 3x" | "300 roupa em 3 parcelas"' />
+              <input id="chatInput" placeholder='Ex: "300 roupa nubank 3x" | "300 roupa parcelado 3" | "300 roupa em 3 parcelas"' />
               <button class="btn" id="btnSend">Enviar</button>
             </div>
 <div class="divider"></div>
@@ -612,11 +586,7 @@ font-weight:bold;
       <section id="tab-transacoes" class="hidden">
         <div class="panelbox">
           <div class="row">
-            <div><label for="mesRef">Mês</label><div class="monthNav"><button id="prevMonth">◀</button><<div class="monthNav">
-  <button id="prevMonth" class="monthArrow">◀</button>
-  <input id="mesRef" type="month" />
-  <button id="nextMonth" class="monthArrow">▶</button>
-</div>><button id="nextMonth">▶</button></div></div>
+            <div><label for="mesRef">Mês</label><input id="mesRef" type="month" /></div>
             <div><label for="filtroMeio">Filtro (meio)</label>
               <select id="filtroMeio">
                 <option value="">Todos</option>
@@ -651,12 +621,6 @@ font-weight:bold;
           <div class="row">
             <div><label for="novaConta">Nome</label><input id="novaConta" placeholder="Ex: Mercado Pago, Nubank..." /></div>
             <div><label for="apelidoConta">Apelidos (vírgula)</label><input id="apelidoConta" placeholder="Ex: mp, mercadopago, roxinho" /></div>
-<div><label for="saldoConta">Saldo inicial</label><input id="saldoConta" placeholder="Ex: 1200" /></div>
-<div style="display:flex;align-items:end">
-<label style="display:flex;gap:6px;align-items:center">
-<input type="checkbox" id="contaPadrao">Conta padrão
-</label>
-</div>
           </div>
           <button class="btn" id="btnAddConta" type="button" style="margin-top:10px">Adicionar conta</button>
           <div class="divider"></div>
@@ -679,7 +643,29 @@ font-weight:bold;
         </div>
       </section>
 
-   
+      <!-- BENEFÍCIOS -->
+      <section id="tab-beneficios" class="hidden">
+        <div class="panelbox">
+          <div class="title">Benefícios (menu separado)</div>
+          <div class="row">
+            <div><label>Ativar Benefícios</label>
+              <select id="benAtivo"><option value="sim">Sim</option><option value="nao">Não</option></select>
+            </div>
+            <div><label>&nbsp;</label><button class="btn" id="btnSalvarBen" type="button">Salvar</button></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div><label for="novoBen">Nome do benefício</label><input id="novoBen" placeholder="Ex: VR, VA, Combustível" /></div>
+            <div><label for="apelidoBen">Apelidos (vírgula)</label><input id="apelidoBen" placeholder="Ex: vale refeição, vale alimentação" /></div>
+          </div>
+          <button class="btn" id="btnAddBen" type="button" style="margin-top:10px">Adicionar benefício</button>
+          <div class="divider"></div>
+          <div style="overflow:auto"><table><thead><tr><th>Benefício</th><th>Apelidos</th><th></th></tr></thead><tbody id="tbodyBen"></tbody></table></div>
+        </div>
+      </section>
+
       <!-- RELATÓRIOS -->
       <section id="tab-relatorios" class="hidden">
         <div class="panelbox">
@@ -903,6 +889,7 @@ function setTab(t){
     t==="painel" ? "Painel" :
     t==="transacoes" ? "Transações" :
     t==="contas" ? "Contas e Cartões" :
+    t==="beneficios" ? "Benefícios" :
     t==="relatorios" ? "Relatórios" : "Configurações";
   closeDrawer();
   if(t==="relatorios") renderCharts();
@@ -1080,35 +1067,16 @@ function extractValue(text){
   if(!m) return null;
   return parseBR(m[1]);
 }
-
 function guessCategory(text, bucket){
-const t = normalize(text);
-
-const map = {
-Mercado:["mercado","supermercado","padaria","feira","hortifruti","acougue","açougue"],
-Transporte:["uber","99","taxi","gasolina","etanol","combustivel","combustível","posto","onibus","ônibus","metro","metrô","estacionamento"],
-Moradia:["aluguel","condominio","condomínio","iptu","manutencao","manutenção"],
-Contas:["energia","luz","agua","água","internet","telefone","celular","vivo","tim","claro","enel","sabesp"],
-Saúde:["farmacia","farmácia","remedio","remédio","medico","médico","dentista","consulta","exame"],
-Educação:["escola","faculdade","curso","mensalidade","material escolar"],
-Lazer:["cinema","bar","restaurante","viagem","hotel","passeio"],
-Assinaturas:["netflix","spotify","amazon","prime","disney","hbo","globoplay","youtube premium","icloud","google one"],
-Pets:["petshop","ração","racao","veterinario","veterinário"],
-Presentes:["presente","aniversario","aniversário","flor","flores"]
-};
-
-for(const cat in map){
- if(map[cat].some(w=>t.includes(w))) return cat;
+  const list = (data.categorias?.[bucket] || []);
+  const t = normalize(text);
+  for(const c of list){ if(t.includes(normalize(c))) return c; }
+  if(isWordIn(text, ["mercado","supermercado","padaria","feira"])) return "Mercado";
+  if(isWordIn(text, ["energia","luz","agua","água","internet","telefone"])) return "Contas";
+  if(isWordIn(text, ["uber","99","onibus","ônibus","metro","metrô","gasolina","etanol","combustivel","combustível"])) return "Transporte";
+  if(bucket==="Receita" && isWordIn(text, ["salario","salário","pagamento"])) return "Salário";
+  return "Outros";
 }
-
-if(bucket==="Receita"){
- if(t.includes("salario")||t.includes("salário")) return "Salário";
- if(t.includes("reembolso")) return "Reembolso";
-}
-
-return "Outros";
-}
-
 function shouldAskFixedBill(text){
   return isWordIn(text, ["energia","luz","agua","água","internet","aluguel","condominio","condomínio","ipva","seguro","escola","mensalidade"]);
 }
@@ -1225,10 +1193,7 @@ function saveDraft(){
     list.push(draft.categoria);
     data.categorias[bucket] = list;
   }
-  if(shouldAskFixedBill(draft.categoria || "")){
-  botSay("Essa parece ser uma conta fixa. Deseja lançar para os próximos meses?");
-}
-const created = createTxFromDraft(draft);
+  const created = createTxFromDraft(draft);
   tx.push(...created);
   persist("lancamento_chat");
   botSummary(draft, created.map(x => x.id));
@@ -1256,8 +1221,6 @@ function handleChatReply(msg){
   }
 
   if(!draft.ref){
-const contaPadrao = (data.contas||[]).find(c=>c.padrao);
-if(contaPadrao){ draft.ref = contaPadrao.name; }
     if(draft.meio==="Cartão"){
       const c = findByAlias(data.cartoes||[], msg) || findByAlias(data.contas||[], msg);
       if(c){ draft.ref = c; draft.cicloFatura = computeBillCycle(draft.ref, draft.data); }
@@ -1379,7 +1342,7 @@ function renderTxTable(){
       const valClass = (t.tipo==="Receita") ? "pos" : "neg";
       const ref = t.ref || "—";
       const extra = (t.meio==="Cartão" && t.totalParcelas) ? ` (${t.parcela}/${t.totalParcelas})` : "";
-      tr.innerHTML = `<td>${t.data}</td><td>${t.tipo}</td><td>${t.meio}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="actionBtns"><button class="btn secondary" style="width:auto" data-edit-tx="${t.id}" title="Editar">✏️</button><button class="btn danger" style="width:auto" data-del="${t.id}" title="Excluir">🗑</button></div></td>`;
+      tr.innerHTML = `<td>${t.data}</td><td>${t.tipo}</td><td>${t.meio}</td><td>${escapeHtml(ref)}${escapeHtml(extra)}</td><td>${escapeHtml(t.categoria||"Outros")}</td><td class="${valClass}">${brl(t.valor)}</td><td><div class="actionBtns"><button class="btn secondary" style="width:auto" data-edit-tx="${t.id}">Editar</button><button class="btn danger" style="width:auto" data-del="${t.id}">Excluir</button></div></td>`;
       tbody.appendChild(tr);
     }
   }
@@ -1429,29 +1392,6 @@ document.addEventListener("click", (e)=>{
   $(id).addEventListener("input", ()=>{ renderTxTable(); renderPainel(); });
 });
 
-
-/* Month navigation */
-const prevBtn = document.getElementById("prevMonth");
-const nextBtn = document.getElementById("nextMonth");
-if(prevBtn && nextBtn){
-prevBtn.onclick = ()=>{
-  const v = document.getElementById("mesRef").value || monthNow();
-  let [y,m] = v.split("-").map(Number);
-  m--;
-  if(m===0){m=12;y--}
-  document.getElementById("mesRef").value = `${y}-${String(m).padStart(2,"0")}`;
-  renderTxTable();
-};
-nextBtn.onclick = ()=>{
-  const v = document.getElementById("mesRef").value || monthNow();
-  let [y,m] = v.split("-").map(Number);
-  m++;
-  if(m===13){m=1;y++}
-  document.getElementById("mesRef").value = `${y}-${String(m).padStart(2,"0")}`;
-  renderTxTable();
-};
-}
-
 /* Contas/cartões/benefícios */
 function renderContas(){
   const tb = $("tbodyContas"); tb.innerHTML="";
@@ -1459,7 +1399,7 @@ function renderContas(){
   for(let i=0;i<data.contas.length;i++){
     const c = data.contas[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td class="contaCell"><span class="bankIcon">${c.icon || "🏦"}</span>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><div class="actionIcons"><button class="iconBtn editConta">✏️</button><button class="iconBtn deleteConta" data-del-conta="${i}">✖</button></div></td>`;
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-conta="${i}">Remover</button></td>`;
     tb.appendChild(tr);
   }
   const tb2 = $("tbodyCartoes"); tb2.innerHTML="";
@@ -1467,7 +1407,7 @@ function renderContas(){
   for(let i=0;i<data.cartoes.length;i++){
     const c = data.cartoes[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td class="contaCell"><span class="bankIcon">${c.icon || "🏦"}</span>${escapeHtml(c.name)}</td><td>${escapeHtml(c.fechamento)}</td><td>${escapeHtml(c.pagamento)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
+    tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.fechamento)}</td><td>${escapeHtml(c.pagamento)}</td><td>${escapeHtml((c.aliases||[]).join(", "))}</td><td style="text-align:right"><button class="btn danger" style="width:auto" data-del-cartao="${i}">Remover</button></td>`;
     tb2.appendChild(tr);
   }
 }
@@ -1517,10 +1457,7 @@ $("btnAddConta").addEventListener("click", ()=>{
   if(!name){ toast("Digite o nome"); return; }
   data.contas = data.contas || [];
   if(data.contas.some(x=>normalize(x.name)===normalize(name))){ toast("Conta já existe"); return; }
-  const saldoInicial = parseFloat($("saldoConta").value) || 0;
-const padrao = $("contaPadrao").checked;
-if(padrao){ data.contas.forEach(c=>c.padrao=false); }
-data.contas.unshift({ name, aliases, saldoInicial, padrao, icon:"🏦" });
+  data.contas.unshift({ name, aliases });
   $("novaConta").value=""; $("apelidoConta").value="";
   persist("add_conta"); renderContas(); toast("Conta adicionada");
 });
@@ -1783,7 +1720,7 @@ document.addEventListener("click", (e)=>{
 /* Boot */
 function bootChat(){
   $("chatBox").innerHTML = "";
-  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-la(o)?`);
+  botSay(`${greeting()} ☺️\nSeja bem-vindo(a).\n\Como posso ajuda-lo:`);
   renderDueAlerts();
 }
 function renderAll(){
@@ -1861,5 +1798,3 @@ function renderAll(){
 
 </body>
 </html>
-
-
